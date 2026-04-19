@@ -6,9 +6,18 @@ async function loadSource() {
 
   if (!url) return;
 
-  try {
-    const response = await fetch(url);
-    const text = await response.text();
+  chrome.runtime.sendMessage({ type: 'FETCH_SOURCE', url: url }, (response) => {
+    if (chrome.runtime.lastError) {
+      loader.textContent = "Erreur : " + chrome.runtime.lastError.message;
+      return;
+    }
+    if (!response || !response.ok) {
+      loader.textContent = "Erreur : Impossible de charger la source. " + (response ? response.error : "Erreur inconnue");
+      console.error(response && response.error);
+      return;
+    }
+
+    const text = response.text;
     
     // Formatage du code HTML avec une indentation de 2 espaces
     const formattedText = typeof html_beautify !== 'undefined' 
@@ -21,10 +30,7 @@ async function loadSource() {
     // Application de la coloration
     Prism.highlightElement(codeBlock);
     loader.style.display = "none";
-  } catch (err) {
-    loader.textContent = "Erreur : Impossible de charger la source. Cela peut être dû aux restrictions CORS du site.";
-    console.error(err);
-  }
+  });
 }
 
 loadSource();
