@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Source Code Viewer</title>
+  <link id="theme-link" href="vendor/prism-tomorrow.min.css" rel="stylesheet" />
+  <style>
+    body { margin: 0; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', 'Monaco', monospace; display: flex; flex-direction: column; height: 100vh; }
+    .toolbar { padding: 10px; background: #333; display: flex; justify-content: flex-end; align-items: center; border-bottom: 1px solid #444; }
+    .toolbar select { padding: 5px; border-radius: 4px; background: #555; color: #fff; border: 1px solid #666; outline: none; }
+    .toolbar label { margin-right: 10px; font-size: 14px; }
+    #content { flex: 1; overflow: auto; background: inherit; }
+    #loader { padding: 20px; font-style: italic; }
+    pre { margin: 0; padding: 20px; tab-size: 4; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <label for="theme-selector">Thème :</label>
+    <select id="theme-selector">
+      <option value="prism-tomorrow.min.css">Tomorrow Night (Dark)</option>
+      <option value="prism-okaidia.min.css">Okaidia (Dark)</option>
+      <option value="prism.min.css">Default (Light)</option>
+      <option value="prism-coy.min.css">Coy (Light)</option>
+    </select>
+  </div>
+  <div id="content">
+    <div id="loader">Récupération du code source...</div>
+    <pre><code id="code-block" class="language-markup"></code></pre>
+  </div>
+
+  <script src="vendor/prism.min.js"></script>
+  <script src="vendor/prism-markup.min.js"></script>
+  <script src="vendor/beautify-html.min.js"></script>
+  <script src="viewer.js"></script>
+</body>
+</html>

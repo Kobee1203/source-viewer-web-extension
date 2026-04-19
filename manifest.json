@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Super Code Viewer",
+  "version": "1.0",
+  "description": "Affiche le code source avec coloration syntaxique.",
+  "permissions": ["activeTab", "tabs", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Voir le code source"
+  }
+}
