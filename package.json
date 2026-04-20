@@ -7,7 +7,7 @@
     "clean": "git clean -fXd -e \\!.idea -e \\!.idea/**/* -e \\!.vscode -e \\!.vscode/**/*",
     "build": "node build.js"
   },
-  "author": "",
+  "author": "Nicolas Dos Santos",
   "license": "ISC",
   "dependencies": {
     "js-beautify": "^1.15.4",

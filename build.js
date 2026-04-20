@@ -4,13 +4,15 @@ const AdmZip = require('adm-zip');
 
 const rootDir = __dirname;
 const distDir = path.join(rootDir, 'dist');
+const pkg = require('./package.json');
 
 // Create dist directory if it doesn't exist
 if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir);
 }
 
-console.log('Creating release.zip in dist/ ...');
+const zipFileName = `${pkg.name}-${pkg.version}.zip`;
+console.log(`Creating ${zipFileName} in dist/ ...`);
 const zip = new AdmZip();
 
 // Include everything from src/
@@ -48,14 +50,10 @@ for (const item of toIncludeRoot) {
       zip.addLocalFile(itemPath);
     }
   } else {
-    if (item === 'vendor') {
-      console.warn('WARNING: vendor folder not found! Please run `npm run postinstall` first.');
-    } else {
-      console.warn(`WARNING: Could not find ${item} in root directory`);
-    }
+    console.warn(`WARNING: Could not find ${item} in root directory`);
   }
 }
 
-const outputPath = path.join(distDir, 'release.zip');
+const outputPath = path.join(distDir, zipFileName);
 zip.writeZip(outputPath);
 console.log(`Successfully created ${outputPath}!`);
