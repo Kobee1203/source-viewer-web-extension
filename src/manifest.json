@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Super Code Viewer",
-  "version": "1.0",
-  "description": "Affiche le code source avec coloration syntaxique.",
+  "name": "Source Code Viewer",
+  "version": "1.0.0",
+  "description": "A browser extension to view formatted source code with syntax highlighting.",
   "permissions": ["activeTab", "tabs", "storage"],
   "host_permissions": [
     "<all_urls>"

@@ -1,0 +1,19 @@
+{
+  "name": "source-viewer-web-extension",
+  "version": "1.0.0",
+  "description": "A browser extension to view formatted source code with syntax highlighting.",
+  "scripts": {
+    "postinstall": "node copy-vendor.js",
+    "clean": "git clean -fXd -e \\!.idea -e \\!.idea/**/* -e \\!.vscode -e \\!.vscode/**/*",
+    "build": "node build.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "js-beautify": "^1.15.4",
+    "prismjs": "^1.30.0"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.5.17"
+  }
+}
