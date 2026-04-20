@@ -7,10 +7,11 @@
   "host_permissions": [
     "<all_urls>"
   ],
+  "default_locale": "en",
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Voir le code source"
+    "default_title": "__MSG_actionTitle__"
   }
 }
