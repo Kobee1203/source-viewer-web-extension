@@ -21,7 +21,9 @@ const filesToCopy = [
   { src: 'prismjs/themes/prism-okaidia.min.css', dest: 'prism-okaidia.min.css' },
   { src: 'prismjs/themes/prism-coy.min.css', dest: 'prism-coy.min.css' },
   // Beautify
-  { src: 'js-beautify/js/lib/beautify-html.js', dest: 'beautify-html.min.js' }
+  { src: 'js-beautify/js/lib/beautify-html.js', dest: 'beautify-html.min.js' },
+  // WebExtension Polyfill
+  { src: 'webextension-polyfill/dist/browser-polyfill.min.js', dest: 'browser-polyfill.min.js' }
 ];
 
 console.log('Copying vendor files from node_modules...');

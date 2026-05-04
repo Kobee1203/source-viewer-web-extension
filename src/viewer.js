@@ -6,11 +6,9 @@ async function loadSource() {
 
   if (!url) return;
 
-  chrome.runtime.sendMessage({ type: 'FETCH_SOURCE', url: url }, (response) => {
-    if (chrome.runtime.lastError) {
-      loader.textContent = "Erreur : " + chrome.runtime.lastError.message;
-      return;
-    }
+  try {
+    const response = await browser.runtime.sendMessage({ type: 'FETCH_SOURCE', url: url });
+    
     if (!response || !response.ok) {
       loader.textContent = "Erreur : Impossible de charger la source. " + (response ? response.error : "Erreur inconnue");
       console.error(response && response.error);
@@ -30,7 +28,10 @@ async function loadSource() {
     // Application de la coloration
     Prism.highlightElement(codeBlock);
     loader.style.display = "none";
-  });
+  } catch (err) {
+    loader.textContent = "Erreur : " + err.message;
+    console.error(err);
+  }
 }
 
 loadSource();
@@ -62,7 +63,7 @@ function applyBodyTheme(themeName) {
 }
 
 // Charger la préférence sauvegardée
-chrome.storage.local.get(["theme"], (result) => {
+browser.storage.local.get(["theme"]).then((result) => {
   if (result.theme) {
     themeSelector.value = result.theme;
     themeLink.href = "vendor/" + result.theme;
@@ -75,5 +76,5 @@ themeSelector.addEventListener("change", (e) => {
   const selectedTheme = e.target.value;
   themeLink.href = "vendor/" + selectedTheme;
   applyBodyTheme(selectedTheme);
-  chrome.storage.local.set({ theme: selectedTheme });
+  browser.storage.local.set({ theme: selectedTheme });
 });
