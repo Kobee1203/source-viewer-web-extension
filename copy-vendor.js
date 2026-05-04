@@ -24,6 +24,10 @@ const filesToCopy = [
   { src: 'prismjs/themes/prism-tomorrow.min.css', dest: 'prism-tomorrow.min.css' },
   { src: 'prismjs/themes/prism-okaidia.min.css', dest: 'prism-okaidia.min.css' },
   { src: 'prismjs/themes/prism-coy.min.css', dest: 'prism-coy.min.css' },
+  { src: 'prismjs/themes/prism-dark.min.css', dest: 'prism-dark.min.css' },
+  { src: 'prismjs/themes/prism-funky.min.css', dest: 'prism-funky.min.css' },
+  { src: 'prismjs/themes/prism-solarizedlight.min.css', dest: 'prism-solarizedlight.min.css' },
+  { src: 'prismjs/themes/prism-twilight.min.css', dest: 'prism-twilight.min.css' },
   // Beautify
   { src: 'js-beautify/js/lib/beautify-html.js', dest: 'beautify-html.min.js' },
   // WebExtension Polyfill

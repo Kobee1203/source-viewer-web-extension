@@ -58,7 +58,7 @@ const themeSelector = document.getElementById("theme-selector");
 const themeLink = document.getElementById("theme-link");
 
 function applyBodyTheme(themeName) {
-  if (themeName.includes("coy") || themeName === "prism.min.css") {
+  if (themeName.includes("coy") || themeName.includes("solarizedlight") || themeName === "prism.min.css") {
     document.body.style.background = "#f5f2f0";
     document.body.style.color = "#000";
     document.querySelector(".toolbar").style.background = "#ddd";
