@@ -23,10 +23,10 @@
   <div class="toolbar">
     <div class="toolbar-group left">
       <input type="checkbox" id="word-wrap-checkbox">
-      <label for="word-wrap-checkbox" style="margin-right: 0; cursor: pointer;">Retour à la ligne automatique</label>
+      <label for="word-wrap-checkbox" data-i18n="viewerWordWrap" style="margin-right: 0; cursor: pointer;">Line wrap</label>
     </div>
     <div class="toolbar-group">
-      <label for="theme-selector">Thème :</label>
+      <label for="theme-selector" data-i18n="viewerTheme">Theme:</label>
       <select id="theme-selector">
         <option value="prism.min.css">Default (Light)</option>
         <option value="prism-okaidia.min.css">Okaidia (Dark)</option>
@@ -36,7 +36,7 @@
     </div>
   </div>
   <div id="content">
-    <div id="loader">Récupération du code source...</div>
+    <div id="loader" data-i18n="viewerLoading">Fetching source code...</div>
     <pre><code id="code-block" class="language-markup line-numbers"></code></pre>
   </div>
 

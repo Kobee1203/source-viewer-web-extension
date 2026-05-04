@@ -2,5 +2,17 @@
   "actionTitle": {
     "message": "View page source code",
     "description": "Tooltip for the extension icon"
-  }
+  },
+  "viewerWordWrap": { "message": "Line wrap" },
+  "viewerTheme": { "message": "Theme:" },
+  "viewerLoading": { "message": "Fetching source code..." },
+  "errorLoadSource": {
+    "message": "Error: Unable to load source. $1",
+    "placeholders": { "1": { "content": "$1" } }
+  },
+  "errorGeneric": {
+    "message": "Error: $1",
+    "placeholders": { "1": { "content": "$1" } }
+  },
+  "errorUnknown": { "message": "Unknown error" }
 }

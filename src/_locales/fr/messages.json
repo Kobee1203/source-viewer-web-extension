@@ -2,5 +2,17 @@
   "actionTitle": {
     "message": "Voir le code source de la page",
     "description": "Infobulle pour l'icône de l'extension"
-  }
+  },
+  "viewerWordWrap": { "message": "Retour à la ligne automatique" },
+  "viewerTheme": { "message": "Thème :" },
+  "viewerLoading": { "message": "Récupération du code source..." },
+  "errorLoadSource": {
+    "message": "Erreur : Impossible de charger la source. $1",
+    "placeholders": { "1": { "content": "$1" } }
+  },
+  "errorGeneric": {
+    "message": "Erreur : $1",
+    "placeholders": { "1": { "content": "$1" } }
+  },
+  "errorUnknown": { "message": "Erreur inconnue" }
 }

@@ -1,3 +1,11 @@
+// Translate HTML elements
+document.querySelectorAll('[data-i18n]').forEach(elem => {
+  const message = browser.i18n.getMessage(elem.getAttribute('data-i18n'));
+  if (message) {
+    elem.textContent = message;
+  }
+});
+
 let currentFormattedText = "";
 
 const preElement = document.querySelector("pre");
@@ -21,7 +29,8 @@ async function loadSource() {
     const response = await browser.runtime.sendMessage({ type: 'FETCH_SOURCE', url: url });
     
     if (!response || !response.ok) {
-      loader.textContent = "Erreur : Impossible de charger la source. " + (response ? response.error : "Erreur inconnue");
+      const errorMsg = response ? response.error : browser.i18n.getMessage("errorUnknown");
+      loader.textContent = browser.i18n.getMessage("errorLoadSource", [errorMsg]);
       console.error(response && response.error);
       return;
     }
@@ -37,7 +46,7 @@ async function loadSource() {
 
     loader.style.display = "none";
   } catch (err) {
-    loader.textContent = "Erreur : " + err.message;
+    loader.textContent = browser.i18n.getMessage("errorGeneric", [err.message]);
     console.error(err);
   }
 }
