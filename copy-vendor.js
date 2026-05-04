@@ -17,6 +17,8 @@ const filesToCopy = [
   { src: 'prismjs/components/prism-markup.min.js', dest: 'prism-markup.min.js' },
   { src: 'prismjs/components/prism-css.min.js', dest: 'prism-css.min.js' },
   { src: 'prismjs/components/prism-javascript.min.js', dest: 'prism-javascript.min.js' },
+  { src: 'prismjs/plugins/line-numbers/prism-line-numbers.min.js', dest: 'prism-line-numbers.min.js' },
+  { src: 'prismjs/plugins/line-numbers/prism-line-numbers.min.css', dest: 'prism-line-numbers.min.css' },
   // PrismThemes
   { src: 'prismjs/themes/prism.min.css', dest: 'prism.min.css' },
   { src: 'prismjs/themes/prism-tomorrow.min.css', dest: 'prism-tomorrow.min.css' },

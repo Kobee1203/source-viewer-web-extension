@@ -3,36 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Source Code Viewer</title>
-  <link id="theme-link" href="vendor/prism-tomorrow.min.css" rel="stylesheet" />
+  <link id="theme-link" href="vendor/prism.min.css" rel="stylesheet" />
+  <link href="vendor/prism-line-numbers.min.css" rel="stylesheet" />
   <style>
     body { margin: 0; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', 'Monaco', monospace; display: flex; flex-direction: column; height: 100vh; }
     .toolbar { padding: 10px; background: #333; display: flex; justify-content: flex-end; align-items: center; border-bottom: 1px solid #444; }
+    .toolbar-group { display: flex; align-items: center; }
+    .toolbar-group.left { margin-right: auto; }
     .toolbar select { padding: 5px; border-radius: 4px; background: #555; color: #fff; border: 1px solid #666; outline: none; }
     .toolbar label { margin-right: 10px; font-size: 14px; }
+    .toolbar input[type="checkbox"] { margin-right: 5px; }
     #content { flex: 1; overflow: auto; background: inherit; }
     #loader { padding: 20px; font-style: italic; }
     pre { margin: 0; padding: 20px; tab-size: 4; }
+    pre.wrap-code, pre.wrap-code code { white-space: pre-wrap !important; word-break: break-word !important; }
   </style>
 </head>
 <body>
   <div class="toolbar">
-    <label for="theme-selector">Thème :</label>
-    <select id="theme-selector">
-      <option value="prism-tomorrow.min.css">Tomorrow Night (Dark)</option>
-      <option value="prism-okaidia.min.css">Okaidia (Dark)</option>
-      <option value="prism.min.css">Default (Light)</option>
-      <option value="prism-coy.min.css">Coy (Light)</option>
-    </select>
+    <div class="toolbar-group left">
+      <input type="checkbox" id="word-wrap-checkbox">
+      <label for="word-wrap-checkbox" style="margin-right: 0; cursor: pointer;">Retour à la ligne automatique</label>
+    </div>
+    <div class="toolbar-group">
+      <label for="theme-selector">Thème :</label>
+      <select id="theme-selector">
+        <option value="prism.min.css">Default (Light)</option>
+        <option value="prism-okaidia.min.css">Okaidia (Dark)</option>
+        <option value="prism-coy.min.css">Coy (Light)</option>
+        <option value="prism-tomorrow.min.css">Tomorrow Night (Dark)</option>
+      </select>
+    </div>
   </div>
   <div id="content">
     <div id="loader">Récupération du code source...</div>
-    <pre><code id="code-block" class="language-markup"></code></pre>
+    <pre><code id="code-block" class="language-markup line-numbers"></code></pre>
   </div>
 
   <script src="vendor/prism.min.js"></script>
   <script src="vendor/prism-markup.min.js"></script>
   <script src="vendor/prism-css.min.js"></script>
   <script src="vendor/prism-javascript.min.js"></script>
+  <script src="vendor/prism-line-numbers.min.js"></script>
   <script src="vendor/beautify-html.min.js"></script>
   <script src="vendor/browser-polyfill.min.js"></script>
   <script src="viewer.js"></script>

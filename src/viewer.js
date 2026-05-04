@@ -17,15 +17,15 @@ async function loadSource() {
 
     const text = response.text;
     
-    // Formatage du code HTML avec une indentation de 2 espaces
+    // Format HTML code with 2 spaces indentation
     const formattedText = typeof html_beautify !== 'undefined' 
       ? html_beautify(text, { indent_size: 2, preserve_newlines: true, max_preserve_newlines: 2 })
       : text;
 
-    // Protection contre l'injection HTML
+    // Protection against HTML injection
     codeBlock.textContent = formattedText;
     
-    // Application de la coloration
+    // Apply syntax highlighting
     Prism.highlightElement(codeBlock);
     loader.style.display = "none";
   } catch (err) {
@@ -36,7 +36,7 @@ async function loadSource() {
 
 loadSource();
 
-// Gestion des thèmes
+// Theme management
 const themeSelector = document.getElementById("theme-selector");
 const themeLink = document.getElementById("theme-link");
 
@@ -62,19 +62,40 @@ function applyBodyTheme(themeName) {
   }
 }
 
-// Charger la préférence sauvegardée
-browser.storage.local.get(["theme"]).then((result) => {
+// Handle word wrap
+const wrapCheckbox = document.getElementById("word-wrap-checkbox");
+const preElement = document.querySelector("pre");
+
+// Load saved preferences
+browser.storage.local.get(["theme", "wordWrap"]).then((result) => {
   if (result.theme) {
     themeSelector.value = result.theme;
     themeLink.href = "vendor/" + result.theme;
     applyBodyTheme(result.theme);
   }
+  if (result.wordWrap !== undefined) {
+    wrapCheckbox.checked = result.wordWrap;
+    if (result.wordWrap) {
+      preElement.classList.add("wrap-code");
+    }
+  }
 });
 
-// Gérer le changement
+// Handle theme change
 themeSelector.addEventListener("change", (e) => {
   const selectedTheme = e.target.value;
   themeLink.href = "vendor/" + selectedTheme;
   applyBodyTheme(selectedTheme);
   browser.storage.local.set({ theme: selectedTheme });
+});
+
+// Handle word wrap change
+wrapCheckbox.addEventListener("change", (e) => {
+  const isChecked = e.target.checked;
+  if (isChecked) {
+    preElement.classList.add("wrap-code");
+  } else {
+    preElement.classList.remove("wrap-code");
+  }
+  browser.storage.local.set({ wordWrap: isChecked });
 });
