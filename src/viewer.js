@@ -1,7 +1,18 @@
+let currentFormattedText = "";
+
+const preElement = document.querySelector("pre");
+const codeBlock = document.getElementById("code-block");
+
+function applyCodeAndHighlight() {
+  // Protection against HTML injection
+  codeBlock.textContent = currentFormattedText;
+  // Apply syntax highlighting
+  Prism.highlightElement(codeBlock);
+}
+
 async function loadSource() {
   const params = new URLSearchParams(window.location.search);
   const url = params.get("url");
-  const codeBlock = document.getElementById("code-block");
   const loader = document.getElementById("loader");
 
   if (!url) return;
@@ -18,15 +29,12 @@ async function loadSource() {
     const text = response.text;
     
     // Format HTML code with 2 spaces indentation
-    const formattedText = typeof html_beautify !== 'undefined' 
+    currentFormattedText = typeof html_beautify !== 'undefined' 
       ? html_beautify(text, { indent_size: 2, preserve_newlines: true, max_preserve_newlines: 2 })
       : text;
 
-    // Protection against HTML injection
-    codeBlock.textContent = formattedText;
-    
-    // Apply syntax highlighting
-    Prism.highlightElement(codeBlock);
+    applyCodeAndHighlight();
+
     loader.style.display = "none";
   } catch (err) {
     loader.textContent = "Erreur : " + err.message;
@@ -64,7 +72,6 @@ function applyBodyTheme(themeName) {
 
 // Handle word wrap
 const wrapCheckbox = document.getElementById("word-wrap-checkbox");
-const preElement = document.querySelector("pre");
 
 // Load saved preferences
 browser.storage.local.get(["theme", "wordWrap"]).then((result) => {
@@ -97,5 +104,8 @@ wrapCheckbox.addEventListener("change", (e) => {
   } else {
     preElement.classList.remove("wrap-code");
   }
+
+  applyCodeAndHighlight();
+
   browser.storage.local.set({ wordWrap: isChecked });
 });
