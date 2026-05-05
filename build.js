@@ -31,7 +31,10 @@ function createZip(targetBrowser) {
         if (targetBrowser === 'firefox') {
           manifestObj.browser_specific_settings = {
             gecko: {
-              id: "source-viewer@ndossantos.com"
+              id: "source-viewer@kobee1203.github.io",
+              data_collection_permissions: {
+                required: ["none"]
+              }
             }
           };
           // Firefox MV3 support for service workers is sometimes disabled or problematic. 
