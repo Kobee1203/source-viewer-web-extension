@@ -14,5 +14,14 @@
     "message": "Erreur : $1",
     "placeholders": { "1": { "content": "$1" } }
   },
-  "errorUnknown": { "message": "Erreur inconnue" }
+  "errorUnknown": { "message": "Erreur inconnue" },
+  "errorRestricted": {
+    "message": "Pour des raisons de sécurité, le navigateur ne permet pas aux extensions d'accéder à ce site. Veuillez utiliser la fonction native 'Code source de la page' du navigateur."
+  },
+  "viewerOpenNative": {
+    "message": "Ouvrir avec le visualiseur natif du navigateur"
+  },
+  "errorRestrictedApi": {
+    "message": "Le navigateur interdit aux extensions d'ouvrir ce type de page. Veuillez copier et coller l'URL suivante dans votre barre d'adresse :"
+  }
 }

@@ -1,5 +1,6 @@
 if (typeof importScripts !== 'undefined') {
   importScripts('vendor/browser-polyfill.min.js');
+  importScripts('utils.js');
 }
 
 browser.action.onClicked.addListener((tab) => {
@@ -10,6 +11,11 @@ browser.action.onClicked.addListener((tab) => {
   }
 
   if (url.startsWith("http")) {
+    // If it's a restricted domain, we open the native view-source instead of our viewer
+    if (isRestricted(url)) {
+      browser.tabs.create({ url: "view-source:" + url });
+      return;
+    }
     const viewerUrl = browser.runtime.getURL("viewer.html") + "?url=" + encodeURIComponent(url);
     browser.tabs.create({ url: viewerUrl });
   }
@@ -21,6 +27,10 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (!url.startsWith('view-source:')) return;
 
   const targetUrl = url.slice('view-source:'.length);
+  
+  // If the target URL is restricted, we let the browser handle it natively
+  if (isRestricted(targetUrl)) return;
+
   const viewerUrl = browser.runtime.getURL('viewer.html')
     + '?url=' + encodeURIComponent(targetUrl);
 

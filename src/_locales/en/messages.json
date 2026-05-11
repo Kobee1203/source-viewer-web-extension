@@ -14,5 +14,14 @@
     "message": "Error: $1",
     "placeholders": { "1": { "content": "$1" } }
   },
-  "errorUnknown": { "message": "Unknown error" }
+  "errorUnknown": { "message": "Unknown error" },
+  "errorRestricted": {
+    "message": "For security reasons, the browser does not allow extensions to access this site. Please use the browser's native 'View Page Source' instead."
+  },
+  "viewerOpenNative": {
+    "message": "Open in browser's native viewer"
+  },
+  "errorRestrictedApi": {
+    "message": "The browser prohibits extensions from opening this type of page. Please copy and paste the following URL into your address bar:"
+  }
 }

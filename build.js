@@ -42,6 +42,7 @@ function createZip(targetBrowser) {
           if (manifestObj.background && manifestObj.background.service_worker) {
             manifestObj.background.scripts = [
               "vendor/browser-polyfill.min.js",
+              "utils.js",
               manifestObj.background.service_worker
             ];
             delete manifestObj.background.service_worker;
