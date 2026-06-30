@@ -23,5 +23,8 @@
   },
   "errorRestrictedApi": {
     "message": "Le navigateur interdit aux extensions d'ouvrir ce type de page. Veuillez copier et coller l'URL suivante dans votre barre d'adresse :"
+  },
+  "viewerPageSize": {
+    "message": "Poids de la page : $1"
   }
 }

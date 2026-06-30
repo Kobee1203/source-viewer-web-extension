@@ -17,6 +17,7 @@
     #loader { padding: 20px; font-style: italic; }
     pre { margin: 0; padding: 20px; tab-size: 4; }
     pre.wrap-code, pre.wrap-code code { white-space: pre-wrap !important; word-break: break-word !important; }
+    .status-bar { padding: 6px 12px; background: #333; font-size: 12px; border-top: 1px solid #444; color: #d4d4d4; display: flex; justify-content: flex-end; align-items: center; user-select: none; }
   </style>
 </head>
 <body>
@@ -43,6 +44,7 @@
     <div id="loader" data-i18n="viewerLoading">Fetching source code...</div>
     <pre><code id="code-block" class="language-markup line-numbers"></code></pre>
   </div>
+  <div class="status-bar" id="status-bar" style="display: none;"></div>
 
   <script src="vendor/prism.min.js"></script>
   <script src="vendor/prism-markup.min.js"></script>

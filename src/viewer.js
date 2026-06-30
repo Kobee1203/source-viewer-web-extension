@@ -19,6 +19,23 @@ function applyCodeAndHighlight() {
   Prism.highlightElement(codeBlock);
 }
 
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const formattedVal = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
+  return `${formattedVal} ${sizes[i]}`;
+}
+
+function displayPageSize(bytes) {
+  const statusBar = document.getElementById("status-bar");
+  if (!statusBar) return;
+  const formattedSize = formatBytes(bytes);
+  statusBar.textContent = browser.i18n.getMessage("viewerPageSize", [formattedSize]);
+  statusBar.style.display = "flex";
+}
+
 async function loadSource() {
   const params = new URLSearchParams(window.location.search);
   const url = params.get("url");
@@ -85,6 +102,10 @@ async function loadSource() {
 
     const text = response.text;
     
+    // Compute and display page size
+    const byteSize = new Blob([text]).size;
+    displayPageSize(byteSize);
+    
     // Format HTML code with 2 spaces indentation
     currentFormattedText = typeof html_beautify !== 'undefined' 
       ? html_beautify(text, { indent_size: 2, preserve_newlines: true, max_preserve_newlines: 2 })
@@ -106,6 +127,7 @@ const themeSelector = document.getElementById("theme-selector");
 const themeLink = document.getElementById("theme-link");
 
 function applyBodyTheme(themeName) {
+  const statusBar = document.getElementById("status-bar");
   if (themeName.includes("coy") || themeName.includes("solarizedlight") || themeName === "prism.min.css") {
     document.body.style.background = "#f5f2f0";
     document.body.style.color = "#000";
@@ -115,6 +137,11 @@ function applyBodyTheme(themeName) {
     themeSelector.style.background = "#fff";
     themeSelector.style.color = "#000";
     themeSelector.style.border = "1px solid #aaa";
+    if (statusBar) {
+      statusBar.style.background = "#ddd";
+      statusBar.style.color = "#000";
+      statusBar.style.borderTop = "1px solid #ccc";
+    }
   } else {
     document.body.style.background = "#1e1e1e";
     document.body.style.color = "#d4d4d4";
@@ -124,6 +151,11 @@ function applyBodyTheme(themeName) {
     themeSelector.style.background = "#555";
     themeSelector.style.color = "#fff";
     themeSelector.style.border = "1px solid #666";
+    if (statusBar) {
+      statusBar.style.background = "#333";
+      statusBar.style.color = "#d4d4d4";
+      statusBar.style.borderTop = "1px solid #444";
+    }
   }
 }
 

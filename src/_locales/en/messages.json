@@ -23,5 +23,8 @@
   },
   "errorRestrictedApi": {
     "message": "The browser prohibits extensions from opening this type of page. Please copy and paste the following URL into your address bar:"
+  },
+  "viewerPageSize": {
+    "message": "Page weight: $1"
   }
 }
