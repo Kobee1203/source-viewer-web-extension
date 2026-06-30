@@ -30,6 +30,8 @@ const filesToCopy = [
   { src: 'prismjs/themes/prism-twilight.min.css', dest: 'prism-twilight.min.css' },
   // Beautify
   { src: 'js-beautify/js/lib/beautify-html.js', dest: 'beautify-html.min.js' },
+  { src: 'js-beautify/js/lib/beautify-css.js', dest: 'beautify-css.min.js' },
+  { src: 'js-beautify/js/lib/beautify.js', dest: 'beautify-js.min.js' },
   // WebExtension Polyfill
   { src: 'webextension-polyfill/dist/browser-polyfill.min.js', dest: 'browser-polyfill.min.js' }
 ];

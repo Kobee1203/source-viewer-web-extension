@@ -86,6 +86,22 @@ function displayPageSize(bytes) {
   statusBar.style.display = "flex";
 }
 
+function getFileType(url) {
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname.toLowerCase();
+    if (pathname.endsWith('.js') || pathname.endsWith('.mjs')) {
+      return 'javascript';
+    }
+    if (pathname.endsWith('.css')) {
+      return 'css';
+    }
+    return 'markup';
+  } catch (e) {
+    return 'markup';
+  }
+}
+
 async function loadSource() {
   const params = new URLSearchParams(window.location.search);
   const url = params.get("url");
@@ -156,10 +172,23 @@ async function loadSource() {
     const byteSize = new Blob([text]).size;
     displayPageSize(byteSize);
     
-    // Format HTML code with 2 spaces indentation
-    currentFormattedText = typeof html_beautify !== 'undefined' 
-      ? html_beautify(text, { indent_size: 2, preserve_newlines: true, max_preserve_newlines: 2 })
-      : text;
+    // Detect file type and format/highlight accordingly
+    const fileType = getFileType(url);
+    codeBlock.className = `language-${fileType} line-numbers`;
+    
+    if (fileType === 'javascript') {
+      currentFormattedText = typeof js_beautify !== 'undefined'
+        ? js_beautify(text, { indent_size: 2, preserve_newlines: true, max_preserve_newlines: 2 })
+        : text;
+    } else if (fileType === 'css') {
+      currentFormattedText = typeof css_beautify !== 'undefined'
+        ? css_beautify(text, { indent_size: 2, preserve_newlines: true, max_preserve_newlines: 2 })
+        : text;
+    } else {
+      currentFormattedText = typeof html_beautify !== 'undefined' 
+        ? html_beautify(text, { indent_size: 2, preserve_newlines: true, max_preserve_newlines: 2 })
+        : text;
+    }
 
     applyCodeAndHighlight();
 
