@@ -12,11 +12,61 @@ const preElement = document.querySelector("pre");
 const codeBlock = document.getElementById("code-block");
 
 
+function makeUrlsClickable() {
+  const attrValues = codeBlock.querySelectorAll('.token.attr-value');
+  const params = new URLSearchParams(window.location.search);
+  const baseUrl = params.get("url");
+  if (!baseUrl) return;
+
+  attrValues.forEach(elem => {
+    // Find the attribute name by checking previous siblings
+    let prev = elem.previousElementSibling;
+    if (!prev || !prev.classList.contains('attr-name')) {
+      let sib = elem.previousSibling;
+      while (sib) {
+        if (sib.nodeType === Node.ELEMENT_NODE && sib.classList.contains('attr-name')) {
+          prev = sib;
+          break;
+        }
+        sib = sib.previousSibling;
+      }
+    }
+
+    if (prev && (prev.textContent === 'href' || prev.textContent === 'src')) {
+      // Find the URL text node inside this attr-value span
+      elem.childNodes.forEach(child => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const rawUrl = child.textContent.trim();
+          // Filter out hash fragments, javascript/data URIs, and empty strings
+          if (rawUrl && !rawUrl.startsWith('#') && !rawUrl.startsWith('javascript:') && !rawUrl.startsWith('data:')) {
+            try {
+              const resolvedUrl = new URL(rawUrl, baseUrl).href;
+              const viewerUrl = browser.runtime.getURL("viewer.html") + "?url=" + encodeURIComponent(resolvedUrl);
+
+              const link = document.createElement('a');
+              link.className = 'source-link';
+              link.textContent = child.textContent; // preserve original spacing
+              link.href = viewerUrl;
+              link.target = '_blank';
+
+              child.replaceWith(link);
+            } catch (e) {
+              console.warn("Failed to resolve URL:", rawUrl, e);
+            }
+          }
+        }
+      });
+    }
+  });
+}
+
 function applyCodeAndHighlight() {
   // Protection against HTML injection
   codeBlock.textContent = currentFormattedText;
   // Apply syntax highlighting
   Prism.highlightElement(codeBlock);
+  // Make URLs clickable
+  makeUrlsClickable();
 }
 
 function formatBytes(bytes) {
