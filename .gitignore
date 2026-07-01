@@ -1,4 +1,11 @@
+# IDEs
+**/.idea
+**/.vscode/*
+!**/.vscode/extensions.json
+
+# System
+**/.DS_Store
+
 node_modules/
 vendor/
 dist/
-.DS_Store

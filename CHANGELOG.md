@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-06-30
+
+### Added
+- **Language-aware Formatting**: Source files are now detected by extension (`.js`/`.mjs`, `.css`) and formatted with the matching beautifier (`beautify-js`, `beautify-css`), falling back to HTML formatting for other content.
+- **Language-aware Syntax Highlighting**: The code block's PrismJS language class is set dynamically based on the detected file type (`javascript`, `css`, `markup`).
+- **Clickable URLs**: `href` and `src` attribute values in HTML source are now clickable links that open the target in the viewer, resolving relative URLs and skipping hash fragments, `javascript:`, and `data:` URIs.
+- **Page Size Status Bar**: A bottom status bar displays the page weight (formatted as B/KB/MB/GB), themed to match light and dark viewer backgrounds.
+
 ## [1.2.0] - 2026-05-13
 
 ### Added
