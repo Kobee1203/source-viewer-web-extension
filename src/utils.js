@@ -8,14 +8,15 @@ const RESTRICTED_DOMAINS = [
 
 /**
  * Checks if the URL belongs to a restricted domain where extensions cannot fetch content.
+ * 
+ * @param {URL} url URL
  */
 function isRestricted(url) {
   try {
-    const urlObj = new URL(url);
-    const hostname = urlObj.hostname;
+    const hostname = url.hostname;
     // Check for restricted domains or non-http protocols (like chrome:// or about:)
     return RESTRICTED_DOMAINS.some(domain => hostname === domain || hostname.endsWith('.' + domain)) ||
-           !['http:', 'https:'].includes(urlObj.protocol);
+           !['http:', 'https:'].includes(url.protocol);
   } catch (e) {
     return false;
   }

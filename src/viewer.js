@@ -40,7 +40,7 @@ function makeUrlsClickable() {
           // Filter out hash fragments, javascript/data URIs, and empty strings
           if (rawUrl && !rawUrl.startsWith('#') && !rawUrl.startsWith('javascript:') && !rawUrl.startsWith('data:')) {
             try {
-              const resolvedUrl = new URL(rawUrl, baseUrl).href;
+              const resolvedUrl = new URL(rawUrl, baseUrl).toString();
               const viewerUrl = browser.runtime.getURL("viewer.html") + "?url=" + encodeURIComponent(resolvedUrl);
 
               const link = document.createElement('a');
@@ -86,10 +86,15 @@ function displayPageSize(bytes) {
   statusBar.style.display = "flex";
 }
 
+/**
+ * Get the file type of the given URL.
+ * 
+ * @param {URL} url 
+ * @returns {String} File type (javascript, css, or markup)
+ */
 function getFileType(url) {
   try {
-    const urlObj = new URL(url);
-    const pathname = urlObj.pathname.toLowerCase();
+    const pathname = url.pathname.toLowerCase();
     if (pathname.endsWith('.js') || pathname.endsWith('.mjs')) {
       return 'javascript';
     }
@@ -102,6 +107,60 @@ function getFileType(url) {
   }
 }
 
+/**
+ * Show error message in the UI.
+ * 
+ * @param {URL} url 
+ * @param {String} errorMsg 
+ */
+function showError(url, errorMsg) {
+  const loader = document.getElementById("loader");
+
+  loader.innerHTML = `
+      <div style="text-align: center; margin-top: 20px;">
+        <p style="margin-bottom: 15px; font-style: normal; line-height: 1.5;">${errorMsg}</p>
+        <button id="open-native-btn" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; transition: background-color 0.2s;">
+          ${browser.i18n.getMessage("viewerOpenNative")}
+        </button>
+      </div>
+    `;
+
+  const btn = document.getElementById("open-native-btn");
+  btn.addEventListener("mouseover", () => btn.style.backgroundColor = "#0056b3");
+  btn.addEventListener("mouseout", () => btn.style.backgroundColor = "#007bff");
+  btn.addEventListener("click", async () => {
+    try {
+      if(!isRestricted(url)) url.searchParams.set('useNativeViewer', 'true');
+      await browser.tabs.update({ url: "view-source:" + url.toString() });
+    } catch (err) {
+      // If navigation fails (e.g., Illegal URL on Firefox for about: pages)
+      const container = btn.parentElement;
+      container.innerHTML = `
+        <p style="margin-bottom: 15px; color: #ff4d4d; font-weight: bold;">${browser.i18n.getMessage("errorRestrictedApi")}</p>
+        <div style="background: #222; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-family: monospace; font-size: 12px; word-break: break-all; border: 1px solid #444;">
+          view-source:${url.toString()}
+        </div>
+        <button id="copy-url-btn" style="padding: 8px 16px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+          Copy to clipboard
+        </button>
+      `;
+      
+      document.getElementById("copy-url-btn").addEventListener("click", () => {
+        navigator.clipboard.writeText("view-source:" + url.toString()).then(() => {
+          const copyBtn = document.getElementById("copy-url-btn");
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = "Copied!";
+          copyBtn.style.backgroundColor = "#28a745";
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.style.backgroundColor = "#6c757d";
+          }, 2000);
+        });
+      });
+    }
+  });
+}
+
 async function loadSource() {
   const params = new URLSearchParams(window.location.search);
   const url = params.get("url");
@@ -109,60 +168,21 @@ async function loadSource() {
 
   if (!url) return;
 
+  const targetUrl = new URL(url);
+
   // Check if the URL is restricted before attempting to fetch
-  if (isRestricted(url)) {
-    loader.innerHTML = `
-      <div style="text-align: center; margin-top: 20px;">
-        <p style="margin-bottom: 15px; font-style: normal; line-height: 1.5;">${browser.i18n.getMessage("errorRestricted")}</p>
-        <button id="open-native-btn" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; transition: background-color 0.2s;">
-          ${browser.i18n.getMessage("viewerOpenNative")}
-        </button>
-      </div>
-    `;
-    
-    const btn = document.getElementById("open-native-btn");
-    btn.addEventListener("mouseover", () => btn.style.backgroundColor = "#0056b3");
-    btn.addEventListener("mouseout", () => btn.style.backgroundColor = "#007bff");
-    btn.addEventListener("click", async () => {
-      try {
-        await browser.tabs.update({ url: "view-source:" + url });
-      } catch (err) {
-        // If navigation fails (e.g., Illegal URL on Firefox for about: pages)
-        const container = btn.parentElement;
-        container.innerHTML = `
-          <p style="margin-bottom: 15px; color: #ff4d4d; font-weight: bold;">${browser.i18n.getMessage("errorRestrictedApi")}</p>
-          <div style="background: #222; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-family: monospace; font-size: 12px; word-break: break-all; border: 1px solid #444;">
-            view-source:${url}
-          </div>
-          <button id="copy-url-btn" style="padding: 8px 16px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
-            Copy to clipboard
-          </button>
-        `;
-        
-        document.getElementById("copy-url-btn").addEventListener("click", () => {
-          navigator.clipboard.writeText("view-source:" + url).then(() => {
-            const copyBtn = document.getElementById("copy-url-btn");
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = "Copied!";
-            copyBtn.style.backgroundColor = "#28a745";
-            setTimeout(() => {
-              copyBtn.textContent = originalText;
-              copyBtn.style.backgroundColor = "#6c757d";
-            }, 2000);
-          });
-        });
-      }
-    });
+  if (isRestricted(targetUrl)) {
+    showError(targetUrl, browser.i18n.getMessage("errorRestricted"));
     return;
   }
 
   try {
-    const response = await browser.runtime.sendMessage({ type: 'FETCH_SOURCE', url: url });
-    
-    if (!response || !response.ok) {
-      const errorMsg = response ? response.error : browser.i18n.getMessage("errorUnknown");
-      loader.textContent = browser.i18n.getMessage("errorLoadSource", [errorMsg]);
-      console.error(response && response.error);
+    const response = await browser.runtime.sendMessage({ type: 'FETCH_SOURCE', url: targetUrl });
+
+    if (!response?.ok) {
+      console.error(`Error fetching source code: ${response?.error}`);
+      const errorMsg = response?.error || browser.i18n.getMessage("errorUnknown");
+      showError(targetUrl, browser.i18n.getMessage("errorLoadSource", [errorMsg]));
       return;
     }
 
@@ -173,7 +193,7 @@ async function loadSource() {
     displayPageSize(byteSize);
     
     // Detect file type and format/highlight accordingly
-    const fileType = getFileType(url);
+    const fileType = getFileType(targetUrl);
     codeBlock.className = `language-${fileType} line-numbers`;
     
     if (fileType === 'javascript') {
