@@ -7,5 +7,11 @@
 **/.DS_Store
 
 node_modules/
-vendor/
-dist/
+
+# WXT
+.wxt/
+.output/
+stats.html
+
+# Agent tooling / planning artifacts
+.agents/
