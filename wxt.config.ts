@@ -7,12 +7,12 @@ export default defineConfig({
   // Force MV3 for all browsers (Firefox defaults to MV2). On Firefox MV3, WXT emits
   // background.scripts (an event page) since service workers aren't well supported there.
   manifestVersion: 3,
-  modules: ['@wxt-dev/module-vue'],
+  modules: ['@wxt-dev/module-vue', '@wxt-dev/i18n/module'],
   // Explicit ES imports everywhere (no auto-imports) for readability / store reviewability.
   imports: false,
   manifest: ({ browser }) => ({
     name: 'Source Code Viewer',
-    description: 'A browser extension to view formatted source code with syntax highlighting.',
+    description: '__MSG_extDescription__',
     default_locale: 'en',
     permissions: ['activeTab', 'tabs', 'storage'],
     host_permissions: ['<all_urls>'],

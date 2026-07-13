@@ -45,7 +45,7 @@ function copy(): void {
       <p class="fallback-message">{{ t('errorRestrictedApi') }}</p>
       <div class="url-box">view-source:{{ url.toString() }}</div>
       <button class="copy-btn" :class="{ copied }" @click="copy">
-        {{ copied ? 'Copied!' : 'Copy to clipboard' }}
+        {{ copied ? t('viewerCopied') : t('viewerCopyUrl') }}
       </button>
     </template>
   </div>
