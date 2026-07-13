@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@wxt-dev/i18n':
+        specifier: ^0.2.6
+        version: 0.2.6(wxt@0.20.27(@types/node@26.1.1)(jiti@2.7.0)(rolldown@1.1.5))
       js-beautify:
         specifier: ^1.15.4
         version: 1.15.4
@@ -493,6 +496,14 @@ packages:
 
   '@wxt-dev/browser@0.2.2':
     resolution: {integrity: sha512-QqLOdEE1UQxieRuMbv9rwczD+xUv45fy+i5gw1eo+/vlPtGX+/rBd6tlIfLFCU3xAN/UTH57bxqOeU2IZg7dEg==}
+
+  '@wxt-dev/i18n@0.2.6':
+    resolution: {integrity: sha512-bpTjdib/7WQ2rKNVCfyeYSJfc6i3+v3YBXmdqk4DZ0brMigJcmjnn6ySsyp4UBhVtutqC/zkQPV4/5HBua1seg==}
+    peerDependencies:
+      wxt: '>=0.19.7'
+    peerDependenciesMeta:
+      wxt:
+        optional: true
 
   '@wxt-dev/module-vue@1.0.3':
     resolution: {integrity: sha512-xUNygcj4w0b1MzQGOQIp5V2ZwFE4y+5AwKPi/IPKyo2aNeFVJTfItIxzWI5vTj7031WCLzHgQrrBRS5C63D5iw==}
@@ -2329,6 +2340,15 @@ snapshots:
     dependencies:
       '@types/filesystem': 0.0.36
       '@types/har-format': 1.2.16
+
+  '@wxt-dev/i18n@0.2.6(wxt@0.20.27(@types/node@26.1.1)(jiti@2.7.0)(rolldown@1.1.5))':
+    dependencies:
+      '@wxt-dev/browser': 0.2.2
+      chokidar: 5.0.0
+      confbox: 0.2.4
+      tinyglobby: 0.2.17
+    optionalDependencies:
+      wxt: 0.20.27(@types/node@26.1.1)(jiti@2.7.0)(rolldown@1.1.5)
 
   '@wxt-dev/module-vue@1.0.3(vite@8.1.4(@types/node@26.1.1)(esbuild@0.27.7)(jiti@2.7.0))(vue@3.5.39(typescript@5.9.3))(wxt@0.20.27(@types/node@26.1.1)(jiti@2.7.0)(rolldown@1.1.5))':
     dependencies:
