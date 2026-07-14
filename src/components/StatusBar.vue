@@ -13,14 +13,14 @@ const props = defineProps<{ bytes: number }>();
 
 <style scoped>
 .status-bar {
-  padding: 6px 12px;
-  background: var(--status-bg);
-  font-size: 12px;
-  border-top: 1px solid var(--status-border);
-  color: var(--app-fg);
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: flex-end;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--app-fg);
   user-select: none;
+  background: var(--status-bg);
+  border-top: 1px solid var(--status-border);
 }
 </style>

@@ -13,7 +13,7 @@
   --btn-bg-hover: #5a5a5a;
   --btn-border: #666;
   --btn-active-bg: #0e639c;
-  --btn-active-border: #1177bb;
+  --btn-active-border: #17b;
   --btn-active-fg: #fff;
 }
 
@@ -36,13 +36,13 @@ body[data-theme-type='light'] {
 }
 
 body {
-  margin: 0;
-  background: var(--app-bg);
-  color: var(--app-fg);
-  font-family: 'Consolas', 'Monaco', monospace;
   display: flex;
   flex-direction: column;
   height: 100vh;
+  margin: 0;
+  font-family: Consolas, Monaco, monospace;
+  color: var(--app-fg);
+  background: var(--app-bg);
 }
 
 /* #app wraps the whole UI; display:contents lets its children be flex items of <body>. */
@@ -62,15 +62,15 @@ body {
 }
 
 pre {
-  margin: 0;
   padding: 20px;
+  margin: 0;
   tab-size: 4;
 }
 
 pre.wrap-code,
 pre.wrap-code code {
+  overflow-wrap: break-word !important;
   white-space: pre-wrap !important;
-  word-break: break-word !important;
 }
 
 .source-link {
