@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { browser } from 'wxt/browser';
-import { nativeViewerUrl } from '@/utils/nativeViewer';
+import { openNativeViewer } from '@/utils/nativeViewer';
 import { t } from '@/utils/i18n';
 
 const props = defineProps<{ url: URL; message: string }>();
@@ -10,12 +9,9 @@ const showFallback = ref(false);
 const copied = ref(false);
 
 async function openNative(): Promise<void> {
-  try {
-    await browser.tabs.update({ url: nativeViewerUrl(props.url) });
-  } catch {
-    // Navigation can fail (e.g. Illegal URL on Firefox for about: pages).
-    showFallback.value = true;
-  }
+  // Navigation can fail (e.g. Illegal URL on Firefox for about: pages).
+  const res = await openNativeViewer(props.url, false);
+  if (!res?.ok) showFallback.value = true;
 }
 
 function copy(): void {

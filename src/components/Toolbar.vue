@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { browser } from 'wxt/browser';
 import { WrapText, Palette, FileCode } from '@lucide/vue';
 import { THEMES } from '@/utils/themes';
-import { nativeViewerUrl } from '@/utils/nativeViewer';
+import { openNativeViewer } from '@/utils/nativeViewer';
 import { t } from '@/utils/i18n';
 
 const props = defineProps<{
@@ -26,12 +25,7 @@ function toggleWrap(): void {
 /** Opens the target URL in the browser's native `view-source:` viewer. */
 function openNative(newTab: boolean): void {
   if (!props.targetUrl) return;
-  const url = nativeViewerUrl(props.targetUrl);
-  if (newTab) {
-    browser.tabs.create({ url });
-  } else {
-    browser.tabs.update({ url });
-  }
+  openNativeViewer(props.targetUrl, newTab);
 }
 
 // No real `href`: `view-source:` cannot be navigated to via <a href>, so gestures
