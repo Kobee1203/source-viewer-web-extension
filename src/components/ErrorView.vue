@@ -15,7 +15,7 @@ async function openNative(): Promise<void> {
 }
 
 function copy(): void {
-  navigator.clipboard
+  void navigator.clipboard
     .writeText('view-source:' + props.url.toString())
     .then(() => {
       copied.value = true;
@@ -46,54 +46,61 @@ function copy(): void {
 
 <style scoped>
 .error-box {
-  text-align: center;
-  margin-top: 20px;
   padding: 20px;
+  margin-top: 20px;
+  text-align: center;
 }
+
 .error-message {
   margin-bottom: 15px;
   font-style: normal;
   line-height: 1.5;
 }
+
 .native-btn {
   padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 14px;
   font-weight: bold;
+  color: white;
+  cursor: pointer;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
   transition: background-color 0.2s;
 }
+
 .native-btn:hover {
   background-color: #0056b3;
 }
+
 .fallback-message {
   margin-bottom: 15px;
-  color: #ff4d4d;
   font-weight: bold;
+  color: #ff4d4d;
 }
+
 .url-box {
-  background: #222;
   padding: 10px;
-  border-radius: 4px;
   margin-bottom: 15px;
   font-family: monospace;
   font-size: 12px;
-  word-break: break-all;
-  border: 1px solid #444;
   color: #d4d4d4;
+  word-break: break-all;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
 }
+
 .copy-btn {
   padding: 8px 16px;
-  background-color: #6c757d;
+  font-size: 13px;
   color: white;
+  cursor: pointer;
+  background-color: #6c757d;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
 }
+
 .copy-btn.copied {
   background-color: #28a745;
 }

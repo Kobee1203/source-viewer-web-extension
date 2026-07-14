@@ -1,0 +1,7 @@
+.output
+.wxt
+node_modules
+pnpm-lock.yaml
+src/public/themes
+
+google*.html

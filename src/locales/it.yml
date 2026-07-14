@@ -1,14 +1,14 @@
-actionTitle: "Visualizza il codice sorgente della pagina"
+actionTitle: 'Visualizza il codice sorgente della pagina'
 extDescription: "Un'estensione del browser per visualizzare il codice sorgente formattato con evidenziazione della sintassi."
-viewerWordWrap: "A capo automatico"
-viewerTheme: "Tema:"
-viewerLoading: "Recupero del codice sorgente..."
-errorLoadSource: "Errore: impossibile caricare il codice sorgente. $1"
-errorGeneric: "Errore: $1"
-errorUnknown: "Errore sconosciuto"
+viewerWordWrap: 'A capo automatico'
+viewerTheme: 'Tema:'
+viewerLoading: 'Recupero del codice sorgente...'
+errorLoadSource: 'Errore: impossibile caricare il codice sorgente. $1'
+errorGeneric: 'Errore: $1'
+errorUnknown: 'Errore sconosciuto'
 errorRestricted: "Per motivi di sicurezza, il browser non consente alle estensioni di accedere a questo sito. Utilizza invece la funzione nativa 'Visualizza sorgente pagina' del browser."
-viewerOpenNative: "Apri nel visualizzatore nativo del browser"
-errorRestrictedApi: "Il browser vieta alle estensioni di aprire questo tipo di pagina. Copia e incolla il seguente URL nella barra degli indirizzi:"
-viewerPageSize: "Peso della pagina: $1"
-viewerCopyUrl: "Copia negli appunti"
-viewerCopied: "Copiato!"
+viewerOpenNative: 'Apri nel visualizzatore nativo del browser'
+errorRestrictedApi: 'Il browser vieta alle estensioni di aprire questo tipo di pagina. Copia e incolla il seguente URL nella barra degli indirizzi:'
+viewerPageSize: 'Peso della pagina: $1'
+viewerCopyUrl: 'Copia negli appunti'
+viewerCopied: 'Copiato!'

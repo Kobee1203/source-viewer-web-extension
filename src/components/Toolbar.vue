@@ -25,7 +25,7 @@ function toggleWrap(): void {
 /** Opens the target URL in the browser's native `view-source:` viewer. */
 function openNative(newTab: boolean): void {
   if (!props.targetUrl) return;
-  openNativeViewer(props.targetUrl, newTab);
+  void openNativeViewer(props.targetUrl, newTab);
 }
 
 // No real `href`: `view-source:` cannot be navigated to via <a href>, so gestures
@@ -91,13 +91,13 @@ function onNativeAuxClick(event: MouseEvent): void {
 
 <style scoped>
 .toolbar {
-  padding: 8px 10px;
-  background: var(--toolbar-bg);
   display: flex;
-  align-items: center;
   gap: 8px;
-  border-bottom: 1px solid var(--toolbar-border);
+  align-items: center;
+  padding: 8px 10px;
   color: var(--app-fg);
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--toolbar-border);
 }
 
 .spacer {
@@ -105,8 +105,8 @@ function onNativeAuxClick(event: MouseEvent): void {
 }
 
 .sep {
-  width: 1px;
   align-self: stretch;
+  width: 1px;
   margin: 2px 4px;
   background: var(--toolbar-border);
   filter: brightness(1.5);
@@ -120,19 +120,21 @@ function onNativeAuxClick(event: MouseEvent): void {
   width: 32px;
   height: 32px;
   padding: 0;
-  border-radius: 5px;
-  background: var(--btn-bg);
   color: var(--app-fg);
-  border: 1px solid var(--btn-border);
   cursor: pointer;
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 5px;
 }
+
 .icon-btn:hover {
   background: var(--btn-bg-hover);
 }
+
 .icon-btn.active {
+  color: var(--btn-active-fg);
   background: var(--btn-active-bg);
   border-color: var(--btn-active-border);
-  color: var(--btn-active-fg);
 }
 
 /* Single control: appearance icon overlaid on the left of a native <select>. */
@@ -141,22 +143,24 @@ function onNativeAuxClick(event: MouseEvent): void {
   display: inline-flex;
   align-items: center;
 }
+
 .theme-select .lead-ic {
   position: absolute;
   left: 9px;
-  pointer-events: none;
   color: var(--select-fg);
+  pointer-events: none;
 }
+
 .theme-select select {
   height: 32px;
   padding: 0 10px 0 32px;
-  border-radius: 5px;
-  background: var(--select-bg);
-  color: var(--select-fg);
-  border: 1px solid var(--select-border);
-  outline: none;
-  font-size: 13px;
   font-family: inherit;
+  font-size: 13px;
+  color: var(--select-fg);
   cursor: pointer;
+  outline: none;
+  background: var(--select-bg);
+  border: 1px solid var(--select-border);
+  border-radius: 5px;
 }
 </style>

@@ -10,7 +10,7 @@ export function usePreferences() {
   const themeId = ref(DEFAULT_THEME_ID);
   const wordWrap = ref(false);
 
-  browser.storage.local.get(['theme', 'wordWrap']).then((result) => {
+  void browser.storage.local.get(['theme', 'wordWrap']).then((result) => {
     const savedTheme = result.theme;
     if (
       typeof savedTheme === 'string' &&
@@ -24,10 +24,10 @@ export function usePreferences() {
   });
 
   watch(themeId, (value) => {
-    browser.storage.local.set({ theme: value });
+    void browser.storage.local.set({ theme: value });
   });
   watch(wordWrap, (value) => {
-    browser.storage.local.set({ wordWrap: value });
+    void browser.storage.local.set({ wordWrap: value });
   });
 
   return { themeId, wordWrap };

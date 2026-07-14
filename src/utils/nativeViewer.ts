@@ -8,9 +8,7 @@ export interface OpenNativeRequest {
 }
 
 /** Response returned by the background service worker for an OPEN_NATIVE request. */
-export type OpenNativeResponse =
-  | { ok: true }
-  | { ok: false; error: string };
+export type OpenNativeResponse = { ok: true } | { ok: false; error: string };
 
 /**
  * Asks the background to open `target` in the browser's native `view-source:`
@@ -25,7 +23,7 @@ export function openNativeViewer(
     url: target.toString(),
     newTab,
   };
-  return browser.runtime.sendMessage(message) as Promise<OpenNativeResponse>;
+  return browser.runtime.sendMessage(message);
 }
 
 /**
