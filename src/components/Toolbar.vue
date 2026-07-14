@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { THEMES } from '../utils/themes';
-import { t } from '../utils/i18n';
+import { THEMES } from '@/utils/themes';
+import { t } from '@/utils/i18n';
 
 defineProps<{ themeId: string; wordWrap: boolean }>();
 const emit = defineEmits<{

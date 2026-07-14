@@ -1,7 +1,7 @@
 import { defineBackground } from '#imports';
 import { browser } from 'wxt/browser';
-import { isRestricted } from '../utils/restricted';
-import type { FetchSourceResponse } from '../utils/messaging';
+import { isRestricted } from '@/utils/restricted';
+import type { FetchSourceResponse } from '@/utils/messaging';
 
 /** Builds the URL of our viewer page for a given target URL. */
 function viewerUrlFor(target: URL): string {

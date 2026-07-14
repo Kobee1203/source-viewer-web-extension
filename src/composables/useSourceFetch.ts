@@ -1,9 +1,9 @@
 import { ref } from 'vue';
-import { requestSource } from '../utils/messaging';
-import { isRestricted } from '../utils/restricted';
-import { getFileType, type FileType } from '../utils/fileType';
-import { formatSource } from '../utils/beautify';
-import { t } from '../utils/i18n';
+import { requestSource } from '@/utils/messaging';
+import { isRestricted } from '@/utils/restricted';
+import { getFileType, type FileType } from '@/utils/fileType';
+import { formatSource } from '@/utils/beautify';
+import { t } from '@/utils/i18n';
 
 /**
  * Fetches the source of the URL passed via the `?url=` query param (through the

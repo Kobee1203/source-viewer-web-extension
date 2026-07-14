@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue';
 import { browser } from 'wxt/browser';
-import { DEFAULT_THEME_ID, THEMES } from '../utils/themes';
+import { DEFAULT_THEME_ID, THEMES } from '@/utils/themes';
 
 /**
  * Reactive user preferences (theme + word wrap) backed by browser.storage.local.

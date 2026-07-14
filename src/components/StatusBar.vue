@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { formatBytes } from '../utils/format';
-import { t } from '../utils/i18n';
+import { formatBytes } from '@/utils/format';
+import { t } from '@/utils/i18n';
 
 const props = defineProps<{ bytes: number }>();
 </script>

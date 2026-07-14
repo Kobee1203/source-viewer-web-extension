@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
-import Toolbar from '../../components/Toolbar.vue';
-import CodeView from '../../components/CodeView.vue';
-import StatusBar from '../../components/StatusBar.vue';
-import ErrorView from '../../components/ErrorView.vue';
-import { useSourceFetch } from '../../composables/useSourceFetch';
-import { usePreferences } from '../../composables/usePreferences';
-import { t } from '../../utils/i18n';
-import { themeCssHref, getThemeType } from '../../utils/themes';
+import Toolbar from '@/components/Toolbar.vue';
+import CodeView from '@/components/CodeView.vue';
+import StatusBar from '@/components/StatusBar.vue';
+import ErrorView from '@/components/ErrorView.vue';
+import { useSourceFetch } from '@/composables/useSourceFetch';
+import { usePreferences } from '@/composables/usePreferences';
+import { t } from '@/utils/i18n';
+import { themeCssHref, getThemeType } from '@/utils/themes';
 
 const {
   loading,

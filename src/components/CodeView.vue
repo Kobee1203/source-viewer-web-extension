@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 import { browser } from 'wxt/browser';
-import Prism from '../utils/prism';
-import type { FileType } from '../utils/fileType';
+import Prism from '@/utils/prism';
+import type { FileType } from '@/utils/fileType';
 
 const props = defineProps<{
   code: string;

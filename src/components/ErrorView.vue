@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { browser } from 'wxt/browser';
-import { isRestricted } from '../utils/restricted';
-import { t } from '../utils/i18n';
+import { isRestricted } from '@/utils/restricted';
+import { t } from '@/utils/i18n';
 
 const props = defineProps<{ url: URL; message: string }>();
 
