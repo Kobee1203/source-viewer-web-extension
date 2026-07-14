@@ -9,6 +9,12 @@
   --select-border: #666;
   --status-bg: #333;
   --status-border: #444;
+  --btn-bg: #4a4a4a;
+  --btn-bg-hover: #5a5a5a;
+  --btn-border: #666;
+  --btn-active-bg: #0e639c;
+  --btn-active-border: #1177bb;
+  --btn-active-fg: #fff;
 }
 
 body[data-theme-type='light'] {
@@ -21,6 +27,12 @@ body[data-theme-type='light'] {
   --select-border: #aaa;
   --status-bg: #ddd;
   --status-border: #ccc;
+  --btn-bg: #fff;
+  --btn-bg-hover: #eee;
+  --btn-border: #aaa;
+  --btn-active-bg: #cfe6ff;
+  --btn-active-border: #7fb6ff;
+  --btn-active-fg: #003a6b;
 }
 
 body {
@@ -36,43 +48,6 @@ body {
 /* #app wraps the whole UI; display:contents lets its children be flex items of <body>. */
 #app {
   display: contents;
-}
-
-.toolbar {
-  padding: 10px;
-  background: var(--toolbar-bg);
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  border-bottom: 1px solid var(--toolbar-border);
-  color: var(--app-fg);
-}
-
-.toolbar-group {
-  display: flex;
-  align-items: center;
-}
-
-.toolbar-group.left {
-  margin-right: auto;
-}
-
-.toolbar select {
-  padding: 5px;
-  border-radius: 4px;
-  background: var(--select-bg);
-  color: var(--select-fg);
-  border: 1px solid var(--select-border);
-  outline: none;
-}
-
-.toolbar label {
-  margin-right: 10px;
-  font-size: 14px;
-}
-
-.toolbar input[type='checkbox'] {
-  margin-right: 5px;
 }
 
 #content {
@@ -96,18 +71,6 @@ pre.wrap-code,
 pre.wrap-code code {
   white-space: pre-wrap !important;
   word-break: break-word !important;
-}
-
-.status-bar {
-  padding: 6px 12px;
-  background: var(--status-bg);
-  font-size: 12px;
-  border-top: 1px solid var(--status-border);
-  color: var(--app-fg);
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  user-select: none;
 }
 
 .source-link {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { browser } from 'wxt/browser';
-import { isRestricted } from '@/utils/restricted';
+import { nativeViewerUrl } from '@/utils/nativeViewer';
 import { t } from '@/utils/i18n';
 
 const props = defineProps<{ url: URL; message: string }>();
@@ -11,10 +11,7 @@ const copied = ref(false);
 
 async function openNative(): Promise<void> {
   try {
-    if (!isRestricted(props.url)) {
-      props.url.searchParams.set('useNativeViewer', 'true');
-    }
-    await browser.tabs.update({ url: 'view-source:' + props.url.toString() });
+    await browser.tabs.update({ url: nativeViewerUrl(props.url) });
   } catch {
     // Navigation can fail (e.g. Illegal URL on Firefox for about: pages).
     showFallback.value = true;
