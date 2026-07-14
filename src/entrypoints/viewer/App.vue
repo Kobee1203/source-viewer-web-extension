@@ -36,7 +36,11 @@ load();
 </script>
 
 <template>
-  <Toolbar v-model:theme-id="themeId" v-model:word-wrap="wordWrap" />
+  <Toolbar
+    v-model:theme-id="themeId"
+    v-model:word-wrap="wordWrap"
+    :target-url="targetUrl"
+  />
 
   <div id="content">
     <div v-if="loading" class="loader">{{ t('viewerLoading') }}</div>

@@ -16,3 +16,22 @@ export function requestSource(url: string): Promise<FetchSourceResponse> {
   const message: FetchSourceRequest = { type: 'FETCH_SOURCE', url };
   return browser.runtime.sendMessage(message) as Promise<FetchSourceResponse>;
 }
+
+/**
+ * Handles a FETCH_SOURCE request in the background: fetches the page's source
+ * there to avoid the page's own CORS/CSP constraints.
+ */
+export function fetchSource(
+  message: FetchSourceRequest,
+): Promise<FetchSourceResponse> {
+  return fetch(message.url, {
+    headers: { Accept: 'text/html,text/plain,*/*' },
+    credentials: 'omit',
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      return res.text();
+    })
+    .then((text): FetchSourceResponse => ({ ok: true, text }))
+    .catch((err): FetchSourceResponse => ({ ok: false, error: err.message }));
+}
