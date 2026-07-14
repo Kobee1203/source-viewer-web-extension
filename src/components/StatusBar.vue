@@ -6,7 +6,9 @@ const props = defineProps<{ bytes: number }>();
 </script>
 
 <template>
-  <div class="status-bar">{{ t('viewerPageSize', [formatBytes(props.bytes)]) }}</div>
+  <div class="status-bar">
+    {{ t('viewerPageSize', [formatBytes(props.bytes)]) }}
+  </div>
 </template>
 
 <style scoped>

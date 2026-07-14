@@ -32,7 +32,7 @@ function applyTheme(id: string): void {
 
 watch(themeId, (id) => applyTheme(id), { immediate: true });
 
-load();
+void load();
 </script>
 
 <template>

@@ -36,10 +36,10 @@ export default defineBackground(() => {
 
     const targetUrl = new URL(url);
     if (isRestricted(targetUrl)) {
-      browser.tabs.create({ url: 'view-source:' + targetUrl.toString() });
+      void browser.tabs.create({ url: 'view-source:' + targetUrl.toString() });
       return;
     }
-    browser.tabs.create({ url: viewerUrlFor(targetUrl) });
+    void browser.tabs.create({ url: viewerUrlFor(targetUrl) });
   });
 
   // Intercept navigations to view-source: and redirect them to our viewer,
@@ -58,9 +58,11 @@ export default defineBackground(() => {
     const targetUrl = new URL(url.slice('view-source:'.length));
     if (isRestricted(targetUrl)) return;
 
-    browser.tabs.update(tabId, { url: viewerUrlFor(targetUrl) });
+    void browser.tabs.update(tabId, { url: viewerUrlFor(targetUrl) });
   });
 
+  // Returning a Promise is how a message listener replies asynchronously.
+  // (no-misused-promises' argument check is relaxed for this file in eslint.config.)
   browser.runtime.onMessage.addListener(
     (
       message,

@@ -1,14 +1,14 @@
-actionTitle: "View page source code"
-extDescription: "A browser extension to view formatted source code with syntax highlighting."
-viewerWordWrap: "Line wrap"
-viewerTheme: "Theme:"
-viewerLoading: "Fetching source code..."
-errorLoadSource: "Error: Unable to load source. $1"
-errorGeneric: "Error: $1"
-errorUnknown: "Unknown error"
+actionTitle: 'View page source code'
+extDescription: 'A browser extension to view formatted source code with syntax highlighting.'
+viewerWordWrap: 'Line wrap'
+viewerTheme: 'Theme:'
+viewerLoading: 'Fetching source code...'
+errorLoadSource: 'Error: Unable to load source. $1'
+errorGeneric: 'Error: $1'
+errorUnknown: 'Unknown error'
 errorRestricted: "For security reasons, the browser does not allow extensions to access this site. Please use the browser's native 'View Page Source' instead."
 viewerOpenNative: "Open in browser's native viewer"
-errorRestrictedApi: "The browser prohibits extensions from opening this type of page. Please copy and paste the following URL into your address bar:"
-viewerPageSize: "Page weight: $1"
-viewerCopyUrl: "Copy to clipboard"
-viewerCopied: "Copied!"
+errorRestrictedApi: 'The browser prohibits extensions from opening this type of page. Please copy and paste the following URL into your address bar:'
+viewerPageSize: 'Page weight: $1'
+viewerCopyUrl: 'Copy to clipboard'
+viewerCopied: 'Copied!'

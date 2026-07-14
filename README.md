@@ -14,9 +14,11 @@ A browser extension to view formatted source code with syntax highlighting. It r
 ## Installation
 
 ### Firefox
+
 Visit the [Firefox Add-ons](https://addons.mozilla.org/fr/firefox/addon/source-code-viewer/) page.
 
 ### Chrome
+
 Visit the [Chrome Web Store](https://chromewebstore.google.com/detail/source-code-viewer/ninadapabgjafeobaoomggobomaogcdi) page.
 
 ## Development
@@ -26,4 +28,5 @@ Visit the [Chrome Web Store](https://chromewebstore.google.com/detail/source-cod
 3. Run `npm run build` to generate the extension packages in the `dist/` directory.
 
 ## License
+
 Distributed under the MIT License.

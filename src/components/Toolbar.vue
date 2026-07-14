@@ -25,7 +25,7 @@ function toggleWrap(): void {
 /** Opens the target URL in the browser's native `view-source:` viewer. */
 function openNative(newTab: boolean): void {
   if (!props.targetUrl) return;
-  openNativeViewer(props.targetUrl, newTab);
+  void openNativeViewer(props.targetUrl, newTab);
 }
 
 // No real `href`: `view-source:` cannot be navigated to via <a href>, so gestures

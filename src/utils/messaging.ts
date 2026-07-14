@@ -8,13 +8,12 @@ export interface FetchSourceRequest {
 
 /** Response returned by the background service worker. */
 export type FetchSourceResponse =
-  | { ok: true; text: string }
-  | { ok: false; error: string };
+  { ok: true; text: string } | { ok: false; error: string };
 
 /** Typed wrapper around runtime.sendMessage for the FETCH_SOURCE request. */
 export function requestSource(url: string): Promise<FetchSourceResponse> {
   const message: FetchSourceRequest = { type: 'FETCH_SOURCE', url };
-  return browser.runtime.sendMessage(message) as Promise<FetchSourceResponse>;
+  return browser.runtime.sendMessage(message);
 }
 
 /**

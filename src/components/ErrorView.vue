@@ -15,7 +15,7 @@ async function openNative(): Promise<void> {
 }
 
 function copy(): void {
-  navigator.clipboard
+  void navigator.clipboard
     .writeText('view-source:' + props.url.toString())
     .then(() => {
       copied.value = true;
