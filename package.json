@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "postinstall": "wxt prepare",
+    "prepare": "husky",
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build && wxt build -b firefox",
@@ -34,6 +35,8 @@
     "eslint": "^10.7.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.9.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "postcss-html": "^1.8.1",
     "prettier": "^3.9.5",
     "stylelint": "^17.14.0",
