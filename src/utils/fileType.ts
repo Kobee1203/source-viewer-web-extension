@@ -5,8 +5,7 @@ export type FileType = 'javascript' | 'css' | 'markup';
 export function getFileType(url: URL): FileType {
   try {
     const pathname = url.pathname.toLowerCase();
-    if (pathname.endsWith('.js') || pathname.endsWith('.mjs'))
-      return 'javascript';
+    if (pathname.endsWith('.js') || pathname.endsWith('.mjs')) return 'javascript';
     if (pathname.endsWith('.css')) return 'css';
     return 'markup';
   } catch {

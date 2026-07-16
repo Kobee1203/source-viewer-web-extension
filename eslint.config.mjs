@@ -38,10 +38,7 @@ export default withVueTs(
     name: 'app/background',
     files: ['src/entrypoints/background.ts'],
     rules: {
-      '@typescript-eslint/no-misused-promises': [
-        'error',
-        { checksVoidReturn: { arguments: false } },
-      ],
+      '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { arguments: false } }],
     },
   },
 

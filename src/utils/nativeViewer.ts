@@ -14,10 +14,7 @@ export type OpenNativeResponse = { ok: true } | { ok: false; error: string };
  * Asks the background to open `target` in the browser's native `view-source:`
  * viewer, in the current tab or a new one. See {@link NativeViewerController}.
  */
-export function openNativeViewer(
-  target: URL,
-  newTab: boolean,
-): Promise<OpenNativeResponse> {
+export function openNativeViewer(target: URL, newTab: boolean): Promise<OpenNativeResponse> {
   const message: OpenNativeRequest = {
     type: 'OPEN_NATIVE',
     url: target.toString(),
@@ -38,10 +35,7 @@ export function openNativeViewer(
  */
 export interface NativeViewerController {
   /** Opens `message.url` in the native viewer, remembering the tab so it isn't recaptured. */
-  open(
-    message: OpenNativeRequest,
-    senderTabId: number | undefined,
-  ): Promise<OpenNativeResponse>;
+  open(message: OpenNativeRequest, senderTabId: number | undefined): Promise<OpenNativeResponse>;
   /** Whether the given tab was sent to the native viewer and shouldn't be recaptured. */
   isAllowed(tabId: number): boolean;
   /** Ends a tab's one-shot allowance (call once its load completes). */
