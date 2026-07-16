@@ -1,24 +1,12 @@
 import { defineBackground } from '#imports';
 import { browser } from 'wxt/browser';
 import { isRestricted } from '@/utils/restricted';
-import {
-  fetchSource,
-  type FetchSourceRequest,
-  type FetchSourceResponse,
-} from '@/utils/messaging';
-import {
-  createNativeViewerController,
-  type OpenNativeRequest,
-  type OpenNativeResponse,
-} from '@/utils/nativeViewer';
+import { fetchSource, type FetchSourceRequest, type FetchSourceResponse } from '@/utils/messaging';
+import { createNativeViewerController, type OpenNativeRequest, type OpenNativeResponse } from '@/utils/nativeViewer';
 
 /** Builds the URL of our viewer page for a given target URL. */
 function viewerUrlFor(target: URL): string {
-  return (
-    browser.runtime.getURL('/viewer.html') +
-    '?url=' +
-    encodeURIComponent(target.toString())
-  );
+  return browser.runtime.getURL('/viewer.html') + '?url=' + encodeURIComponent(target.toString());
 }
 
 export default defineBackground(() => {
@@ -64,10 +52,7 @@ export default defineBackground(() => {
   // Returning a Promise is how a message listener replies asynchronously.
   // (no-misused-promises' argument check is relaxed for this file in eslint.config.)
   browser.runtime.onMessage.addListener(
-    (
-      message,
-      sender,
-    ): Promise<FetchSourceResponse> | Promise<OpenNativeResponse> | false => {
+    (message, sender): Promise<FetchSourceResponse> | Promise<OpenNativeResponse> | false => {
       if (typeof message !== 'object' || message === null) return false;
       const type = (message as { type?: unknown }).type;
 

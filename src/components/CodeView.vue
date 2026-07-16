@@ -26,10 +26,7 @@ function makeUrlsClickable(): void {
     if (!prev || !prev.classList.contains('attr-name')) {
       let sib = elem.previousSibling;
       while (sib) {
-        if (
-          sib.nodeType === Node.ELEMENT_NODE &&
-          (sib as Element).classList.contains('attr-name')
-        ) {
+        if (sib.nodeType === Node.ELEMENT_NODE && (sib as Element).classList.contains('attr-name')) {
           prev = sib as Element;
           break;
         }
@@ -42,20 +39,12 @@ function makeUrlsClickable(): void {
         if (child.nodeType !== Node.TEXT_NODE) return;
         const rawUrl = (child.textContent ?? '').trim();
         // Skip hash fragments, javascript/data URIs, and empty strings.
-        if (
-          !rawUrl ||
-          rawUrl.startsWith('#') ||
-          rawUrl.startsWith('javascript:') ||
-          rawUrl.startsWith('data:')
-        ) {
+        if (!rawUrl || rawUrl.startsWith('#') || rawUrl.startsWith('javascript:') || rawUrl.startsWith('data:')) {
           return;
         }
         try {
           const resolvedUrl = new URL(rawUrl, props.baseUrl).toString();
-          const viewerUrl =
-            browser.runtime.getURL('/viewer.html') +
-            '?url=' +
-            encodeURIComponent(resolvedUrl);
+          const viewerUrl = browser.runtime.getURL('/viewer.html') + '?url=' + encodeURIComponent(resolvedUrl);
 
           const link = document.createElement('a');
           link.className = 'source-link';

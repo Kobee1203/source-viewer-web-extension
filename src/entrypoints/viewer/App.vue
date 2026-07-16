@@ -9,16 +9,7 @@ import { usePreferences } from '@/composables/usePreferences';
 import { t } from '@/utils/i18n';
 import { themeCssHref, getThemeType } from '@/utils/themes';
 
-const {
-  loading,
-  errorMessage,
-  errorWithNativeButton,
-  code,
-  language,
-  byteSize,
-  targetUrl,
-  load,
-} = useSourceFetch();
+const { loading, errorMessage, errorWithNativeButton, code, language, byteSize, targetUrl, load } = useSourceFetch();
 
 const { themeId, wordWrap } = usePreferences();
 
@@ -36,11 +27,7 @@ void load();
 </script>
 
 <template>
-  <Toolbar
-    v-model:theme-id="themeId"
-    v-model:word-wrap="wordWrap"
-    :target-url="targetUrl"
-  />
+  <Toolbar v-model:theme-id="themeId" v-model:word-wrap="wordWrap" :target-url="targetUrl" />
 
   <div id="content">
     <div v-if="loading" class="loader">{{ t('viewerLoading') }}</div>
@@ -50,13 +37,7 @@ void load();
       :message="errorMessage"
     />
     <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
-    <CodeView
-      v-else
-      :code="code"
-      :language="language"
-      :base-url="baseUrl"
-      :wrap="wordWrap"
-    />
+    <CodeView v-else :code="code" :language="language" :base-url="baseUrl" :wrap="wordWrap" />
   </div>
 
   <StatusBar v-if="byteSize !== null" :bytes="byteSize" />

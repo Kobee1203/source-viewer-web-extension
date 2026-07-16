@@ -46,9 +46,7 @@ export function useSourceFetch() {
 
       if (!response.ok) {
         console.error(`Error fetching source code: ${response.error}`);
-        errorMessage.value = t('errorLoadSource', [
-          response.error || t('errorUnknown'),
-        ]);
+        errorMessage.value = t('errorLoadSource', [response.error || t('errorUnknown')]);
         errorWithNativeButton.value = true;
         loading.value = false;
         return;

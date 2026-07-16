@@ -1,8 +1,4 @@
-import {
-  js as beautifyJs,
-  css as beautifyCss,
-  html as beautifyHtml,
-} from 'js-beautify';
+import { js as beautifyJs, css as beautifyCss, html as beautifyHtml } from 'js-beautify';
 import type { FileType } from './fileType';
 
 const OPTIONS = {

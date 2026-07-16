@@ -12,10 +12,7 @@ export function usePreferences() {
 
   void browser.storage.local.get(['theme', 'wordWrap']).then((result) => {
     const savedTheme = result.theme;
-    if (
-      typeof savedTheme === 'string' &&
-      THEMES.some((theme) => theme.id === savedTheme)
-    ) {
+    if (typeof savedTheme === 'string' && THEMES.some((theme) => theme.id === savedTheme)) {
       themeId.value = savedTheme;
     }
     if (typeof result.wordWrap === 'boolean') {

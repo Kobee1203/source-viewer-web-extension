@@ -14,9 +14,8 @@ export function isRestricted(url: URL): boolean {
   try {
     const hostname = url.hostname;
     return (
-      RESTRICTED_DOMAINS.some(
-        (domain) => hostname === domain || hostname.endsWith('.' + domain),
-      ) || !['http:', 'https:'].includes(url.protocol)
+      RESTRICTED_DOMAINS.some((domain) => hostname === domain || hostname.endsWith('.' + domain)) ||
+      !['http:', 'https:'].includes(url.protocol)
     );
   } catch {
     return false;

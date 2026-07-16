@@ -15,14 +15,12 @@ async function openNative(): Promise<void> {
 }
 
 function copy(): void {
-  void navigator.clipboard
-    .writeText('view-source:' + props.url.toString())
-    .then(() => {
-      copied.value = true;
-      setTimeout(() => {
-        copied.value = false;
-      }, 2000);
-    });
+  void navigator.clipboard.writeText('view-source:' + props.url.toString()).then(() => {
+    copied.value = true;
+    setTimeout(() => {
+      copied.value = false;
+    }, 2000);
+  });
 }
 </script>
 

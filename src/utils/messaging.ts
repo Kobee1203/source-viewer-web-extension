@@ -7,8 +7,7 @@ export interface FetchSourceRequest {
 }
 
 /** Response returned by the background service worker. */
-export type FetchSourceResponse =
-  { ok: true; text: string } | { ok: false; error: string };
+export type FetchSourceResponse = { ok: true; text: string } | { ok: false; error: string };
 
 /** Typed wrapper around runtime.sendMessage for the FETCH_SOURCE request. */
 export function requestSource(url: string): Promise<FetchSourceResponse> {
@@ -20,9 +19,7 @@ export function requestSource(url: string): Promise<FetchSourceResponse> {
  * Handles a FETCH_SOURCE request in the background: fetches the page's source
  * there to avoid the page's own CORS/CSP constraints.
  */
-export async function fetchSource(
-  message: FetchSourceRequest,
-): Promise<FetchSourceResponse> {
+export async function fetchSource(message: FetchSourceRequest): Promise<FetchSourceResponse> {
   try {
     const res = await fetch(message.url, {
       headers: { Accept: 'text/html,text/plain,*/*' },
