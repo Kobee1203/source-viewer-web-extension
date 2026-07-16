@@ -3,11 +3,7 @@ import { browser } from 'wxt/browser';
 import { isRestricted } from '@/utils/restricted';
 import { fetchSource, type FetchSourceRequest, type FetchSourceResponse } from '@/utils/messaging';
 import { createNativeViewerController, type OpenNativeRequest, type OpenNativeResponse } from '@/utils/nativeViewer';
-
-/** Builds the URL of our viewer page for a given target URL. */
-function viewerUrlFor(target: URL): string {
-  return browser.runtime.getURL('/viewer.html') + '?url=' + encodeURIComponent(target.toString());
-}
+import { viewerUrl } from '@/utils/viewerUrl';
 
 export default defineBackground(() => {
   const nativeViewer = createNativeViewerController();
@@ -27,7 +23,7 @@ export default defineBackground(() => {
       void browser.tabs.create({ url: 'view-source:' + targetUrl.toString() });
       return;
     }
-    void browser.tabs.create({ url: viewerUrlFor(targetUrl) });
+    void browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
   });
 
   // Intercept navigations to view-source: and redirect them to our viewer,
@@ -46,7 +42,7 @@ export default defineBackground(() => {
     const targetUrl = new URL(url.slice('view-source:'.length));
     if (isRestricted(targetUrl)) return;
 
-    void browser.tabs.update(tabId, { url: viewerUrlFor(targetUrl) });
+    void browser.tabs.update(tabId, { url: viewerUrl(targetUrl.toString()) });
   });
 
   // Returning a Promise is how a message listener replies asynchronously.
