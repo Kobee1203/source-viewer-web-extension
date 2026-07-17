@@ -30,9 +30,12 @@ export default defineContentScript({
     // also works in XML documents: there `createElement('style')` would yield an
     // inert null-namespace element, and the root isn't <html> (e.g. a direct .xml
     // navigation renders an <rss> root).
+    // `overflow: hidden` suppresses the raw page's own scrollbar — its content is
+    // only hidden (still laid out), so without this its scrollbar would render over
+    // the full-viewport viewer iframe. The iframe scrolls its own content instead.
     const hideStyle = document.createElementNS('http://www.w3.org/1999/xhtml', 'style');
     hideStyle.id = HIDE_STYLE_ID;
-    hideStyle.textContent = ':root { visibility: hidden !important; }';
+    hideStyle.textContent = ':root { visibility: hidden !important; overflow: hidden !important; }';
     document.documentElement.appendChild(hideStyle);
 
     let injected = false;

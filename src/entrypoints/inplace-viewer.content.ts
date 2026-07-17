@@ -34,11 +34,14 @@ export default defineContentScript({
     const iframe = document.createElementNS('http://www.w3.org/1999/xhtml', 'iframe') as HTMLIFrameElement;
     iframe.id = IFRAME_ID;
     iframe.src = viewerUrl(location.href);
+    // `width/height: 100%` (of the fixed viewport, excluding scrollbars) rather than
+    // 100vw/100vh so the iframe never extends under the host page's scrollbar gutter.
+    // `visibility: visible` overrides the inherited `hidden` from content.ts's hide-style.
     iframe.style.cssText = [
       'position: fixed',
       'inset: 0',
-      'width: 100vw',
-      'height: 100vh',
+      'width: 100%',
+      'height: 100%',
       'border: 0',
       'margin: 0',
       'z-index: 2147483647',
