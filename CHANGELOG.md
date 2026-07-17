@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-07-17
+
+### Added
+
+- **Additional Languages**: Added Spanish, German, Italian, Japanese, Simplified Chinese, and Portuguese (Brazilian + European) on top of English and French — 9 locales total. The store description is now localized as well.
+- **Native Source Viewer Action**: Added a toolbar button to open the current page in the browser's built-in `view-source:` viewer (left click opens in the same tab; middle click or Ctrl/Cmd+click opens in a new tab).
+
+### Changed
+
+- **Build & Codebase Migration**: Migrated the extension to WXT + TypeScript + Vue 3, with behaviour parity. Source is now organized into components, composables, and typed utilities.
+- **Toolbar Redesign**: Reworked the toolbar into a coherent icon-button bar — word wrap became an icon toggle (highlighted when active), the theme selector gained a palette icon, and the native-viewer action is a dedicated icon button (using `@lucide/vue`).
+- **Localization Overhaul**: Switched to YAML-based, type-safe messages via `@wxt-dev/i18n`; the `_locales/*/messages.json` files are now generated at build time.
+- **Developer Tooling**: Added type-aware ESLint, Prettier (`printWidth` 120), and Stylelint; husky + lint-staged pre-commit hooks; a GitHub Actions CI workflow (lint + typecheck + build); and pinned Node 24 and pnpm via `engines`/`packageManager`.
+
+### Fixed
+
+- **Native Viewer Redirects**: The native-viewer action now survives redirects that strip the query string (e.g. sites that 301 `/?...` back to `/`). The request is routed through the background script, which tracks the intended tab by id instead of relying on a fragile query parameter, keeping the target URL clean.
+
 ## [1.3.0] - 2026-06-30
 
 ### Added
