@@ -1,7 +1,12 @@
 import { defineBackground } from '#imports';
 import { browser } from 'wxt/browser';
 import { isRestricted } from '@/utils/restricted';
-import { fetchSource, type FetchSourceRequest, type FetchSourceResponse } from '@/utils/messaging';
+import {
+  fetchSource,
+  type AutoOpenRequest,
+  type FetchSourceRequest,
+  type FetchSourceResponse,
+} from '@/utils/messaging';
 import { createNativeViewerController, type OpenNativeRequest, type OpenNativeResponse } from '@/utils/nativeViewer';
 import { viewerUrl } from '@/utils/viewerUrl';
 
@@ -57,6 +62,16 @@ export default defineBackground(() => {
       }
       if (type === 'FETCH_SOURCE') {
         return fetchSource(message as FetchSourceRequest);
+      }
+      if (type === 'AUTO_OPEN') {
+        // Content script detected a direct CSS/JS/JSON/XML navigation: redirect
+        // the tab to our viewer (skip restricted URLs we couldn't fetch anyway).
+        const tabId = sender.tab?.id;
+        const rawUrl = (message as AutoOpenRequest).url;
+        if (tabId !== undefined && !isRestricted(new URL(rawUrl))) {
+          void browser.tabs.update(tabId, { url: viewerUrl(rawUrl) });
+        }
+        return false;
       }
       return false;
     },
