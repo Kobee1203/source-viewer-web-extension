@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - not released
+
+### Added
+
+- **In-Place Auto-Open**: Navigating directly to a raw `.css`/`.js`/`.json`/`.xml` URL now renders the formatted viewer in place, as a Shadow DOM overlay on the page itself, instead of redirecting to the extension's viewer — the address bar keeps the original URL and the browser back button works as expected. (Firefox's built-in JSON viewer, when enabled via `devtools.jsonview.enabled`, still intercepts direct `.json` navigations before the extension can run.)
+
 ## [1.4.0] - 2026-07-17
 
 ### Added

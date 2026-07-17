@@ -15,15 +15,25 @@ export function requestSource(url: string): Promise<FetchSourceResponse> {
   return browser.runtime.sendMessage(message);
 }
 
-/** Request sent from the content script asking the background to open a direct-content URL in the viewer. */
-export interface AutoOpenRequest {
-  type: 'AUTO_OPEN';
+/** Request sent from `content.ts` asking the background to inject the in-place viewer for `url`. */
+export interface RequestViewerInjectionRequest {
+  type: 'REQUEST_VIEWER_INJECTION';
   url: string;
 }
 
-/** Asks the background to redirect the current tab to the viewer for `url`. Fire-and-forget. */
-export function requestAutoOpen(url: string): Promise<void> {
-  const message: AutoOpenRequest = { type: 'AUTO_OPEN', url };
+/** Whether the background went ahead and injected the viewer script into the tab. */
+export interface RequestViewerInjectionResponse {
+  inject: boolean;
+}
+
+/**
+ * Asks the background to inject the heavy in-place viewer content script into the
+ * current tab. Resolves to `{ inject: false }` (never rejects on the happy path)
+ * when the URL is restricted or the tab is gone — the caller must reveal the raw
+ * page itself in that case.
+ */
+export function requestViewerInjection(url: string): Promise<RequestViewerInjectionResponse> {
+  const message: RequestViewerInjectionRequest = { type: 'REQUEST_VIEWER_INJECTION', url };
   return browser.runtime.sendMessage(message);
 }
 
