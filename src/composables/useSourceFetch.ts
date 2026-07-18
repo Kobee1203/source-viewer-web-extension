@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import { requestSource } from '@/utils/messaging';
 import { isRestricted } from '@/utils/restricted';
 import { getFileType, type FileType } from '@/utils/fileType';
+import { mimeToFileType } from '@/utils/contentType';
 import { formatSource } from '@/utils/beautify';
 import { t } from '@/utils/i18n';
 
@@ -53,7 +54,9 @@ export function useSourceFetch() {
       }
 
       byteSize.value = new Blob([response.text]).size;
-      const type = getFileType(target);
+      // Prefer the response's real MIME (handles extensionless URLs like
+      // fonts.googleapis.com/css2?…); fall back to the URL extension.
+      const type = mimeToFileType(response.contentType) ?? getFileType(target);
       language.value = type;
       code.value = formatSource(response.text, type);
       loading.value = false;

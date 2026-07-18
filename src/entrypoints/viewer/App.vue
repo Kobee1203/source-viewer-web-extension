@@ -42,3 +42,16 @@ void load();
 
   <StatusBar v-if="byteSize !== null" :bytes="byteSize" />
 </template>
+
+<style>
+#content {
+  flex: 1;
+  overflow: auto;
+  background: inherit;
+}
+
+.loader {
+  padding: 20px;
+  font-style: italic;
+}
+</style>

@@ -1,3 +1,6 @@
+import { browser } from 'wxt/browser';
+import type { PublicPath } from 'wxt/browser';
+
 export type ThemeType = 'light' | 'dark';
 
 export interface Theme {
@@ -23,9 +26,12 @@ export const THEMES: Theme[] = [
 
 export const DEFAULT_THEME_ID = 'default';
 
-/** Public URL of a theme's stylesheet. */
+/**
+ * Absolute URL of a theme's stylesheet, resolved via `browser.runtime.getURL` so it
+ * loads correctly from any origin's shadow root (not just the extension's own pages).
+ */
 export function themeCssHref(id: string): string {
-  return `/themes/${id}.css`;
+  return browser.runtime.getURL(`/themes/${id}.css` as PublicPath);
 }
 
 /** Resolves a theme id to its light/dark type (falls back to light). */

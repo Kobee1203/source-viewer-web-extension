@@ -14,7 +14,18 @@ export function formatSource(text: string, type: FileType): string {
       return beautifyJs(text, OPTIONS);
     case 'css':
       return beautifyCss(text, OPTIONS);
+    case 'json':
+      return formatJson(text);
     default:
       return beautifyHtml(text, OPTIONS);
+  }
+}
+
+/** Pretty-prints JSON; falls back to the raw text when it isn't valid JSON (e.g. JSONC). */
+function formatJson(text: string): string {
+  try {
+    return JSON.stringify(JSON.parse(text), null, 2);
+  } catch {
+    return text;
   }
 }

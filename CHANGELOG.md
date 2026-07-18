@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - not released
+
+### Added
+
+- **In-Place Auto-Open**: Navigating directly to a raw `.css`/`.js`/`.json`/`.xml` URL now renders the formatted viewer in place — as a full-viewport iframe embedding the viewer page over the original page — instead of redirecting the tab. The address bar keeps the original URL and the browser back button works in a single hop. (Firefox's built-in JSON viewer, when enabled via `devtools.jsonview.enabled`, still intercepts direct `.json` navigations before the extension can run.)
+- **JSON Support**: Added JSON syntax highlighting and formatting (with a safe fallback for invalid JSON), plus content-type-aware file detection — the response's real MIME type now takes precedence over the URL extension (handles extensionless URLs such as `fonts.googleapis.com/css2?…`).
+
+### Fixed
+
+- **Theme Stylesheet URL**: Theme stylesheets are now resolved via `browser.runtime.getURL`, so they load correctly regardless of the page hosting the viewer.
+- **Line-Number Alignment**: Line numbers no longer misalign when word wrap is on. The viewer now waits for fonts (`document.fonts.ready`) and a frame (`requestAnimationFrame`) before highlighting, and recomputes line-number row heights whenever word wrap is toggled.
+
 ## [1.4.0] - 2026-07-17
 
 ### Added

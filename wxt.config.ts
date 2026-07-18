@@ -14,8 +14,11 @@ export default defineConfig({
     name: 'Source Code Viewer',
     description: '__MSG_extDescription__',
     default_locale: 'en',
-    permissions: ['activeTab', 'tabs', 'storage'],
+    permissions: ['activeTab', 'tabs', 'storage', 'scripting'],
     host_permissions: ['<all_urls>'],
+    // Lets the in-place viewer (inplace-viewer.content.ts) embed viewer.html in a
+    // full-viewport iframe on any origin's page for direct CSS/JS/JSON/XML navigations.
+    web_accessible_resources: [{ resources: ['viewer.html'], matches: ['<all_urls>'] }],
     action: {
       default_title: '__MSG_actionTitle__',
       default_icon: {
