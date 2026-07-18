@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - **In-Place Auto-Open**: Navigating directly to a raw `.css`/`.js`/`.json`/`.xml` URL now renders the formatted viewer in place — as a full-viewport iframe embedding the viewer page over the original page — instead of redirecting the tab. The address bar keeps the original URL and the browser back button works in a single hop. (Firefox's built-in JSON viewer, when enabled via `devtools.jsonview.enabled`, still intercepts direct `.json` navigations before the extension can run.)
 - **JSON Support**: Added JSON syntax highlighting and formatting (with a safe fallback for invalid JSON), plus content-type-aware file detection — the response's real MIME type now takes precedence over the URL extension (handles extensionless URLs such as `fonts.googleapis.com/css2?…`).
+- **Type-Aware Link Routing**: Links in the viewer are now routed by the target's type — image URLs (`.png`, `.svg`, …) open in the browser to render natively, while source files reopen in the code viewer. Clickable URLs now also cover CSS `url(…)` values and the HTML `content` attribute (e.g. `og:image`), the latter only when it holds an absolute URL.
 
 ### Fixed
 
