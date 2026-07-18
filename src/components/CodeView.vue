@@ -33,3 +33,27 @@ watch(() => [props.code, props.language], render);
   -->
   <pre class="line-numbers" :class="[`language-${language}`, { 'wrap-code': wrap }]"><code ref="codeEl"></code></pre>
 </template>
+
+<style>
+pre {
+  padding: 20px;
+  margin: 0;
+  tab-size: 4;
+}
+
+pre.wrap-code,
+pre.wrap-code code {
+  overflow-wrap: break-word !important;
+  white-space: pre-wrap !important;
+}
+
+pre .source-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+pre .source-link:hover {
+  text-decoration: underline;
+}
+</style>
