@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onWatcherCleanup, shallowRef, watch } from 'vue';
+import type { Extension } from '@codemirror/state';
 import CodeMirror from 'vue-codemirror6';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
@@ -9,7 +10,7 @@ import { xml } from '@codemirror/lang-xml';
 
 import { DEFAULT_FILE_TYPE, FileType } from '@/utils/fileType';
 import { linkifyPlugin } from '@/utils/cm-linkify';
-import { getThemeExtension } from '@/utils/themes';
+import { DEFAULT_THEME_ID, getThemeExtension } from '@/utils/themes';
 
 const props = defineProps<{
   code: string;
@@ -36,9 +37,21 @@ const lang = computed(() => {
   }
 });
 
-const extensions = computed(() => {
-  return [getThemeExtension(props.themeId ?? 'default'), linkifyPlugin(props.baseUrl)];
-});
+// The theme extension is loaded on demand (each theme is its own lazy chunk).
+// The cleanup marks an in-flight load as stale so a slower one can't clobber a newer selection.
+const themeExtension = shallowRef<Extension>([]);
+watch(
+  () => props.themeId ?? DEFAULT_THEME_ID,
+  async (id) => {
+    let stale = false;
+    onWatcherCleanup(() => (stale = true));
+    const ext = await getThemeExtension(id);
+    if (!stale) themeExtension.value = ext;
+  },
+  { immediate: true },
+);
+
+const extensions = computed(() => [themeExtension.value, linkifyPlugin(props.baseUrl)]);
 </script>
 
 <template>
