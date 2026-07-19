@@ -2,7 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.5.0] - not released
+## [1.6.0] - not released
+
+### Changed
+
+- **Syntax Highlighting Engine**: Migrated the viewer from PrismJS to **CodeMirror 6** for rendering and highlighting (read-only). Source is still formatted with `js-beautify`; CodeMirror now handles display, line numbers, word wrap, and code folding.
+- **Themes**: Replaced the 8 bundled Prism themes with the full CodeMirror theme set (`@uiw/codemirror-theme-*`) — **45 themes** — with `default` mapped to _Basic Light_.\
+  ⚠️ **Theme ids changed, so a previously selected theme resets to the default and must be re-picked once.**
+- **On-Demand Loading**: Themes and language grammars are now code-split and loaded on demand — only the selected theme and the current file's language are fetched (from the packaged extension, no network) and parsed — keeping them out of the initial viewer bundle.
+
+## [1.5.0] - 2026-07-18
 
 ### Added
 
