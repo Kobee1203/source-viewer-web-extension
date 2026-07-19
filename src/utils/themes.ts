@@ -1,5 +1,13 @@
-import { browser } from 'wxt/browser';
-import type { PublicPath } from 'wxt/browser';
+import {
+  githubLight,
+  githubDark,
+  bbedit,
+  solarizedLight,
+  okaidia,
+  tomorrowNightBlue,
+  dracula,
+  vscodeDark,
+} from '@uiw/codemirror-themes-all';
 
 export type ThemeType = 'light' | 'dark';
 
@@ -10,7 +18,7 @@ export interface Theme {
 }
 
 /**
- * Built-in themes. `id` matches the vendored CSS file in `public/themes/<id>.css`.
+ * Built-in themes mapped to CodeMirror 6 extensions.
  * `type` drives the app chrome palette (see the CSS variables on <body>).
  */
 export const THEMES: Theme[] = [
@@ -26,12 +34,27 @@ export const THEMES: Theme[] = [
 
 export const DEFAULT_THEME_ID = 'default';
 
-/**
- * Absolute URL of a theme's stylesheet, resolved via `browser.runtime.getURL` so it
- * loads correctly from any origin's shadow root (not just the extension's own pages).
- */
-export function themeCssHref(id: string): string {
-  return browser.runtime.getURL(`/themes/${id}.css` as PublicPath);
+/** Resolves a theme id to its CodeMirror extension. */
+export function getThemeExtension(id: string) {
+  switch (id) {
+    case 'coy':
+      return bbedit;
+    case 'solarizedlight':
+      return solarizedLight;
+    case 'okaidia':
+      return okaidia;
+    case 'tomorrow':
+      return tomorrowNightBlue;
+    case 'dark':
+      return githubDark;
+    case 'funky':
+      return dracula;
+    case 'twilight':
+      return vscodeDark;
+    case 'default':
+    default:
+      return githubLight;
+  }
 }
 
 /** Resolves a theme id to its light/dark type (falls back to light). */

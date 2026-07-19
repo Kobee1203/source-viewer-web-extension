@@ -30,7 +30,7 @@ export function mimeToFileType(mime: string | null | undefined): FileType | null
   if (JS_MIMES.has(m)) return 'javascript';
   if (JSON_MIMES.has(m) || (m.startsWith('application/') && m.endsWith('+json'))) return 'json';
   if (m === 'image/svg+xml') return null; // an image, not source — leave it to the browser
-  if (XML_MIMES.has(m) || (m.startsWith('application/') && m.endsWith('+xml'))) return 'markup';
+  if (XML_MIMES.has(m) || (m.startsWith('application/') && m.endsWith('+xml'))) return 'xml';
   return null;
 }
 

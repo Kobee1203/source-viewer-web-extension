@@ -6,6 +6,7 @@
   "scripts": {
     "postinstall": "wxt prepare",
     "prepare": "husky",
+    "clean": "wxt clean && git clean -fXd -e \\!.idea -e \\!.idea/**/* -e \\!.vscode -e \\!.vscode/**/* -e \\!.claude -e \\!.claude/**/* -e \\!.agents -e \\!.agents/**/*",
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build && wxt build -b firefox",
@@ -26,15 +27,23 @@
     "pnpm": ">=11"
   },
   "dependencies": {
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.11",
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-xml": "^6.1.0",
+    "@codemirror/state": "^6.7.1",
+    "@codemirror/view": "^6.43.6",
     "@lucide/vue": "^1.24.0",
+    "@uiw/codemirror-themes-all": "^4.25.11",
     "@wxt-dev/i18n": "^0.2.6",
+    "codemirror": "^6.0.2",
     "js-beautify": "^1.15.4",
-    "prismjs": "^1.30.0",
-    "vue": "^3.5.39"
+    "vue": "^3.5.39",
+    "vue-codemirror6": "^1.6.1"
   },
   "devDependencies": {
     "@types/js-beautify": "^1.14.3",
-    "@types/prismjs": "^1.26.6",
     "@vue/eslint-config-typescript": "^14.9.0",
     "@wxt-dev/module-vue": "^1.0.3",
     "eslint": "^10.7.0",

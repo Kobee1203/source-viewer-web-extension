@@ -1,4 +1,4 @@
-/* App chrome palettes. Default is dark; body[data-theme-type='light'] switches to light. */
+/* App chrome palettes. Default is dark; #app-viewer[data-theme-type='light'] switches to light. */
 :root {
   --app-bg: #1e1e1e;
   --app-fg: #d4d4d4;
@@ -17,27 +17,7 @@
   --btn-active-fg: #fff;
 }
 
-body[data-theme-type='light'] {
-  --app-bg: #f5f2f0;
-  --app-fg: #000;
-  --toolbar-bg: #ddd;
-  --toolbar-border: #ccc;
-  --select-bg: #fff;
-  --select-fg: #000;
-  --select-border: #aaa;
-  --status-bg: #ddd;
-  --status-border: #ccc;
-  --btn-bg: #fff;
-  --btn-bg-hover: #eee;
-  --btn-border: #aaa;
-  --btn-active-bg: #cfe6ff;
-  --btn-active-border: #7fb6ff;
-  --btn-active-fg: #003a6b;
-}
-
 body {
-  display: flex;
-  flex-direction: column;
   height: 100vh;
   margin: 0;
   font-family: Consolas, Monaco, monospace;
@@ -45,7 +25,6 @@ body {
   background: var(--app-bg);
 }
 
-/* #app wraps the whole UI; display:contents lets its children be flex items of <body>. */
 #app {
   display: contents;
 }
