@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { requestSource } from '@/utils/messaging';
 import { isRestricted } from '@/utils/restricted';
-import { getFileType, type FileType } from '@/utils/fileType';
+import { getFileType, type FileType, DEFAULT_FILE_TYPE } from '@/utils/fileType';
 import { mimeToFileType } from '@/utils/contentType';
 import { formatSource } from '@/utils/beautify';
 import { t } from '@/utils/i18n';
@@ -15,7 +15,7 @@ export function useSourceFetch() {
   const errorMessage = ref<string | null>(null);
   const errorWithNativeButton = ref(false);
   const code = ref('');
-  const language = ref<FileType>('markup');
+  const language = ref<FileType>(DEFAULT_FILE_TYPE);
   const byteSize = ref<number | null>(null);
   const targetUrl = ref<URL | null>(null);
 
@@ -54,8 +54,7 @@ export function useSourceFetch() {
       }
 
       byteSize.value = new Blob([response.text]).size;
-      // Prefer the response's real MIME (handles extensionless URLs like
-      // fonts.googleapis.com/css2?…); fall back to the URL extension.
+      // Prefer the response's real MIME (handles extensionless URLs like fonts.googleapis.com/css2?…); fall back to the URL extension.
       const type = mimeToFileType(response.contentType) ?? getFileType(target);
       language.value = type;
       code.value = formatSource(response.text, type);
