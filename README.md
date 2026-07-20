@@ -1,15 +1,19 @@
 # Source Code Viewer
 
-A browser extension to view formatted source code with syntax highlighting. It replaces the default browser's "View Source" with a more readable version featuring multiple themes and word-wrapping.
+A browser extension that replaces the browser's plain "View Source" with a readable, syntax-highlighted view — with multiple themes, word wrap, and clickable links. Built with [WXT](https://wxt.dev/) + TypeScript + Vue 3, and [CodeMirror 6](https://codemirror.net/) for rendering.
 
 ## Features
 
-- **Syntax Highlighting**: Beautiful code highlighting for HTML, CSS, and JavaScript.
-- **Code Formatting**: Automatic beautification of the source code.
-- **Multiple Themes**: Choose from several PrismJS themes (Dark, Light, Funky, etc.).
-- **Word Wrap**: Toggle line wrapping for long lines of code.
-- **Smart Fallback**: Detects restricted domains (like the Chrome Web Store) and provides a graceful fallback to the browser's native source viewer.
-- **Cross-Platform**: Compatible with both Google Chrome and Mozilla Firefox.
+- **Syntax Highlighting**: Powered by CodeMirror 6, for HTML, CSS, JavaScript, JSON, and XML.
+- **Code Formatting**: Automatic beautification of the source (via `js-beautify`).
+- **In-Place Auto-Open**: Navigating directly to a raw `.css`/`.js`/`.json`/`.xml` URL renders the formatted viewer in place, keeping the original URL in the address bar.
+- **Multiple Themes**: 45 CodeMirror themes (light & dark), loaded on demand, with a persistent selector.
+- **Word Wrap, Line Numbers & Folding**: Toggle line wrapping; navigate with line numbers and code folding.
+- **Clickable Links**: URLs in the source are clickable and routed by type — images open in the browser, other resources reopen in the viewer.
+- **Native Viewer Toggle**: A toolbar button to open the browser's built-in `view-source:` viewer (same tab, or new tab with middle/Ctrl/Cmd-click).
+- **Smart Fallback**: Detects restricted domains (like the Chrome Web Store) and falls back gracefully to the browser's native source viewer.
+- **Localized**: Available in 9 languages (English, French, Spanish, German, Italian, Japanese, Simplified Chinese, and Brazilian/European Portuguese).
+- **Cross-Platform**: Compatible with both Google Chrome and Mozilla Firefox (both Manifest V3).
 
 ## Installation
 
@@ -23,9 +27,23 @@ Visit the [Chrome Web Store](https://chromewebstore.google.com/detail/source-cod
 
 ## Development
 
-1. Clone the repository.
-2. Run `npm install` to install dependencies.
-3. Run `npm run build` to generate the extension packages in the `dist/` directory.
+Requires Node.js ≥ 24 and pnpm ≥ 11 (see `packageManager` in `package.json`).
+
+```bash
+pnpm install        # install dependencies
+pnpm dev            # run in dev mode (Chrome); pnpm dev:firefox for Firefox
+pnpm build          # build both chrome-mv3 and firefox-mv3 into .output/
+pnpm zip            # produce the store zips (+ sources.zip)
+```
+
+Other useful scripts:
+
+```bash
+pnpm compile        # type-check (vue-tsc)
+pnpm lint           # ESLint (type-aware)
+pnpm lint:css       # Stylelint
+pnpm format         # Prettier
+```
 
 ## License
 
