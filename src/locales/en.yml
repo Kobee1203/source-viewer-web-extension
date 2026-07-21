@@ -1,5 +1,5 @@
 actionTitle: 'View page source code'
-extDescription: 'A browser extension to view formatted source code with syntax highlighting.'
+extDescription: 'View & format source code with syntax highlighting — HTML, CSS, JavaScript, JSON & XML. A clean source code viewer & formatter.'
 viewerWordWrap: 'Line wrap'
 viewerTheme: 'Theme:'
 viewerLoading: 'Fetching source code...'

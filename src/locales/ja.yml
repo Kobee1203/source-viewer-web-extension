@@ -1,5 +1,5 @@
 actionTitle: 'ページのソースコードを表示'
-extDescription: '整形されたソースコードを構文ハイライト付きで表示するブラウザ拡張機能。'
+extDescription: 'ソースコードを構文ハイライト付きで表示・整形。HTML・CSS・JavaScript・JSON・XML対応のコードビューア＆フォーマッター。'
 viewerWordWrap: '行の折り返し'
 viewerTheme: 'テーマ:'
 viewerLoading: 'ソースコードを取得しています...'

@@ -1,5 +1,5 @@
 actionTitle: '查看页面源代码'
-extDescription: '一款用于查看带语法高亮的格式化源代码的浏览器扩展。'
+extDescription: '查看并格式化源代码，支持语法高亮：HTML、CSS、JavaScript、JSON、XML。简洁的源代码查看器与格式化工具。'
 viewerWordWrap: '自动换行'
 viewerTheme: '主题：'
 viewerLoading: '正在获取源代码…'
