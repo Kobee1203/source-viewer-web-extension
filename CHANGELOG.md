@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.6.0] - not released
+## [1.6.1] - not released
+
+### Changed
+
+- **Store Listing**: Renamed the extension to "Source Code Viewer — HTML, CSS, JS, JSON & XML Formatter" and reworded the store summary across all locales to mention the supported languages (HTML, CSS, JavaScript, JSON, XML) and formatting, improving discoverability. No functional changes.
+
+## [1.6.0] - 2026-07-20
 
 ### Changed
 
