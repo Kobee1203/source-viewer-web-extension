@@ -1,5 +1,5 @@
 actionTitle: 'Ver el código fuente de la página'
-extDescription: 'Una extensión de navegador para ver el código fuente formateado con resaltado de sintaxis.'
+extDescription: 'Visualiza y formatea código fuente con resaltado de sintaxis: HTML, CSS, JS, JSON y XML. Un visor y formateador de código.'
 viewerWordWrap: 'Ajuste de línea'
 viewerTheme: 'Tema:'
 viewerLoading: 'Obteniendo el código fuente...'

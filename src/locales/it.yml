@@ -1,5 +1,5 @@
 actionTitle: 'Visualizza il codice sorgente della pagina'
-extDescription: "Un'estensione del browser per visualizzare il codice sorgente formattato con evidenziazione della sintassi."
+extDescription: 'Visualizza e formatta il codice sorgente con evidenziazione: HTML, CSS, JS, JSON, XML. Un visualizzatore e formattatore di codice.'
 viewerWordWrap: 'A capo automatico'
 viewerTheme: 'Tema:'
 viewerLoading: 'Recupero del codice sorgente...'
