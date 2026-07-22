@@ -1,6 +1,7 @@
 import { ViewPlugin, Decoration, DecorationSet, EditorView } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
 import { viewerUrl } from '@/utils/viewerUrl';
+import { fontViewerUrl } from '@/utils/fontViewerUrl';
 import { classifyLinkTarget } from '@/utils/linkTarget';
 
 /** Whether `value` is an absolute URL (`http(s)://…`) or protocol-relative (`//…`). */
@@ -19,7 +20,16 @@ function resolveUrl(attr: string, rawUrl: string, baseUrl: string): string | nul
   }
   try {
     const resolved = new URL(trimmed, baseUrl);
-    return classifyLinkTarget(resolved) === 'image' ? resolved.toString() : viewerUrl(resolved.toString());
+    // Route by target type: images render natively in the browser, fonts open in the
+    // dedicated font viewer, everything else opens in the code viewer.
+    switch (classifyLinkTarget(resolved)) {
+      case 'image':
+        return resolved.toString();
+      case 'font':
+        return fontViewerUrl(resolved.toString());
+      default:
+        return viewerUrl(resolved.toString());
+    }
   } catch {
     return null;
   }

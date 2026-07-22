@@ -1,0 +1,29 @@
+/* Font viewer chrome palette. Dark by default; #app-fontviewer[data-theme-type='light'] switches to light.
+   Shares the same CSS variable names as the code viewer (src/entrypoints/viewer/style.css). */
+:root {
+  --app-bg: #1e1e1e;
+  --app-fg: #d4d4d4;
+  --toolbar-bg: #333;
+  --toolbar-border: #444;
+  --select-bg: #555;
+  --select-fg: #fff;
+  --select-border: #666;
+  --btn-bg: #4a4a4a;
+  --btn-bg-hover: #5a5a5a;
+  --btn-border: #666;
+  --btn-active-bg: #0e639c;
+  --btn-active-border: #17b;
+  --btn-active-fg: #fff;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  font-family: Consolas, Monaco, monospace;
+  color: var(--app-fg);
+  background: var(--app-bg);
+}
+
+#app {
+  display: contents;
+}
