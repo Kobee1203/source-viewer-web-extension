@@ -32,7 +32,7 @@ void load();
         :message="errorMessage"
       />
       <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
-      <CodeView v-else :code="code" :language="language" :base-url="baseUrl" :wrap="wordWrap" :theme-id="themeId" />
+      <CodeView v-else :code :language :base-url :wrap="wordWrap" :theme-id :theme-type />
     </div>
 
     <StatusBar v-if="byteSize !== null" :bytes="byteSize" />

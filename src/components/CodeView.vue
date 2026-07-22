@@ -14,6 +14,7 @@ const props = defineProps<{
   baseUrl: string;
   wrap: boolean;
   themeId?: string;
+  themeType?: string;
 }>();
 
 // The language support is loaded on demand (each @codemirror/lang-* is its own chunk).
@@ -44,6 +45,8 @@ watch(
 );
 
 const extensions = computed(() => [langSupport.value, themeExtension.value, linkifyPlugin(props.baseUrl)]);
+
+const linkHoverColor = computed(() => (props.themeType === 'dark' ? 'black' : 'white'));
 </script>
 
 <template>
@@ -75,6 +78,11 @@ const extensions = computed(() => [langSupport.value, themeExtension.value, link
 }
 
 .source-link:hover {
-  text-decoration: none;
+  color: color-mix(in srgb, currentcolor, v-bind(linkHoverColor) 30%);
+  text-decoration-color: color-mix(in srgb, currentcolor, v-bind(linkHoverColor) 30%);
+}
+
+.source-link:hover span {
+  color: color-mix(in srgb, currentcolor, v-bind(linkHoverColor) 0%);
 }
 </style>

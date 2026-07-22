@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.6.1] - not released
+## [1.6.2] - not released
+
+### Changed
+
+- feat(viewer): adjust link hover color based on theme type
+
+## [1.6.1] - 2026-07-22
 
 ### Changed
 
