@@ -7,8 +7,10 @@
   --select-bg: #555;
   --select-fg: #fff;
   --select-border: #666;
-  --status-bg: #333;
-  --status-border: #444;
+  --statusbar-bg: #333;
+  --statusbar-border: #444;
+  --statusbar-http-status-success-bg: #387c15;
+  --statusbar-http-status-error-bg: #d9534f;
   --btn-bg: #4a4a4a;
   --btn-bg-hover: #5a5a5a;
   --btn-border: #666;

@@ -18,6 +18,8 @@ export function useSourceFetch() {
   const language = ref<FileType>(DEFAULT_FILE_TYPE);
   const byteSize = ref<number | null>(null);
   const targetUrl = ref<URL | null>(null);
+  const httpStatus = ref<number | null>(null);
+  const httpStatusText = ref('');
 
   async function load(): Promise<void> {
     const params = new URLSearchParams(window.location.search);
@@ -54,6 +56,8 @@ export function useSourceFetch() {
       }
 
       byteSize.value = new Blob([response.text]).size;
+      httpStatus.value = response.httpStatus;
+      httpStatusText.value = response.httpStatusText;
       // Prefer the response's real MIME (handles extensionless URLs like fonts.googleapis.com/css2?…); fall back to the URL extension.
       const type = mimeToFileType(response.contentType) ?? getFileType(target);
       language.value = type;
@@ -74,6 +78,8 @@ export function useSourceFetch() {
     language,
     byteSize,
     targetUrl,
+    httpStatus,
+    httpStatusText,
     load,
   };
 }

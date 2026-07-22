@@ -9,7 +9,18 @@ import { usePreferences } from '@/composables/usePreferences';
 import { t } from '@/utils/i18n';
 import { getThemeType } from '@/utils/themes';
 
-const { loading, errorMessage, errorWithNativeButton, code, language, byteSize, targetUrl, load } = useSourceFetch();
+const {
+  loading,
+  errorMessage,
+  errorWithNativeButton,
+  code,
+  language,
+  byteSize,
+  targetUrl,
+  httpStatus,
+  httpStatusText,
+  load,
+} = useSourceFetch();
 
 const { themeId, wordWrap } = usePreferences();
 
@@ -35,7 +46,12 @@ void load();
       <CodeView v-else :code :language :base-url :wrap="wordWrap" :theme-id :theme-type />
     </div>
 
-    <StatusBar v-if="byteSize !== null" :bytes="byteSize" />
+    <StatusBar
+      v-if="byteSize !== null"
+      :bytes="byteSize"
+      :http-status="httpStatus"
+      :http-status-text="httpStatusText"
+    />
   </div>
 </template>
 
@@ -48,8 +64,8 @@ void load();
   --select-bg: #fff;
   --select-fg: #000;
   --select-border: #aaa;
-  --status-bg: #ddd;
-  --status-border: #ccc;
+  --statusbar-bg: #ddd;
+  --statusbar-border: #ccc;
   --btn-bg: #fff;
   --btn-bg-hover: #eee;
   --btn-border: #aaa;
