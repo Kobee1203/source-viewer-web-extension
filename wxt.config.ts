@@ -11,7 +11,11 @@ export default defineConfig({
   // Explicit ES imports everywhere (no auto-imports) for readability / store reviewability.
   imports: false,
   manifest: ({ browser }) => ({
-    name: 'Source Code Viewer — HTML, CSS, JS, JSON & XML Formatter',
+    // AMO (Firefox) caps the manifest name at 45 characters; Chrome allows ~75.
+    name:
+      browser === 'firefox'
+        ? 'Source Code Viewer — HTML/CSS/JS/JSON/XML'
+        : 'Source Code Viewer — HTML, CSS, JS, JSON & XML Formatter',
     description: '__MSG_extDescription__',
     default_locale: 'en',
     permissions: ['activeTab', 'tabs', 'storage', 'scripting'],
