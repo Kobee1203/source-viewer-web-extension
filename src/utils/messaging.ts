@@ -47,8 +47,10 @@ export async function fetchSource(message: FetchSourceRequest): Promise<FetchSou
       headers: { Accept: 'text/html,text/plain,*/*' },
       credentials: 'omit',
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
     const text = await res.text();
+    // Still show the body on an error status (e.g. a JSON 500 error payload) as long as
+    // there is one — only report a failure when there's no content to display.
+    if (!res.ok && !text) throw new Error(`HTTP ${res.status} ${res.statusText}`);
     return { ok: true, text, contentType: res.headers.get('content-type') };
   } catch (err) {
     return { ok: false, error: (err as Error).message };
