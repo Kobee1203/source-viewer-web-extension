@@ -2,6 +2,8 @@
   "name": "source-viewer-web-extension",
   "version": "1.6.1",
   "description": "A browser extension to view formatted source code with syntax highlighting.",
+  "author": "Nicolas Dos Santos",
+  "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
     "postinstall": "wxt prepare",
@@ -19,8 +21,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
-  "author": "Nicolas Dos Santos",
-  "license": "ISC",
   "packageManager": "pnpm@11.4.0",
   "engines": {
     "node": ">=24",

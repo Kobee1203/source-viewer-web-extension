@@ -47,4 +47,6 @@ pnpm format         # Prettier
 
 ## License
 
-Distributed under the MIT License.
+Copyright (C) 2026 Nicolas Dos Santos
+
+This project is licensed under the **GNU General Public License v3.0 (or later)** — see the [LICENSE](LICENSE) file for details.
