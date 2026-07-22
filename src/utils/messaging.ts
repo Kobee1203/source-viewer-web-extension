@@ -51,7 +51,7 @@ export async function fetchSource(message: FetchSourceRequest): Promise<FetchSou
   try {
     const res = await fetch(message.url, {
       headers: { Accept: 'text/html,text/plain,*/*' },
-      credentials: 'omit',
+      credentials: 'include',
     });
     const text = await res.text();
     // Still show the body on an error status (e.g. a JSON 500 error payload) as long as there is one.

@@ -15,6 +15,7 @@ feat: surface HTTP status in StatusBar
 ### Fixed
 
 - fix: show response body on HTTP error status when one is returned
+- fix: include credentials in fetch request
 
 ## [1.6.1] - 2026-07-22
 
