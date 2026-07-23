@@ -6,8 +6,14 @@ export interface FetchSourceRequest {
   url: string;
 }
 
-/** Response returned by the background service worker. `contentType` is the raw response header, if any. */
-export type FetchSourceResponse = { ok: true; text: string; contentType: string | null } | { ok: false; error: string };
+/**
+ * Response returned by the background service worker. `contentType` is the raw response
+ * header, if any. `httpStatus`/`httpStatusText` are the response's status (surfaced so the
+ * viewer can flag an error status even while still showing the returned body).
+ */
+export type FetchSourceResponse =
+  | { ok: true; text: string; contentType: string | null; httpStatus: number; httpStatusText: string }
+  | { ok: false; error: string };
 
 /** Typed wrapper around runtime.sendMessage for the FETCH_SOURCE request. */
 export function requestSource(url: string): Promise<FetchSourceResponse> {
@@ -45,11 +51,19 @@ export async function fetchSource(message: FetchSourceRequest): Promise<FetchSou
   try {
     const res = await fetch(message.url, {
       headers: { Accept: 'text/html,text/plain,*/*' },
-      credentials: 'omit',
+      credentials: 'include',
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
     const text = await res.text();
-    return { ok: true, text, contentType: res.headers.get('content-type') };
+    // Still show the body on an error status (e.g. a JSON 500 error payload) as long as there is one.
+    // Only report a failure when there's no content to display.
+    if (!res.ok && !text) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    return {
+      ok: true,
+      text,
+      contentType: res.headers.get('content-type'),
+      httpStatus: res.status,
+      httpStatusText: res.statusText,
+    };
   } catch (err) {
     return { ok: false, error: (err as Error).message };
   }

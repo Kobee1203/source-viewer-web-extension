@@ -1,4 +1,5 @@
-/* App chrome palettes. Default is dark; #app-viewer[data-theme-type='light'] switches to light. */
+/* Font viewer chrome palette. Dark by default; #app-fontviewer[data-theme-type='light'] switches to light.
+   Shares the same CSS variable names as the code viewer (src/entrypoints/viewer/style.css). */
 :root {
   --app-bg: #1e1e1e;
   --app-fg: #d4d4d4;
@@ -7,10 +8,6 @@
   --select-bg: #555;
   --select-fg: #fff;
   --select-border: #666;
-  --statusbar-bg: #333;
-  --statusbar-border: #444;
-  --statusbar-http-status-success-bg: #387c15;
-  --statusbar-http-status-error-bg: #d9534f;
   --btn-bg: #4a4a4a;
   --btn-bg-hover: #5a5a5a;
   --btn-border: #666;

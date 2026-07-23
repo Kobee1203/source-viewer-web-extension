@@ -4,9 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [1.6.2] - not released
 
+### Added
+
+feat: surface HTTP status in StatusBar
+
 ### Changed
 
 - feat(viewer): adjust link hover color based on theme type
+
+### Fixed
+
+- fix: show response body on HTTP error status when one is returned
+- fix: include credentials in fetch request
 
 ## [1.6.1] - 2026-07-22
 

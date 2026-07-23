@@ -22,7 +22,9 @@ export default defineConfig({
     host_permissions: ['<all_urls>'],
     // Lets the in-place viewer (inplace-viewer.content.ts) embed viewer.html in a
     // full-viewport iframe on any origin's page for direct CSS/JS/JSON/XML navigations.
-    web_accessible_resources: [{ resources: ['viewer.html'], matches: ['<all_urls>'] }],
+    // fontviewer.html is exposed too so a font link clicked from that embedded viewer
+    // can open the dedicated font viewer from any origin.
+    web_accessible_resources: [{ resources: ['viewer.html', 'fontviewer.html'], matches: ['<all_urls>'] }],
     action: {
       default_title: '__MSG_actionTitle__',
       default_icon: {
