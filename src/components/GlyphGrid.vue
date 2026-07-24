@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Toast from '@/components/Toast.vue';
 import { useGlyphCoverage } from '@/composables/useGlyphCoverage';
 import { useCopyFeedback } from '@/composables/useCopyFeedback';
 import { codePointLabel } from '@/utils/glyphSample';
@@ -24,7 +25,7 @@ const { copied, copy } = useCopyFeedback<number>();
     >
       {{ String.fromCodePoint(cp) }}
     </button>
-    <span class="sr-only" role="status" aria-live="polite">{{ copied !== null ? t('viewerCopied') : '' }}</span>
+    <Toast :show="copied !== null">{{ t('viewerCopied') }}</Toast>
   </div>
 </template>
 
@@ -59,14 +60,5 @@ const { copied, copy } = useCopyFeedback<number>();
   color: var(--btn-active-fg);
   background: var(--btn-active-bg);
   border-color: var(--btn-active-border);
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  white-space: nowrap;
-  clip-path: inset(50%);
 }
 </style>
