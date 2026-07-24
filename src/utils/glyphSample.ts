@@ -3,8 +3,10 @@
  * font's cmap (see glyphCoverage.ts), we can't enumerate a font's real glyph inventory — we
  * instead render this fixed sample and keep only the code points the font actually covers.
  *
- * Consequence: fonts with very large coverage (e.g. CJK) only ever show this Latin-centric
- * sample, not their full glyph set. Enumerating those would require reading the cmap.
+ * Ranges can be broad: uncovered code points (unassigned, or absent from the font) are filtered
+ * out by the coverage test, so they add no noise — only probing cost. We cover the major
+ * alphabetic scripts, not the huge ideographic blocks: fonts with very large coverage (e.g. CJK)
+ * still only show this sample, not their full glyph set. Enumerating those would require the cmap.
  */
 
 /** Inclusive `[start, end]` code point ranges. */
@@ -13,6 +15,18 @@ const RANGES: [number, number][] = [
   [0xa1, 0xff], // Latin-1 Supplement (printable)
   [0x100, 0x17f], // Latin Extended-A
   [0x180, 0x24f], // Latin Extended-B
+  [0x370, 0x3ff], // Greek and Coptic
+  [0x400, 0x4ff], // Cyrillic
+  [0x500, 0x52f], // Cyrillic Supplement
+  [0x531, 0x58f], // Armenian
+  [0x5d0, 0x5ff], // Hebrew (letters onward)
+  [0x600, 0x6ff], // Arabic
+  [0x900, 0x97f], // Devanagari
+  [0xe00, 0xe7f], // Thai
+  [0x1200, 0x137f], // Ethiopic
+  [0x2d80, 0x2ddf], // Ethiopic Extended
+  [0x1380, 0x139f], // Ethiopic Supplement
+  [0x1f00, 0x1fff], // Greek Extended
   [0x20a0, 0x20bf], // Currency Symbols
 ];
 
@@ -31,10 +45,18 @@ const SINGLES: number[] = [
   0x25a0, 0x25aa, 0x25cf, 0x2605, 0x2606, 0x2660, 0x2663, 0x2665, 0x2666, 0x2713, 0x2717,
 ];
 
+// Several blocks above (Greek, Thai, Ethiopic, Greek Extended...) have unassigned gaps.
+// Probing an unassigned code point renders a browser-drawn ".notdef" placeholder that can
+// differ from the plain-fallback placeholder purely due to font-selection quirks, registering
+// as a false "covered" — so drop anything Unicode hasn't actually assigned.
+const ASSIGNED = /\p{Assigned}/u;
+
 function expand(): number[] {
   const out: number[] = [];
   for (const [start, end] of RANGES) {
-    for (let cp = start; cp <= end; cp++) out.push(cp);
+    for (let cp = start; cp <= end; cp++) {
+      if (ASSIGNED.test(String.fromCodePoint(cp))) out.push(cp);
+    }
   }
   return out.concat(SINGLES);
 }

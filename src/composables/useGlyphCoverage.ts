@@ -18,8 +18,10 @@ export function useGlyphCoverage(family: () => string): { covered: Ref<number[]>
         covered.value = [];
         return;
       }
+      // The tester attaches an offscreen canvas to the DOM; dispose it once probing is done.
       const tester = createCoverageTester(value);
       covered.value = GLYPH_SAMPLE.filter((cp) => tester.covers(cp));
+      tester.dispose();
     },
     { immediate: true },
   );

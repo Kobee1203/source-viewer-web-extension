@@ -12,7 +12,8 @@ const { copied, copy } = useCopyFeedback<number>();
 </script>
 
 <template>
-  <div class="glyph-grid">
+  <p v-if="covered.length === 0" class="glyph-empty">{{ t('fontViewerNoGlyphs') }}</p>
+  <div v-else class="glyph-grid">
     <button
       v-for="cp in covered"
       :key="cp"
@@ -30,6 +31,11 @@ const { copied, copy } = useCopyFeedback<number>();
 </template>
 
 <style scoped>
+.glyph-empty {
+  padding: 20px;
+  font-style: italic;
+}
+
 .glyph-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
