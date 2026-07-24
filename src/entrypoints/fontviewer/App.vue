@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import FontControls from '@/components/FontControls.vue';
 import FontPreview from '@/components/FontPreview.vue';
+import GlyphGrid from '@/components/GlyphGrid.vue';
 import FontInfo from '@/components/FontInfo.vue';
 import { useFontLoad } from '@/composables/useFontLoad';
 import { useFontPreferences } from '@/composables/useFontPreferences';
@@ -9,12 +11,15 @@ import { t } from '@/utils/i18n';
 const { loading, errorMessage, targetUrl, fontFamily, fileSize, format, load } = useFontLoad();
 const { previewText, fontSize, bold, italic, darkBg } = useFontPreferences();
 
+const view = ref<'preview' | 'glyphs'>('preview');
+
 void load();
 </script>
 
 <template>
   <div id="app-fontviewer">
     <FontControls
+      v-model:view="view"
       v-model:text="previewText"
       v-model:size="fontSize"
       v-model:bold="bold"
@@ -25,6 +30,7 @@ void load();
     <div id="content">
       <div v-if="loading" class="loader">{{ t('fontViewerLoading') }}</div>
       <div v-else-if="errorMessage" class="error">{{ errorMessage }}</div>
+      <GlyphGrid v-else-if="view === 'glyphs'" :family="fontFamily" />
       <FontPreview
         v-else
         :family="fontFamily"

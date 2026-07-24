@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { Bold, Italic, Sun, Moon } from '@lucide/vue';
+import { Bold, Italic, Sun, Moon, Type, LayoutGrid } from '@lucide/vue';
 import { t } from '@/utils/i18n';
+
+// Which view is shown; the preview settings only apply to (and only show in) the preview view.
+const view = defineModel<'preview' | 'glyphs'>('view', { required: true });
 
 // Two-way bound preview settings, owned by the font viewer's App.
 const text = defineModel<string>('text', { required: true });
@@ -12,59 +15,86 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
 
 <template>
   <div class="toolbar">
-    <input
-      v-model="text"
-      type="text"
-      name="preview"
-      class="preview-input"
-      :placeholder="t('fontViewerPreviewLabel')"
-      :aria-label="t('fontViewerPreviewLabel')"
-    />
+    <div class="view-switch" role="group">
+      <button
+        type="button"
+        class="icon-btn"
+        :class="{ active: view === 'preview' }"
+        :aria-pressed="view === 'preview'"
+        :title="t('fontViewerViewPreview')"
+        :aria-label="t('fontViewerViewPreview')"
+        @click="view = 'preview'"
+      >
+        <Type :size="20" />
+      </button>
+      <button
+        type="button"
+        class="icon-btn"
+        :class="{ active: view === 'glyphs' }"
+        :aria-pressed="view === 'glyphs'"
+        :title="t('fontViewerViewGlyphs')"
+        :aria-label="t('fontViewerViewGlyphs')"
+        @click="view = 'glyphs'"
+      >
+        <LayoutGrid :size="20" />
+      </button>
+    </div>
 
-    <span class="spacer"></span>
+    <template v-if="view === 'preview'">
+      <input
+        v-model="text"
+        type="text"
+        name="preview"
+        class="preview-input"
+        :placeholder="t('fontViewerPreviewLabel')"
+        :aria-label="t('fontViewerPreviewLabel')"
+      />
 
-    <label class="size-control" :title="t('fontViewerSize')">
-      <input v-model.number="size" type="range" min="8" max="200" step="1" :aria-label="t('fontViewerSize')" />
-      <span class="size-value">{{ size }}px</span>
-    </label>
+      <span class="spacer"></span>
 
-    <span class="sep"></span>
+      <label class="size-control" :title="t('fontViewerSize')">
+        <input v-model.number="size" type="range" min="8" max="200" step="1" :aria-label="t('fontViewerSize')" />
+        <span class="size-value">{{ size }}px</span>
+      </label>
 
-    <button
-      type="button"
-      class="icon-btn"
-      :class="{ active: bold }"
-      :aria-pressed="bold"
-      :title="t('fontViewerBold')"
-      :aria-label="t('fontViewerBold')"
-      @click="bold = !bold"
-    >
-      <Bold :size="20" />
-    </button>
+      <span class="sep"></span>
 
-    <button
-      type="button"
-      class="icon-btn"
-      :class="{ active: italic }"
-      :aria-pressed="italic"
-      :title="t('fontViewerItalic')"
-      :aria-label="t('fontViewerItalic')"
-      @click="italic = !italic"
-    >
-      <Italic :size="20" />
-    </button>
+      <button
+        type="button"
+        class="icon-btn"
+        :class="{ active: bold }"
+        :aria-pressed="bold"
+        :title="t('fontViewerBold')"
+        :aria-label="t('fontViewerBold')"
+        @click="bold = !bold"
+      >
+        <Bold :size="20" />
+      </button>
 
-    <button
-      type="button"
-      class="icon-btn"
-      :class="{ active: darkBg }"
-      :aria-pressed="darkBg"
-      :title="t('fontViewerBackground')"
-      :aria-label="t('fontViewerBackground')"
-      @click="darkBg = !darkBg"
-    >
-      <component :is="darkBg ? Sun : Moon" :size="20" />
-    </button>
+      <button
+        type="button"
+        class="icon-btn"
+        :class="{ active: italic }"
+        :aria-pressed="italic"
+        :title="t('fontViewerItalic')"
+        :aria-label="t('fontViewerItalic')"
+        @click="italic = !italic"
+      >
+        <Italic :size="20" />
+      </button>
+
+      <button
+        type="button"
+        class="icon-btn"
+        :class="{ active: darkBg }"
+        :aria-pressed="darkBg"
+        :title="t('fontViewerBackground')"
+        :aria-label="t('fontViewerBackground')"
+        @click="darkBg = !darkBg"
+      >
+        <component :is="darkBg ? Sun : Moon" :size="20" />
+      </button>
+    </template>
   </div>
 </template>
 
@@ -77,6 +107,11 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
   color: var(--app-fg);
   background: var(--toolbar-bg);
   border-bottom: 1px solid var(--toolbar-border);
+}
+
+.view-switch {
+  display: inline-flex;
+  gap: 4px;
 }
 
 .spacer {
