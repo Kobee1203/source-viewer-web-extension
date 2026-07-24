@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { Bold, Italic, Sun, Moon, Type, LayoutGrid } from '@lucide/vue';
+import { Type, LayoutGrid } from '@lucide/vue';
+import FontPreviewControls from '@/components/FontPreviewControls.vue';
 import { t } from '@/utils/i18n';
 
 // Which view is shown; the preview settings only apply to (and only show in) the preview view.
 const view = defineModel<'preview' | 'glyphs'>('view', { required: true });
 
-// Two-way bound preview settings, owned by the font viewer's App.
+// Preview settings, owned by the font viewer's App and forwarded to FontPreviewControls.
 const text = defineModel<string>('text', { required: true });
 const size = defineModel<number>('size', { required: true });
 const bold = defineModel<boolean>('bold', { required: true });
@@ -40,61 +41,14 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
       </button>
     </div>
 
-    <template v-if="view === 'preview'">
-      <input
-        v-model="text"
-        type="text"
-        name="preview"
-        class="preview-input"
-        :placeholder="t('fontViewerPreviewLabel')"
-        :aria-label="t('fontViewerPreviewLabel')"
-      />
-
-      <span class="spacer"></span>
-
-      <label class="size-control" :title="t('fontViewerSize')">
-        <input v-model.number="size" type="range" min="8" max="200" step="1" :aria-label="t('fontViewerSize')" />
-        <span class="size-value">{{ size }}px</span>
-      </label>
-
-      <span class="sep"></span>
-
-      <button
-        type="button"
-        class="icon-btn"
-        :class="{ active: bold }"
-        :aria-pressed="bold"
-        :title="t('fontViewerBold')"
-        :aria-label="t('fontViewerBold')"
-        @click="bold = !bold"
-      >
-        <Bold :size="20" />
-      </button>
-
-      <button
-        type="button"
-        class="icon-btn"
-        :class="{ active: italic }"
-        :aria-pressed="italic"
-        :title="t('fontViewerItalic')"
-        :aria-label="t('fontViewerItalic')"
-        @click="italic = !italic"
-      >
-        <Italic :size="20" />
-      </button>
-
-      <button
-        type="button"
-        class="icon-btn"
-        :class="{ active: darkBg }"
-        :aria-pressed="darkBg"
-        :title="t('fontViewerBackground')"
-        :aria-label="t('fontViewerBackground')"
-        @click="darkBg = !darkBg"
-      >
-        <component :is="darkBg ? Sun : Moon" :size="20" />
-      </button>
-    </template>
+    <FontPreviewControls
+      v-if="view === 'preview'"
+      v-model:text="text"
+      v-model:size="size"
+      v-model:bold="bold"
+      v-model:italic="italic"
+      v-model:dark-bg="darkBg"
+    />
   </div>
 </template>
 
@@ -112,45 +66,6 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
 .view-switch {
   display: inline-flex;
   gap: 4px;
-}
-
-.spacer {
-  margin-left: auto;
-}
-
-.sep {
-  align-self: stretch;
-  width: 1px;
-  margin: 2px 4px;
-  background: var(--toolbar-border);
-  filter: brightness(1.5);
-}
-
-.preview-input {
-  flex: 1 1 auto;
-  min-width: 120px;
-  max-width: 480px;
-  height: 32px;
-  padding: 0 10px;
-  font-family: inherit;
-  font-size: 13px;
-  color: var(--select-fg);
-  outline: none;
-  background: var(--select-bg);
-  border: 1px solid var(--select-border);
-  border-radius: 5px;
-}
-
-.size-control {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.size-value {
-  min-width: 44px;
-  font-size: 13px;
-  text-align: right;
 }
 
 /* Icon button — matches the code viewer's Toolbar. */
