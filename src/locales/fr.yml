@@ -24,3 +24,6 @@ fontViewerSource: 'Source'
 fontViewerFormat: 'Format'
 fontViewerFileSize: 'Taille du fichier'
 fontViewerStatus: 'Statut'
+fontViewerViewPreview: 'Aperçu'
+fontViewerViewGlyphs: 'Glyphes'
+fontViewerNoGlyphs: "Cette police ne couvre aucun des caractères de l'échantillon."

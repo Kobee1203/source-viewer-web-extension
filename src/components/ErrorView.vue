@@ -1,26 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { openNativeViewer } from '@/utils/nativeViewer';
+import { useCopyFeedback } from '@/composables/useCopyFeedback';
 import { t } from '@/utils/i18n';
 
 const props = defineProps<{ url: URL; message: string }>();
 
 const showFallback = ref(false);
-const copied = ref(false);
+const { copied, copy } = useCopyFeedback<boolean>(2000);
 
 async function openNative(): Promise<void> {
   // Navigation can fail (e.g. Illegal URL on Firefox for about: pages).
   const res = await openNativeViewer(props.url, false);
   if (!res?.ok) showFallback.value = true;
-}
-
-function copy(): void {
-  void navigator.clipboard.writeText('view-source:' + props.url.toString()).then(() => {
-    copied.value = true;
-    setTimeout(() => {
-      copied.value = false;
-    }, 2000);
-  });
 }
 </script>
 
@@ -35,7 +27,7 @@ function copy(): void {
     <template v-else>
       <p class="fallback-message">{{ t('errorRestrictedApi') }}</p>
       <div class="url-box">view-source:{{ url.toString() }}</div>
-      <button class="copy-btn" :class="{ copied }" @click="copy">
+      <button class="copy-btn" :class="{ copied }" @click="copy('view-source:' + url.toString(), true)">
         {{ copied ? t('viewerCopied') : t('viewerCopyUrl') }}
       </button>
     </template>

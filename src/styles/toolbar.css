@@ -1,0 +1,24 @@
+/* Shared toolbar layout primitives, used by the code viewer's Toolbar and the font viewer's
+   FontControls/FontPreviewControls. Global (not scoped) because Vue's scoped styles don't cross
+   component boundaries; imported by both entrypoints' style.css. */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  color: var(--app-fg);
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--toolbar-border);
+}
+
+.spacer {
+  margin-left: auto;
+}
+
+.sep {
+  align-self: stretch;
+  width: 1px;
+  margin: 2px 4px;
+  background: var(--toolbar-border);
+  filter: brightness(1.5);
+}
