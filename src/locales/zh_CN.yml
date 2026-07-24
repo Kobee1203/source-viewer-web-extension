@@ -1,5 +1,5 @@
 actionTitle: '查看页面源代码'
-extDescription: '查看并格式化源代码，支持语法高亮：HTML、CSS、JavaScript、JSON、XML。简洁的源代码查看器与格式化工具。'
+extDescription: '查看并格式化源代码，支持语法高亮：HTML、CSS、JS、JSON、XML，另含字体查看器与字形网格。'
 viewerWordWrap: '自动换行'
 viewerTheme: '主题：'
 viewerLoading: '正在获取源代码…'

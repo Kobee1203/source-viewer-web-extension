@@ -1,5 +1,5 @@
 actionTitle: 'Seitenquelltext anzeigen'
-extDescription: 'Quelltext anzeigen und formatieren, mit Syntaxhervorhebung: HTML, CSS, JS, JSON, XML. Ein Quellcode-Viewer und -Formatierer.'
+extDescription: 'Quelltext anzeigen und formatieren mit Syntaxhervorhebung: HTML, CSS, JS, JSON, XML – plus ein Schriften-Viewer.'
 viewerWordWrap: 'Zeilenumbruch'
 viewerTheme: 'Design:'
 viewerLoading: 'Quelltext wird abgerufen...'

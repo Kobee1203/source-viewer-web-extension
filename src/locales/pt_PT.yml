@@ -1,5 +1,5 @@
 actionTitle: 'Ver o código-fonte da página'
-extDescription: 'Veja e formate o código-fonte com realce de sintaxe: HTML, CSS, JS, JSON e XML. Um visualizador e formatador de código.'
+extDescription: 'Veja e formate o código-fonte com realce de sintaxe: HTML, CSS, JS, JSON e XML, além de um visualizador de tipos de letra.'
 viewerWordWrap: 'Quebra de linha'
 viewerTheme: 'Tema:'
 viewerLoading: 'A obter o código-fonte...'

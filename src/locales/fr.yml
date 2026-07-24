@@ -1,5 +1,5 @@
 actionTitle: 'Voir le code source de la page'
-extDescription: 'Affichez et mettez en forme le code source avec coloration syntaxique : HTML, CSS, JS, JSON, XML. Visionneuse et formateur de code.'
+extDescription: 'Affichez et mettez en forme le code source avec coloration syntaxique : HTML, CSS, JS, JSON, XML, plus une visionneuse de polices.'
 viewerWordWrap: 'Retour à la ligne automatique'
 viewerTheme: 'Thème :'
 viewerLoading: 'Récupération du code source...'
