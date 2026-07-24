@@ -1,3 +1,5 @@
+@import url('../../styles/toolbar.css');
+
 /* App chrome palettes. Default is dark; #app-viewer[data-theme-type='light'] switches to light. */
 :root {
   --app-bg: #1e1e1e;

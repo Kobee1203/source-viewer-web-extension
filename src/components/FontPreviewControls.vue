@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Bold, Italic, Sun, Moon } from '@lucide/vue';
+import IconButton from '@/components/IconButton.vue';
 import { t } from '@/utils/i18n';
 
 // Two-way bound preview settings, owned by the font viewer's App (forwarded via FontControls).
@@ -30,63 +31,28 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
 
     <span class="sep"></span>
 
-    <button
-      type="button"
-      class="icon-btn"
-      :class="{ active: bold }"
-      :aria-pressed="bold"
-      :title="t('fontViewerBold')"
-      :aria-label="t('fontViewerBold')"
-      @click="bold = !bold"
-    >
+    <IconButton :active="bold" :label="t('fontViewerBold')" @click="bold = !bold">
       <Bold :size="20" />
-    </button>
+    </IconButton>
 
-    <button
-      type="button"
-      class="icon-btn"
-      :class="{ active: italic }"
-      :aria-pressed="italic"
-      :title="t('fontViewerItalic')"
-      :aria-label="t('fontViewerItalic')"
-      @click="italic = !italic"
-    >
+    <IconButton :active="italic" :label="t('fontViewerItalic')" @click="italic = !italic">
       <Italic :size="20" />
-    </button>
+    </IconButton>
 
-    <button
-      type="button"
-      class="icon-btn"
-      :class="{ active: darkBg }"
-      :aria-pressed="darkBg"
-      :title="t('fontViewerBackground')"
-      :aria-label="t('fontViewerBackground')"
-      @click="darkBg = !darkBg"
-    >
+    <IconButton :active="darkBg" :label="t('fontViewerBackground')" @click="darkBg = !darkBg">
       <component :is="darkBg ? Sun : Moon" :size="20" />
-    </button>
+    </IconButton>
   </div>
 </template>
 
 <style scoped>
-/* Fills the toolbar space beside the view switch; internal spacer splits left/right groups. */
+/* Fills the toolbar space beside the view switch; internal spacer splits left/right groups
+   (.spacer/.sep are shared globals — see src/styles/toolbar.css). */
 .preview-controls {
   display: flex;
   flex: 1 1 auto;
   gap: 8px;
   align-items: center;
-}
-
-.spacer {
-  margin-left: auto;
-}
-
-.sep {
-  align-self: stretch;
-  width: 1px;
-  margin: 2px 4px;
-  background: var(--toolbar-border);
-  filter: brightness(1.5);
 }
 
 .preview-input {
@@ -114,30 +80,5 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
   min-width: 44px;
   font-size: 13px;
   text-align: right;
-}
-
-/* Icon button — matches the code viewer's Toolbar. */
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  color: var(--app-fg);
-  cursor: pointer;
-  background: var(--btn-bg);
-  border: 1px solid var(--btn-border);
-  border-radius: 5px;
-}
-
-.icon-btn:hover {
-  background: var(--btn-bg-hover);
-}
-
-.icon-btn.active {
-  color: var(--btn-active-fg);
-  background: var(--btn-active-bg);
-  border-color: var(--btn-active-border);
 }
 </style>

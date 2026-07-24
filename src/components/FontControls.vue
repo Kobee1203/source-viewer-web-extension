@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Type, LayoutGrid } from '@lucide/vue';
+import IconButton from '@/components/IconButton.vue';
 import FontPreviewControls from '@/components/FontPreviewControls.vue';
 import { t } from '@/utils/i18n';
 
@@ -17,28 +18,12 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
 <template>
   <div class="toolbar">
     <div class="view-switch" role="group">
-      <button
-        type="button"
-        class="icon-btn"
-        :class="{ active: view === 'preview' }"
-        :aria-pressed="view === 'preview'"
-        :title="t('fontViewerViewPreview')"
-        :aria-label="t('fontViewerViewPreview')"
-        @click="view = 'preview'"
-      >
+      <IconButton :active="view === 'preview'" :label="t('fontViewerViewPreview')" @click="view = 'preview'">
         <Type :size="20" />
-      </button>
-      <button
-        type="button"
-        class="icon-btn"
-        :class="{ active: view === 'glyphs' }"
-        :aria-pressed="view === 'glyphs'"
-        :title="t('fontViewerViewGlyphs')"
-        :aria-label="t('fontViewerViewGlyphs')"
-        @click="view = 'glyphs'"
-      >
+      </IconButton>
+      <IconButton :active="view === 'glyphs'" :label="t('fontViewerViewGlyphs')" @click="view = 'glyphs'">
         <LayoutGrid :size="20" />
-      </button>
+      </IconButton>
     </div>
 
     <FontPreviewControls
@@ -53,43 +38,8 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
 </template>
 
 <style scoped>
-.toolbar {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 10px;
-  color: var(--app-fg);
-  background: var(--toolbar-bg);
-  border-bottom: 1px solid var(--toolbar-border);
-}
-
 .view-switch {
   display: inline-flex;
   gap: 4px;
-}
-
-/* Icon button — matches the code viewer's Toolbar. */
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  color: var(--app-fg);
-  cursor: pointer;
-  background: var(--btn-bg);
-  border: 1px solid var(--btn-border);
-  border-radius: 5px;
-}
-
-.icon-btn:hover {
-  background: var(--btn-bg-hover);
-}
-
-.icon-btn.active {
-  color: var(--btn-active-fg);
-  background: var(--btn-active-bg);
-  border-color: var(--btn-active-border);
 }
 </style>

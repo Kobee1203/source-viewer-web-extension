@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { WrapText, Palette, FileCode } from '@lucide/vue';
+import IconButton from '@/components/IconButton.vue';
 import { THEMES } from '@/utils/themes';
 import { openNativeViewer } from '@/utils/nativeViewer';
 import { t } from '@/utils/i18n';
@@ -44,17 +45,9 @@ function onNativeAuxClick(event: MouseEvent): void {
 
 <template>
   <div class="toolbar">
-    <button
-      type="button"
-      class="icon-btn"
-      :class="{ active: wordWrap }"
-      :aria-pressed="wordWrap"
-      :title="t('viewerWordWrap')"
-      :aria-label="t('viewerWordWrap')"
-      @click="toggleWrap"
-    >
+    <IconButton :active="wordWrap" :label="t('viewerWordWrap')" @click="toggleWrap">
       <WrapText :size="20" />
-    </button>
+    </IconButton>
 
     <span class="spacer"></span>
 
@@ -75,68 +68,14 @@ function onNativeAuxClick(event: MouseEvent): void {
 
     <template v-if="targetUrl">
       <span class="sep"></span>
-      <button
-        type="button"
-        class="icon-btn"
-        :title="t('viewerOpenNative')"
-        :aria-label="t('viewerOpenNative')"
-        @click="onNativeClick"
-        @auxclick="onNativeAuxClick"
-      >
+      <IconButton :label="t('viewerOpenNative')" @click="onNativeClick" @auxclick="onNativeAuxClick">
         <FileCode :size="20" />
-      </button>
+      </IconButton>
     </template>
   </div>
 </template>
 
 <style scoped>
-.toolbar {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 10px;
-  color: var(--app-fg);
-  background: var(--toolbar-bg);
-  border-bottom: 1px solid var(--toolbar-border);
-}
-
-.spacer {
-  margin-left: auto;
-}
-
-.sep {
-  align-self: stretch;
-  width: 1px;
-  margin: 2px 4px;
-  background: var(--toolbar-border);
-  filter: brightness(1.5);
-}
-
-/* Icon button — shared by the word-wrap toggle and the native-viewer action. */
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  color: var(--app-fg);
-  cursor: pointer;
-  background: var(--btn-bg);
-  border: 1px solid var(--btn-border);
-  border-radius: 5px;
-}
-
-.icon-btn:hover {
-  background: var(--btn-bg-hover);
-}
-
-.icon-btn.active {
-  color: var(--btn-active-fg);
-  background: var(--btn-active-bg);
-  border-color: var(--btn-active-border);
-}
-
 /* Single control: appearance icon overlaid on the left of a native <select>. */
 .theme-select {
   position: relative;
