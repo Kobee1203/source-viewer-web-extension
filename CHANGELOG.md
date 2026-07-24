@@ -2,20 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.6.2] - not released
+## [1.7.0] - 2026-07-24
 
 ### Added
 
-feat: surface HTTP status in StatusBar
+- **Font Viewer**: Navigating directly to a font URL (`woff2`/`woff`/`ttf`/`otf`) now opens a dedicated font viewer with a live preview — editable sample text, adjustable size, bold/italic toggles, and a light/dark background switch — alongside font details (source, format, file size, HTTP status).
+- **Glyph Grid**: A **Glyphs** view lists the characters the font actually renders. Hover a cell to see its `U+XXXX` code point, click to copy the character.
+- **HTTP Status in Status Bar**: The status bar now surfaces the response's HTTP status.
 
 ### Changed
 
-- feat(viewer): adjust link hover color based on theme type
+- **Theme-Aware Link Hover**: The link hover color now adapts to the theme type (light or dark).
 
 ### Fixed
 
-- fix: show response body on HTTP error status when one is returned
-- fix: include credentials in fetch request
+- **Error Response Bodies**: The response body is now shown on an HTTP error status when the server returns one.
+- **Authenticated Requests**: Credentials are now included in the fetch request, so pages behind a session cookie load correctly.
+- **Empty Glyph Grid on Firefox**: The glyph-coverage probe canvas is now attached to the document — Firefox only exposes a `FontFace`-loaded font to a canvas connected to the DOM, so the grid no longer renders empty.
+- **Firefox Store Name**: Shortened the Firefox extension name to comply with AMO's 45-character limit.
 
 ## [1.6.1] - 2026-07-22
 

@@ -1,6 +1,6 @@
 # Source Code Viewer
 
-A browser extension that replaces the browser's plain "View Source" with a readable, syntax-highlighted view — with multiple themes, word wrap, and clickable links. Built with [WXT](https://wxt.dev/) + TypeScript + Vue 3, and [CodeMirror 6](https://codemirror.net/) for rendering.
+A browser extension that replaces the browser's plain "View Source" with a readable, syntax-highlighted view — with multiple themes, word wrap, and clickable links. It also renders a dedicated viewer for font files. Built with [WXT](https://wxt.dev/) + TypeScript + Vue 3, and [CodeMirror 6](https://codemirror.net/) for rendering.
 
 ## Features
 
@@ -10,6 +10,7 @@ A browser extension that replaces the browser's plain "View Source" with a reada
 - **Multiple Themes**: 45 CodeMirror themes (light & dark), loaded on demand, with a persistent selector.
 - **Word Wrap, Line Numbers & Folding**: Toggle line wrapping; navigate with line numbers and code folding.
 - **Clickable Links**: URLs in the source are clickable and routed by type — images open in the browser, other resources reopen in the viewer.
+- **Font Viewer**: Opening a font URL (`woff2`/`woff`/`ttf`/`otf`) shows a live preview with adjustable sample text, size, weight, style, and background, plus a glyph grid of the characters the font covers (click a glyph to copy it).
 - **Native Viewer Toggle**: A toolbar button to open the browser's built-in `view-source:` viewer (same tab, or new tab with middle/Ctrl/Cmd-click).
 - **Smart Fallback**: Detects restricted domains (like the Chrome Web Store) and falls back gracefully to the browser's native source viewer.
 - **Localized**: Available in 9 languages (English, French, Spanish, German, Italian, Japanese, Simplified Chinese, and Brazilian/European Portuguese).
