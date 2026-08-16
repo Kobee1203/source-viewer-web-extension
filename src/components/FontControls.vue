@@ -7,6 +7,9 @@ import { t } from '@/utils/i18n';
 // Which view is shown; the preview settings only apply to (and only show in) the preview view.
 const view = defineModel<'preview' | 'glyphs'>('view', { required: true });
 
+// Loaded font's family name, forwarded to FontPreviewControls for its writing-system dropdown.
+defineProps<{ family: string }>();
+
 // Preview settings, owned by the font viewer's App and forwarded to FontPreviewControls.
 const text = defineModel<string>('text', { required: true });
 const size = defineModel<number>('size', { required: true });
@@ -33,6 +36,7 @@ const darkBg = defineModel<boolean>('darkBg', { required: true });
       v-model:bold="bold"
       v-model:italic="italic"
       v-model:dark-bg="darkBg"
+      :family="family"
     />
   </div>
 </template>

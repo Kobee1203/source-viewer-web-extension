@@ -25,6 +25,7 @@ void load();
       v-model:bold="bold"
       v-model:italic="italic"
       v-model:dark-bg="darkBg"
+      :family="fontFamily"
     />
 
     <div id="content">

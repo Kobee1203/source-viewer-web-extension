@@ -1,5 +1,6 @@
 import { ref } from 'vue';
-import { t } from '@/utils/i18n';
+import { browser } from 'wxt/browser';
+import { defaultWritingSystemFor } from '@/utils/writingSystems';
 
 /** Default preview font size, in pixels. */
 const DEFAULT_FONT_SIZE = 48;
@@ -10,7 +11,7 @@ const DEFAULT_FONT_SIZE = 48;
  * adding `browser.storage.local` backing later a localized change.
  */
 export function useFontPreferences() {
-  const previewText = ref(t('fontViewerSample'));
+  const previewText = ref(defaultWritingSystemFor(browser.i18n.getUILanguage()).sample);
   const fontSize = ref(DEFAULT_FONT_SIZE);
   const bold = ref(false);
   const italic = ref(false);
