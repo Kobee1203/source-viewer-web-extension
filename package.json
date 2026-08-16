@@ -1,6 +1,6 @@
 {
   "name": "source-viewer-web-extension",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "A browser extension to view and format source code with syntax highlighting, plus a dedicated font viewer.",
   "author": "Nicolas Dos Santos",
   "license": "GPL-3.0-or-later",

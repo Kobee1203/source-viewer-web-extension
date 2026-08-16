@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0] - Unreleased
+
+### Added
+
+- **Writing System Selector**: The font viewer's preview now offers a **writing system** dropdown listing only the scripts the loaded font actually covers (detected via the existing canvas coverage probe — no font parsing or extra network). Picking a script fills the preview with a native sample sentence for it. Covers Latin, Greek, Cyrillic, Armenian, Hebrew, Arabic, Devanagari, Thai, Ethiopic, Japanese, Chinese, and Korean. The dropdown is hidden when a single script is detected.
+
+### Changed
+
+- **Locale-Aware Preview Text**: The initial preview text now follows the browser's UI language, derived from its ISO 15924 script (e.g. Japanese, Chinese, or Cyrillic instead of a Latin pangram). This replaces the previous per-locale sample string with a single source of truth shared with the writing-system selector, so the initial text and the "Latin" menu entry no longer diverge.
+
 ## [1.7.0] - 2026-07-24
 
 ### Added
