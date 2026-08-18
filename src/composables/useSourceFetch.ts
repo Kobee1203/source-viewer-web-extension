@@ -55,7 +55,7 @@ export function useSourceFetch() {
         return;
       }
 
-      byteSize.value = new Blob([response.text]).size;
+      byteSize.value = response.byteLength;
       httpStatus.value = response.httpStatus;
       httpStatusText.value = response.httpStatusText;
       // Prefer the response's real MIME (handles extensionless URLs like fonts.googleapis.com/css2?…); fall back to the URL extension.

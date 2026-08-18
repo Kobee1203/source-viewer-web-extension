@@ -1,4 +1,5 @@
 import { browser } from 'wxt/browser';
+import { decodeBytes } from '@/utils/charset';
 
 /** Request sent from the viewer to the background service worker to fetch a page's source. */
 export interface FetchSourceRequest {
@@ -8,11 +9,19 @@ export interface FetchSourceRequest {
 
 /**
  * Response returned by the background service worker. `contentType` is the raw response
- * header, if any. `httpStatus`/`httpStatusText` are the response's status (surfaced so the
- * viewer can flag an error status even while still showing the returned body).
+ * header, if any. `byteLength` is the raw transferred size (used for the page-weight status).
+ * `httpStatus`/`httpStatusText` are the response's status (surfaced so the viewer can flag an
+ * error status even while still showing the returned body).
  */
 export type FetchSourceResponse =
-  | { ok: true; text: string; contentType: string | null; httpStatus: number; httpStatusText: string }
+  | {
+      ok: true;
+      text: string;
+      contentType: string | null;
+      byteLength: number;
+      httpStatus: number;
+      httpStatusText: string;
+    }
   | { ok: false; error: string };
 
 /** Typed wrapper around runtime.sendMessage for the FETCH_SOURCE request. */
@@ -53,14 +62,19 @@ export async function fetchSource(message: FetchSourceRequest): Promise<FetchSou
       headers: { Accept: 'text/html,text/plain,*/*' },
       credentials: 'include',
     });
-    const text = await res.text();
+    const contentType = res.headers.get('content-type');
+    // Read raw bytes and decode ourselves: res.text() would default to UTF-8 whenever the header
+    // carries no parseable charset, corrupting legacy-encoded pages (see charset.ts).
+    const buffer = await res.arrayBuffer();
+    const text = decodeBytes(buffer, contentType);
     // Still show the body on an error status (e.g. a JSON 500 error payload) as long as there is one.
     // Only report a failure when there's no content to display.
     if (!res.ok && !text) throw new Error(`HTTP ${res.status} ${res.statusText}`);
     return {
       ok: true,
       text,
-      contentType: res.headers.get('content-type'),
+      contentType,
+      byteLength: buffer.byteLength,
       httpStatus: res.status,
       httpStatusText: res.statusText,
     };
