@@ -12,6 +12,7 @@ errorRestrictedApi: 'Il browser vieta alle estensioni di aprire questo tipo di p
 viewerPageSize: 'Peso della pagina: $1'
 viewerCopyUrl: 'Copia negli appunti'
 viewerCopied: 'Copiato!'
+viewerDownload: 'Scarica'
 fontViewerLoading: 'Caricamento del font...'
 fontViewerError: 'Errore: impossibile caricare il font. $1'
 fontViewerPreviewLabel: 'Testo di anteprima'

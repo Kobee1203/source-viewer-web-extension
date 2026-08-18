@@ -9,7 +9,8 @@ export interface FetchSourceRequest {
 
 /**
  * Response returned by the background service worker. `contentType` is the raw response
- * header, if any. `byteLength` is the raw transferred size (used for the page-weight status).
+ * header, if any. `contentDisposition` is the raw header too (used to name the download).
+ * `byteLength` is the raw transferred size (used for the page-weight status).
  * `httpStatus`/`httpStatusText` are the response's status (surfaced so the viewer can flag an
  * error status even while still showing the returned body).
  */
@@ -18,6 +19,7 @@ export type FetchSourceResponse =
       ok: true;
       text: string;
       contentType: string | null;
+      contentDisposition: string | null;
       byteLength: number;
       httpStatus: number;
       httpStatusText: string;
@@ -74,6 +76,7 @@ export async function fetchSource(message: FetchSourceRequest): Promise<FetchSou
       ok: true,
       text,
       contentType,
+      contentDisposition: res.headers.get('content-disposition'),
       byteLength: buffer.byteLength,
       httpStatus: res.status,
       httpStatusText: res.statusText,

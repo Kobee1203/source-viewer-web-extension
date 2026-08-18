@@ -12,6 +12,7 @@ errorRestrictedApi: '浏览器禁止扩展打开此类页面。请将以下网�
 viewerPageSize: '页面大小：$1'
 viewerCopyUrl: '复制到剪贴板'
 viewerCopied: '已复制！'
+viewerDownload: '下载'
 fontViewerLoading: '正在加载字体…'
 fontViewerError: '错误：无法加载字体。$1'
 fontViewerPreviewLabel: '预览文字'

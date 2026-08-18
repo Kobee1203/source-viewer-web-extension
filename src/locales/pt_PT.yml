@@ -12,6 +12,7 @@ errorRestrictedApi: 'O navegador impede que as extensões abram este tipo de pá
 viewerPageSize: 'Tamanho da página: $1'
 viewerCopyUrl: 'Copiar para a área de transferência'
 viewerCopied: 'Copiado!'
+viewerDownload: 'Transferir'
 fontViewerLoading: 'A carregar o tipo de letra...'
 fontViewerError: 'Erro: não foi possível carregar o tipo de letra. $1'
 fontViewerPreviewLabel: 'Texto de pré-visualização'

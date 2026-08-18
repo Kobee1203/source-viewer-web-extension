@@ -12,6 +12,7 @@ errorRestrictedApi: 'ブラウザは拡張機能によるこの種類のペー�
 viewerPageSize: 'ページサイズ: $1'
 viewerCopyUrl: 'クリップボードにコピー'
 viewerCopied: 'コピーしました！'
+viewerDownload: 'ダウンロード'
 fontViewerLoading: 'フォントを読み込んでいます...'
 fontViewerError: 'エラー: フォントを読み込めませんでした。$1'
 fontViewerPreviewLabel: 'プレビューテキスト'

@@ -12,6 +12,7 @@ errorRestrictedApi: 'El navegador prohíbe que las extensiones abran este tipo d
 viewerPageSize: 'Peso de la página: $1'
 viewerCopyUrl: 'Copiar al portapapeles'
 viewerCopied: '¡Copiado!'
+viewerDownload: 'Descargar'
 fontViewerLoading: 'Cargando la fuente...'
 fontViewerError: 'Error: No se pudo cargar la fuente. $1'
 fontViewerPreviewLabel: 'Texto de vista previa'

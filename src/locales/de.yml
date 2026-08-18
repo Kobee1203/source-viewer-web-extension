@@ -12,6 +12,7 @@ errorRestrictedApi: 'Der Browser verbietet Erweiterungen das Öffnen dieser Art 
 viewerPageSize: 'Seitengröße: $1'
 viewerCopyUrl: 'In die Zwischenablage kopieren'
 viewerCopied: 'Kopiert!'
+viewerDownload: 'Herunterladen'
 fontViewerLoading: 'Schriftart wird geladen...'
 fontViewerError: 'Fehler: Schriftart konnte nicht geladen werden. $1'
 fontViewerPreviewLabel: 'Vorschautext'

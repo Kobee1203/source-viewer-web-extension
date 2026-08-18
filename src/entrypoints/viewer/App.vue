@@ -17,6 +17,7 @@ const {
   language,
   byteSize,
   targetUrl,
+  contentDisposition,
   httpStatus,
   httpStatusText,
   load,
@@ -33,7 +34,14 @@ void load();
 
 <template>
   <div id="app-viewer" :data-theme-type="themeType">
-    <Toolbar v-model:theme-id="themeId" v-model:word-wrap="wordWrap" :target-url="targetUrl" />
+    <Toolbar
+      v-model:theme-id="themeId"
+      v-model:word-wrap="wordWrap"
+      :target-url="targetUrl"
+      :code="code"
+      :language="language"
+      :content-disposition="contentDisposition"
+    />
 
     <div id="content">
       <div v-if="loading" class="loader">{{ t('viewerLoading') }}</div>

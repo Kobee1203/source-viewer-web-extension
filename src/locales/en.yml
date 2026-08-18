@@ -12,6 +12,7 @@ errorRestrictedApi: 'The browser prohibits extensions from opening this type of 
 viewerPageSize: 'Page weight: $1'
 viewerCopyUrl: 'Copy to clipboard'
 viewerCopied: 'Copied!'
+viewerDownload: 'Download'
 fontViewerLoading: 'Loading font...'
 fontViewerError: 'Error: Unable to load font. $1'
 fontViewerPreviewLabel: 'Preview text'

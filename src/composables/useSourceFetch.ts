@@ -18,6 +18,7 @@ export function useSourceFetch() {
   const language = ref<FileType>(DEFAULT_FILE_TYPE);
   const byteSize = ref<number | null>(null);
   const targetUrl = ref<URL | null>(null);
+  const contentDisposition = ref<string | null>(null);
   const httpStatus = ref<number | null>(null);
   const httpStatusText = ref('');
 
@@ -56,6 +57,7 @@ export function useSourceFetch() {
       }
 
       byteSize.value = response.byteLength;
+      contentDisposition.value = response.contentDisposition;
       httpStatus.value = response.httpStatus;
       httpStatusText.value = response.httpStatusText;
       // Prefer the response's real MIME (handles extensionless URLs like fonts.googleapis.com/css2?…); fall back to the URL extension.
@@ -78,6 +80,7 @@ export function useSourceFetch() {
     language,
     byteSize,
     targetUrl,
+    contentDisposition,
     httpStatus,
     httpStatusText,
     load,

@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import { WrapText, Palette, FileCode } from '@lucide/vue';
+import { WrapText, Palette, FileCode, Download } from '@lucide/vue';
 import IconButton from '@/components/IconButton.vue';
 import { THEMES } from '@/utils/themes';
 import { openNativeViewer } from '@/utils/nativeViewer';
+import { downloadSource } from '@/utils/download';
+import type { FileType } from '@/utils/fileType';
 import { t } from '@/utils/i18n';
 
 const props = defineProps<{
   themeId: string;
   wordWrap: boolean;
   targetUrl: URL | null;
+  code: string;
+  language: FileType;
+  contentDisposition: string | null;
 }>();
 const emit = defineEmits<{
   'update:themeId': [value: string];
@@ -27,6 +32,12 @@ function toggleWrap(): void {
 function openNative(newTab: boolean): void {
   if (!props.targetUrl) return;
   void openNativeViewer(props.targetUrl, newTab);
+}
+
+/** Downloads the formatted source shown in the viewer. */
+function onDownload(): void {
+  if (!props.targetUrl || !props.code) return;
+  downloadSource(props.code, props.language, props.targetUrl, props.contentDisposition);
 }
 
 // No real `href`: `view-source:` cannot be navigated to via <a href>, so gestures
@@ -68,6 +79,9 @@ function onNativeAuxClick(event: MouseEvent): void {
 
     <template v-if="targetUrl">
       <span class="sep"></span>
+      <IconButton v-if="code" :label="t('viewerDownload')" @click="onDownload">
+        <Download :size="20" />
+      </IconButton>
       <IconButton :label="t('viewerOpenNative')" @click="onNativeClick" @auxclick="onNativeAuxClick">
         <FileCode :size="20" />
       </IconButton>

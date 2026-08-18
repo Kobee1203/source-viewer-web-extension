@@ -12,6 +12,7 @@ errorRestrictedApi: "Le navigateur interdit aux extensions d'ouvrir ce type de p
 viewerPageSize: 'Poids de la page : $1'
 viewerCopyUrl: 'Copier dans le presse-papiers'
 viewerCopied: 'Copié !'
+viewerDownload: 'Télécharger'
 fontViewerLoading: 'Chargement de la police...'
 fontViewerError: 'Erreur : Impossible de charger la police. $1'
 fontViewerPreviewLabel: "Texte d'aperçu"
