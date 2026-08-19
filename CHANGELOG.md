@@ -7,10 +7,15 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - **Writing System Selector**: The font viewer's preview now offers a **writing system** dropdown listing only the scripts the loaded font actually covers (detected via the existing canvas coverage probe — no font parsing or extra network). Picking a script fills the preview with a native sample sentence for it. Covers Latin, Greek, Cyrillic, Armenian, Hebrew, Arabic, Devanagari, Thai, Ethiopic, Japanese, Chinese, and Korean. The dropdown is hidden when a single script is detected.
+- **Download Button**: A toolbar button downloads the formatted source you're viewing. The filename follows the server's `Content-Disposition`, the URL's own filename, or a `download.<ext>` default. A downloaded **HTML** page gets a `<base>` pointing at the original URL so it still renders (styles, images, scripts) when opened locally, and a downloaded **CSS** file has its relative `url(...)`/`@import` references rewritten to absolute so it keeps finding its fonts and images. (Cross-origin webfonts that the server doesn't expose via CORS won't render from a local file — a fully self-contained download is planned for later.)
 
 ### Changed
 
 - **Locale-Aware Preview Text**: The initial preview text now follows the browser's UI language, derived from its ISO 15924 script (e.g. Japanese, Chinese, or Cyrillic instead of a Latin pangram). This replaces the previous per-locale sample string with a single source of truth shared with the writing-system selector, so the initial text and the "Latin" menu entry no longer diverge.
+
+### Fixed
+
+- **Source Text Encoding**: Pages that declare their charset only in an HTML `<meta>` tag or via a malformed `Content-Type` header were decoded as UTF-8 and showed replacement characters (`�`) on accented or non-Latin text (e.g. `développeurs`). The source is now decoded using the charset from the HTTP header (parsed leniently), falling back to the `<meta>` declaration, then UTF-8. The page-weight status also reflects the true transferred size.
 
 ## [1.7.0] - 2026-07-24
 
