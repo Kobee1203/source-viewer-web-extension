@@ -7,8 +7,17 @@ import type { FileType } from '@/utils/fileType';
  * URL's last path segment when it looks like a filename, or a `download.<ext>` default. HTML is
  * post-processed so it renders correctly when opened locally: a `<base>` pointing at the original
  * URL lets the browser resolve every relative asset against the origin, and a leading
- * `<meta charset="utf-8">` matches our UTF-8 output. Everything is string surgery (no DOM
- * parsing), consistent with the rest of the codebase.
+ * `<meta charset="utf-8">` matches our UTF-8 output. CSS can't carry a `<base>`, so a downloaded
+ * stylesheet instead gets its relative `url(...)`/`@import` targets resolved to absolute against
+ * its own URL (otherwise `url(../webfonts/…)` would break once the file lives on disk). Everything
+ * is string surgery (no DOM/CSS parsing), consistent with the rest of the codebase.
+ *
+ * Known limitation: a downloaded HTML page still pulls its assets from the origin over the network
+ * (it is not offline), and cross-origin webfonts are subject to CORS — a page opened from `file://`
+ * has a `null` origin, so an `@font-face` served without `Access-Control-Allow-Origin` is blocked
+ * and its glyphs won't render (unlike `<link>` CSS and `<img>`, which aren't CORS-checked). Full
+ * offline/complete rendering would require fetching and embedding the subresources ourselves via
+ * the background — a separate, deferred feature.
  */
 
 /** Canonical extension per file type, used for the default filename. */
@@ -112,9 +121,46 @@ export function injectBaseAndCharset(html: string, target: URL): string {
   return injection + out;
 }
 
-/** Builds the content to download: HTML gets base/charset injection; other types are downloaded as-is. */
+/** Resolves a single CSS reference against the stylesheet URL, leaving absolute/data/fragment refs alone. */
+function resolveCssRef(value: string, target: URL): string {
+  const trimmed = value.trim();
+  if (!trimmed || /^(data:|https?:|\/\/|#|about:)/i.test(trimmed)) return value;
+  try {
+    return new URL(trimmed, target).toString();
+  } catch {
+    return value;
+  }
+}
+
+/**
+ * Rewrites relative `url(...)` and bare `@import "…"` targets in a stylesheet to absolute URLs
+ * resolved against its own URL, so a downloaded CSS still finds its fonts/images from disk. The
+ * `@import url(...)` form is covered by the `url(...)` pass. `data:`, absolute and fragment refs
+ * are left untouched.
+ */
+export function rewriteCssUrls(css: string, target: URL): string {
+  const withUrls = css.replace(/url\(\s*("[^"]*"|'[^']*'|[^"')]+)\s*\)/gi, (full, raw) => {
+    const quote = raw[0] === '"' || raw[0] === "'" ? raw[0] : '';
+    const value = quote ? raw.slice(1, -1) : raw;
+    const resolved = resolveCssRef(value, target);
+    return resolved === value ? full : `url(${quote}${resolved}${quote})`;
+  });
+  return withUrls.replace(/@import\s+("[^"]*"|'[^']*')/gi, (full, raw) => {
+    const quote = raw[0];
+    const value = raw.slice(1, -1);
+    const resolved = resolveCssRef(value, target);
+    return resolved === value ? full : `@import ${quote}${resolved}${quote}`;
+  });
+}
+
+/**
+ * Builds the content to download: HTML gets base/charset injection, CSS gets its relative
+ * references resolved to absolute; other types are downloaded as-is.
+ */
 export function buildDownloadContent(code: string, type: FileType, target: URL): string {
-  return type === 'html' ? injectBaseAndCharset(code, target) : code;
+  if (type === 'html') return injectBaseAndCharset(code, target);
+  if (type === 'css') return rewriteCssUrls(code, target);
+  return code;
 }
 
 /**
