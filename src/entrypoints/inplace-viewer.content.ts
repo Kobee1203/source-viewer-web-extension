@@ -55,6 +55,10 @@ export default defineContentScript({
       document.getElementById(HIDE_STYLE_ID)?.remove();
     });
 
+    // Give the iframe keyboard focus once loaded so the viewer's Cmd/Ctrl-F search handler fires
+    // without the user having to click into it first (the host page holds focus otherwise).
+    iframe.addEventListener('load', () => iframe.focus());
+
     document.documentElement.appendChild(iframe);
   },
 });

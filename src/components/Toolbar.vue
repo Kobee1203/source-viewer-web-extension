@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { WrapText, Palette, FileCode, Download } from '@lucide/vue';
+import { WrapText, Palette, FileCode, Download, Search } from '@lucide/vue';
 import IconButton from '@/components/IconButton.vue';
 import { THEMES } from '@/utils/themes';
 import { openNativeViewer } from '@/utils/nativeViewer';
@@ -18,6 +18,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:themeId': [value: string];
   'update:wordWrap': [value: boolean];
+  search: [];
 }>();
 
 function onThemeChange(event: Event): void {
@@ -79,6 +80,9 @@ function onNativeAuxClick(event: MouseEvent): void {
 
     <template v-if="targetUrl">
       <span class="sep"></span>
+      <IconButton v-if="code" :label="t('viewerSearch')" @click="emit('search')">
+        <Search :size="20" />
+      </IconButton>
       <IconButton v-if="code" :label="t('viewerDownload')" @click="onDownload">
         <Download :size="20" />
       </IconButton>

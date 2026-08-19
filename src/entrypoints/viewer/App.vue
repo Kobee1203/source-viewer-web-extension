@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, useTemplateRef } from 'vue';
 import Toolbar from '@/components/Toolbar.vue';
 import CodeView from '@/components/CodeView.vue';
 import StatusBar from '@/components/StatusBar.vue';
@@ -29,11 +29,19 @@ const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
 
 const themeType = computed(() => getThemeType(themeId.value));
 
+const codeView = useTemplateRef('codeView');
+const appRoot = useTemplateRef('appRoot');
+
+// Take keyboard focus on load so the Cmd/Ctrl-F interceptor (in CodeView) works without the user
+// first clicking — notably in the in-place iframe, which otherwise stays unfocused and lets the
+// browser's native find open instead.
+onMounted(() => appRoot.value?.focus());
+
 void load();
 </script>
 
 <template>
-  <div id="app-viewer" :data-theme-type="themeType">
+  <div id="app-viewer" ref="appRoot" tabindex="-1" :data-theme-type="themeType">
     <Toolbar
       v-model:theme-id="themeId"
       v-model:word-wrap="wordWrap"
@@ -41,6 +49,7 @@ void load();
       :code="code"
       :language="language"
       :content-disposition="contentDisposition"
+      @search="codeView?.openSearch()"
     />
 
     <div id="content">
@@ -51,7 +60,7 @@ void load();
         :message="errorMessage"
       />
       <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
-      <CodeView v-else :code :language :base-url :wrap="wordWrap" :theme-id :theme-type />
+      <CodeView v-else ref="codeView" :code :language :base-url :wrap="wordWrap" :theme-id :theme-type />
     </div>
 
     <StatusBar
@@ -87,10 +96,16 @@ void load();
   flex-direction: column;
   height: 100vh;
   margin: 0;
+  outline: none; /* focused on load only to capture keyboard — no focus ring wanted */
 }
 
 #content {
   flex: 1;
+
+  /* min-height: 0 lets this flex child shrink to the available height instead of growing with its
+     content, so CodeMirror's scroller gets a correct viewport height and can scroll matches (even
+     far off-screen ones) precisely into view. */
+  min-height: 0;
   overflow: auto;
   background: inherit;
 }
