@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.8.0] - Unreleased
+## [1.8.0] - 2006-08-20
 
 ### Added
 
