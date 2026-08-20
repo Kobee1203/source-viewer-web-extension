@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, onWatcherCleanup, shallowRef, watch } from 'vue';
-import { EditorState, type Extension } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
-import { openSearchPanel, setSearchQuery, getSearchQuery } from '@codemirror/search';
+import { computed } from 'vue';
 import CodeMirror from 'vue-codemirror6';
 
 import type { FileType } from '@/utils/fileType';
 import { linkifyPlugin } from '@/utils/cm-linkify';
 import { loadLanguage } from '@/utils/language';
 import { DEFAULT_THEME_ID, getThemeExtension } from '@/utils/themes';
-import { t } from '@/utils/i18n';
+import { useAsyncExtension } from '@/composables/useAsyncExtension';
+import { useCodeSearch } from '@/composables/useCodeSearch';
 
 const props = defineProps<{
   code: string;
@@ -20,104 +18,20 @@ const props = defineProps<{
   themeType?: string;
 }>();
 
-// The language support is loaded on demand (each @codemirror/lang-* is its own chunk).
-const langSupport = shallowRef<Extension>([]);
-watch(
-  () => props.language,
-  async (language) => {
-    let stale = false;
-    onWatcherCleanup(() => (stale = true));
-    const support = await loadLanguage(language);
-    if (!stale) langSupport.value = support;
-  },
-  { immediate: true },
-);
+// Language support and theme are each their own lazy chunk, loaded on demand (see useAsyncExtension).
+const langSupport = useAsyncExtension(() => props.language, loadLanguage);
+const themeExtension = useAsyncExtension(() => props.themeId ?? DEFAULT_THEME_ID, getThemeExtension);
 
-// The theme extension is loaded on demand (each theme is its own lazy chunk).
-// The cleanup marks an in-flight load as stale so a slower one can't clobber a newer selection.
-const themeExtension = shallowRef<Extension>([]);
-watch(
-  () => props.themeId ?? DEFAULT_THEME_ID,
-  async (id) => {
-    let stale = false;
-    onWatcherCleanup(() => (stale = true));
-    const ext = await getThemeExtension(id);
-    if (!stale) themeExtension.value = ext;
-  },
-  { immediate: true },
-);
-
-// Localize CodeMirror's search-panel labels to the UI locale. Replace-related phrases are omitted:
-// the panel hides them in read-only mode. Built once — the UI locale is fixed for the session.
-const searchPhrases = EditorState.phrases.of({
-  Find: t('searchFind'),
-  next: t('searchNext'),
-  previous: t('searchPrevious'),
-  all: t('searchAll'),
-  'match case': t('searchMatchCase'),
-  regexp: t('searchRegexp'),
-  'by word': t('searchByWord'),
-  close: t('searchClose'),
-});
-
-// Jump to the first match as the query is typed (incremental, browser-find-like) instead of only
-// on Enter/next. Searches from the current selection so refining the query stays near the current
-// spot, wrapping to the document start otherwise. Dispatched in a microtask because a transaction
-// can't be dispatched from within an update; the scroll/selection carries no setSearchQuery effect
-// so it can't re-trigger this listener.
-const scrollToMatchOnQuery = EditorView.updateListener.of((update) => {
-  if (!update.transactions.some((tr) => tr.effects.some((e) => e.is(setSearchQuery)))) return;
-  const query = getSearchQuery(update.state);
-  if (!query.search || !query.valid) return;
-  let match = query.getCursor(update.state, update.state.selection.main.from).next();
-  if (match.done) match = query.getCursor(update.state, 0).next();
-  if (match.done) return;
-  const { from, to } = match.value;
-  queueMicrotask(() => {
-    if (update.view.dom.isConnected) {
-      update.view.dispatch({
-        selection: { anchor: from, head: to },
-        effects: EditorView.scrollIntoView(from, { y: 'center' }),
-      });
-    }
-  });
-});
+const { searchExtensions, onReady, openSearch } = useCodeSearch();
 
 const extensions = computed(() => [
   langSupport.value,
   themeExtension.value,
   linkifyPlugin(props.baseUrl),
-  searchPhrases,
-  scrollToMatchOnQuery,
+  searchExtensions,
 ]);
 
 const linkHoverColor = computed(() => (props.themeType === 'dark' ? 'black' : 'white'));
-
-// The editor is `disabled` (not focusable), so CodeMirror's own Mod-f keymap never fires. Intercept
-// the OS find shortcut (Cmd-f / Ctrl-f) at the window level, in the capture phase, and open the
-// search panel ourselves — `openSearchPanel` lazily installs the search extension on first use. In
-// the in-place viewer this listener lives in the iframe document, so it only fires when the iframe
-// has focus.
-const view = shallowRef<EditorView>();
-
-function onReady(payload: { view: EditorView }): void {
-  view.value = payload.view;
-}
-
-/** Opens the search panel (also invoked by the toolbar's search button). */
-function openSearch(): void {
-  if (view.value) openSearchPanel(view.value);
-}
-
-function onKeydown(event: KeyboardEvent): void {
-  if ((event.metaKey || event.ctrlKey) && !event.altKey && event.key.toLowerCase() === 'f' && view.value) {
-    event.preventDefault();
-    openSearchPanel(view.value);
-  }
-}
-
-onMounted(() => window.addEventListener('keydown', onKeydown, true));
-onUnmounted(() => window.removeEventListener('keydown', onKeydown, true));
 
 defineExpose({ openSearch });
 </script>
@@ -149,6 +63,79 @@ defineExpose({ openSearch });
   font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   font-size: 13px;
   line-height: 1.5;
+}
+
+/* Search panel — styled to match the app toolbar. It renders inside CodeMirror's DOM, so these
+   rules override CM's base/theme styles; the .cm-panels background/border use !important to stay
+   consistent across all 45 editor themes (which each set their own panel colors). */
+.cm-editor .cm-panels {
+  color: var(--app-fg) !important;
+  background: var(--toolbar-bg) !important;
+  border-color: var(--toolbar-border) !important;
+}
+
+.cm-editor .cm-panels.cm-panels-top {
+  border-bottom: 1px solid var(--toolbar-border);
+}
+
+.cm-editor .cm-panel.cm-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 7px 30px 7px 8px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.cm-editor .cm-search .cm-textfield {
+  height: 28px;
+  padding: 0 8px;
+  margin: 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--select-fg);
+  background: var(--select-bg);
+  border: 1px solid var(--select-border);
+  border-radius: 5px;
+}
+
+.cm-editor .cm-search .cm-button {
+  height: 28px;
+  padding: 0 10px;
+  margin: 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--select-fg);
+  cursor: pointer;
+  background: var(--btn-bg);
+  background-image: none;
+  border: 1px solid var(--btn-border);
+  border-radius: 5px;
+}
+
+.cm-editor .cm-search .cm-button:hover {
+  background: var(--btn-bg-hover);
+}
+
+.cm-editor .cm-search label {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.cm-editor .cm-search [name='close'] {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 0 6px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--app-fg);
+  cursor: pointer;
+  background: transparent;
+  border: none;
 }
 
 .source-link {
