@@ -9,8 +9,10 @@ A browser extension that replaces the browser's plain "View Source" with a reada
 - **In-Place Auto-Open**: Navigating directly to a raw `.css`/`.js`/`.json`/`.xml` URL renders the formatted viewer in place, keeping the original URL in the address bar.
 - **Multiple Themes**: 45 CodeMirror themes (light & dark), loaded on demand, with a persistent selector.
 - **Word Wrap, Line Numbers & Folding**: Toggle line wrapping; navigate with line numbers and code folding.
-- **Clickable Links**: URLs in the source are clickable and routed by type — images open in the browser, other resources reopen in the viewer.
-- **Font Viewer**: Opening a font URL (`woff2`/`woff`/`ttf`/`otf`) shows a live preview with adjustable sample text, size, weight, style, and background, plus a glyph grid of the characters the font covers (click a glyph to copy it).
+- **Full-Text Search**: `Cmd`/`Ctrl`+`F` (or the toolbar button) searches the whole source — not just the rendered viewport — with live highlighting, next/previous, match case, whole word, and regular expressions.
+- **Download**: Save the formatted source in one click with a smart filename (from `Content-Disposition`, the URL, or a default). Downloaded HTML gets a `<base>` so it renders locally, and CSS has its relative `url(...)`/`@import` references rewritten so it keeps its assets.
+- **Clickable Links**: URLs in the source are clickable and routed by type — images open in the browser, CSS/JS/JSON/XML open directly (keeping a clean, copy-able URL), and other sources reopen in the viewer.
+- **Font Viewer**: Opening a font URL (`woff2`/`woff`/`ttf`/`otf`) shows a live preview with adjustable sample text, size, weight, style, and background, plus a glyph grid of the characters the font covers (click a glyph to copy it) and a writing-system selector listing only the scripts the font actually covers.
 - **Native Viewer Toggle**: A toolbar button to open the browser's built-in `view-source:` viewer (same tab, or new tab with middle/Ctrl/Cmd-click).
 - **Smart Fallback**: Detects restricted domains (like the Chrome Web Store) and falls back gracefully to the browser's native source viewer.
 - **Localized**: Available in 9 languages (English, French, Spanish, German, Italian, Japanese, Simplified Chinese, and Brazilian/European Portuguese).
