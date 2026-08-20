@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - **Writing System Selector**: The font viewer's preview now offers a **writing system** dropdown listing only the scripts the loaded font actually covers (detected via the existing canvas coverage probe — no font parsing or extra network). Picking a script fills the preview with a native sample sentence for it. Covers Latin, Greek, Cyrillic, Armenian, Hebrew, Arabic, Devanagari, Thai, Ethiopic, Japanese, Chinese, and Korean. The dropdown is hidden when a single script is detected.
 - **Download Button**: A toolbar button downloads the formatted source you're viewing. The filename follows the server's `Content-Disposition`, the URL's own filename, or a `download.<ext>` default. A downloaded **HTML** page gets a `<base>` pointing at the original URL so it still renders (styles, images, scripts) when opened locally, and a downloaded **CSS** file has its relative `url(...)`/`@import` references rewritten to absolute so it keeps finding its fonts and images. (Cross-origin webfonts that the server doesn't expose via CORS won't render from a local file — a fully self-contained download is planned for later.)
+- **Search in Source**: `Cmd`/`Ctrl`+`F` (or the toolbar search button) now searches the whole source, not just the part rendered in the viewport. Matches are highlighted and scrolled into view as you type, with next/previous, match-case, whole-word, and regular-expression options. The search bar is localized in all languages.
 
 ### Changed
 
