@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - **Locale-Aware Preview Text**: The initial preview text now follows the browser's UI language, derived from its ISO 15924 script (e.g. Japanese, Chinese, or Cyrillic instead of a Latin pangram). This replaces the previous per-locale sample string with a single source of truth shared with the writing-system selector, so the initial text and the "Latin" menu entry no longer diverge.
+- **Direct Source Links**: Links to CSS/JS/JSON/XML files in the source now point at the real file URL (still shown in place by the extension when navigated to) instead of an encoded `viewer.html` link, so the address bar keeps a clean, copy-able URL. HTML links still open through the viewer to show their source.
 
 ### Fixed
 
