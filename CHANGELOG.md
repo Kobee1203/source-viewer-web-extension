@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0] - Unreleased
+
+### Fixed
+
+- **In-Place Viewer on CSP-Sandboxed Pages**: Navigating directly to a raw CSS/JS/JSON/XML file served with a `Content-Security-Policy: sandbox` header (e.g. `raw.githubusercontent.com`) left a blank page — the injected in-place iframe inherited the page's sandbox and couldn't run the viewer's scripts. Such pages are now detected (opaque document origin) and opened as a full-tab navigation to the viewer instead.
+
 ## [1.8.0] - 2006-08-20
 
 ### Added

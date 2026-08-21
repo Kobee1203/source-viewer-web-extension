@@ -55,6 +55,22 @@ export function requestViewerInjection(url: string): Promise<RequestViewerInject
 }
 
 /**
+ * Request sent from `content.ts` asking the background to navigate the tab to `viewer.html`.
+ * Used when the page is served with CSP `sandbox`: the in-place iframe would inherit the sandbox
+ * and couldn't run the viewer, so we open it as a full-tab navigation instead.
+ */
+export interface RequestViewerRedirectRequest {
+  type: 'REQUEST_VIEWER_REDIRECT';
+  url: string;
+}
+
+/** Asks the background to navigate the sender's tab to the viewer for `url`. */
+export function requestViewerRedirect(url: string): Promise<void> {
+  const message: RequestViewerRedirectRequest = { type: 'REQUEST_VIEWER_REDIRECT', url };
+  return browser.runtime.sendMessage(message);
+}
+
+/**
  * Handles a FETCH_SOURCE request in the background: fetches the page's source
  * there to avoid the page's own CORS/CSP constraints.
  */

@@ -7,6 +7,7 @@ import {
   type FetchSourceResponse,
   type RequestViewerInjectionRequest,
   type RequestViewerInjectionResponse,
+  type RequestViewerRedirectRequest,
 } from '@/utils/messaging';
 import { createNativeViewerController, type OpenNativeRequest, type OpenNativeResponse } from '@/utils/nativeViewer';
 import { viewerUrl } from '@/utils/viewerUrl';
@@ -70,13 +71,29 @@ export default defineBackground(() => {
     }
   }
 
+  // content.ts found a handled source type on a CSP-sandboxed page, where the in-place iframe
+  // can't run: navigate the tab to the viewer instead (same as the view-source redirect above).
+  async function redirectToViewer(request: RequestViewerRedirectRequest, tabId?: number): Promise<void> {
+    if (tabId === undefined || isRestricted(new URL(request.url))) return;
+    try {
+      await browser.tabs.update(tabId, { url: viewerUrl(request.url) });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   // Returning a Promise is how a message listener replies asynchronously.
   // (no-misused-promises' argument check is relaxed for this file in eslint.config.)
   browser.runtime.onMessage.addListener(
     (
       message,
       sender,
-    ): Promise<FetchSourceResponse> | Promise<OpenNativeResponse> | Promise<RequestViewerInjectionResponse> | false => {
+    ):
+      | Promise<FetchSourceResponse>
+      | Promise<OpenNativeResponse>
+      | Promise<RequestViewerInjectionResponse>
+      | Promise<void>
+      | false => {
       if (typeof message !== 'object' || message === null) return false;
       const type = (message as { type?: unknown }).type;
 
@@ -88,6 +105,9 @@ export default defineBackground(() => {
       }
       if (type === 'REQUEST_VIEWER_INJECTION') {
         return injectViewer(message as RequestViewerInjectionRequest, sender.tab?.id);
+      }
+      if (type === 'REQUEST_VIEWER_REDIRECT') {
+        return redirectToViewer(message as RequestViewerRedirectRequest, sender.tab?.id);
       }
       return false;
     },

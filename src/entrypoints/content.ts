@@ -1,6 +1,6 @@
 import { defineContentScript } from '#imports';
 import { detectRedirectFileType } from '@/utils/contentType';
-import { requestViewerInjection } from '@/utils/messaging';
+import { requestViewerInjection, requestViewerRedirect } from '@/utils/messaging';
 import { HIDE_STYLE_ID } from '@/utils/inplace';
 
 /**
@@ -23,6 +23,15 @@ export default defineContentScript({
   async main() {
     const type = detectRedirectFileType(document.contentType, new URL(location.href));
     if (!type) return; // not a handled source type — leave the page alone
+
+    // A page served with CSP `sandbox` (e.g. raw.githubusercontent.com) sandboxes any iframe we
+    // inject, blocking the viewer's scripts — the document then has an opaque ("null") origin.
+    // The in-place iframe can't work here, so navigate the whole tab to the viewer instead.
+    // (The pending message rejects when the navigation tears down this content script — ignore it.)
+    if (window.origin === 'null') {
+      requestViewerRedirect(location.href).catch(() => {});
+      return;
+    }
 
     // Hide the raw content immediately to avoid a flash before the viewer takes
     // over. `document.documentElement` always exists at document_start.
