@@ -1,5 +1,6 @@
 import { ViewPlugin, Decoration, DecorationSet, EditorView } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
+import { ViewUpdate } from '@codemirror/view';
 import { viewerUrl } from '@/utils/viewerUrl';
 import { fontViewerUrl } from '@/utils/fontViewerUrl';
 import { classifyLinkTarget } from '@/utils/linkTarget';
@@ -86,7 +87,7 @@ export function linkifyPlugin(baseUrl: string) {
     (view: EditorView) => {
       return {
         decorations: buildDecorations(view, baseUrl),
-        update(update: import('@codemirror/view').ViewUpdate) {
+        update(update: ViewUpdate) {
           if (update.docChanged || update.viewportChanged) {
             this.decorations = buildDecorations(update.view, baseUrl);
           }

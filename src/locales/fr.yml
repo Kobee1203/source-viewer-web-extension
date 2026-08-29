@@ -22,6 +22,11 @@ searchMatchCase: 'respecter la casse'
 searchRegexp: 'expression régulière'
 searchByWord: 'mot entier'
 searchClose: 'fermer'
+searchTextMode: 'Texte (Défaut)'
+searchResults:
+  0: '0 résultat'
+  1: '1 résultat'
+  n: '$1 résultats'
 fontViewerLoading: 'Chargement de la police...'
 fontViewerError: 'Erreur : Impossible de charger la police. $1'
 fontViewerPreviewLabel: "Texte d'aperçu"

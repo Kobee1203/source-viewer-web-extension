@@ -3,6 +3,8 @@ import { EditorView } from '@codemirror/view';
 import { EditorState, type Extension } from '@codemirror/state';
 import { search, openSearchPanel, setSearchQuery, getSearchQuery } from '@codemirror/search';
 import { t } from '@/utils/i18n';
+import { createStructuralSearchPanel, structuralSearchField, fileTypeFacet } from '@/composables/search/SearchManager';
+import { FileType } from '@/utils/fileType';
 
 /**
  * Full-document search for the code viewer, bound to the OS find shortcut.
@@ -13,7 +15,7 @@ import { t } from '@/utils/i18n';
  * phase and open the panel ourselves. In the in-place viewer this listener lives in the iframe
  * document, so it only fires when the iframe has focus.
  */
-export function useCodeSearch(): {
+export function useCodeSearch(fileType: FileType): {
   searchExtensions: Extension;
   onReady: (payload: { view: EditorView }) => void;
   openSearch: () => void;
@@ -56,9 +58,13 @@ export function useCodeSearch(): {
     });
   });
 
-  // `search({ top: true })` places the panel above the content (more visible than at the bottom)
-  // and installs the search state field up front.
-  const searchExtensions: Extension = [search({ top: true }), phrases, scrollToMatchOnQuery];
+  const searchExtensions: Extension = [
+    fileTypeFacet.of(fileType),
+    search({ top: true, createPanel: createStructuralSearchPanel }),
+    structuralSearchField,
+    phrases,
+    scrollToMatchOnQuery,
+  ];
 
   function onReady(payload: { view: EditorView }): void {
     view.value = payload.view;

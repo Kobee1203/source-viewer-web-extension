@@ -22,7 +22,7 @@ const props = defineProps<{
 const langSupport = useAsyncExtension(() => props.language, loadLanguage);
 const themeExtension = useAsyncExtension(() => props.themeId ?? DEFAULT_THEME_ID, getThemeExtension);
 
-const { searchExtensions, onReady, openSearch } = useCodeSearch();
+const { searchExtensions, onReady, openSearch } = useCodeSearch(props.language);
 
 const extensions = computed(() => [
   langSupport.value,
