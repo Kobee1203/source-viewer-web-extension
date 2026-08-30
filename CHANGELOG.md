@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [1.9.0] - Unreleased
 
+### Added
+
+- **Structural Search Modes**: The search panel now supports advanced structural search engines: **XPath** (for HTML/XML), **CSS Selectors** (for HTML/XML), and **JSONPath** (for JSON).
+  - **Search Help Modal**: A new help icon in the search panel provides official documentation links and concrete, localized query examples for each structural search mode.
+
+### Changed
+
+- **Codebase Standardization**: Enforced strict `import type` policies via ESLint and automated import sorting/grouping via Prettier (`@trivago/prettier-plugin-sort-imports`).
+
 ### Fixed
 
 - **In-Place Viewer on CSP-Sandboxed Pages**: Navigating directly to a raw CSS/JS/JSON/XML file served with a `Content-Security-Policy: sandbox` header (e.g. `raw.githubusercontent.com`) left a blank page — the injected in-place iframe inherited the page's sandbox and couldn't run the viewer's scripts. Such pages are now detected (opaque document origin) and opened as a full-tab navigation to the viewer instead.
