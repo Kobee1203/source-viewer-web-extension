@@ -1,4 +1,5 @@
 import { FileType } from '@/utils/fileType';
+import { type I18nSimpleKey } from '@/utils/i18n';
 
 export interface SearchMatch {
   from: number;
@@ -12,6 +13,8 @@ export interface StructuralSearchProvider {
   label: string;
   /** Optional list of supported file types for this provider */
   supportedFileTypes?: FileType[];
+  helpUrl: string;
+  examples: { query: string; descriptionKey: I18nSimpleKey }[];
   /**
    * Returns matches based on the query and source text.
    * If parsing or query execution fails, it should throw an error or return an empty array,

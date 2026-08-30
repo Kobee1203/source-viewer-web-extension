@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, defineAsyncComponent } from 'vue';
+import { HelpCircle } from '@lucide/vue';
 import { EditorView } from '@codemirror/view';
 import { getSearchQuery, setSearchQuery, SearchQuery, closeSearchPanel } from '@codemirror/search';
 import {
@@ -35,6 +36,24 @@ const availableModes = computed(() => {
 });
 
 const activeMode = ref('text');
+
+const SearchHelpDialog = defineAsyncComponent(() => import('@/components/SearchHelpDialog.vue'));
+
+const showHelpDialog = ref(false);
+
+const activeProvider = computed(() => {
+  if (activeMode.value === 'text') return null;
+  return providers.find((p) => p.id === activeMode.value);
+});
+
+function openHelp() {
+  showHelpDialog.value = true;
+}
+
+function onHelpClosed() {
+  showHelpDialog.value = false;
+}
+
 const query = ref('');
 const caseSensitive = ref(false);
 const regexp = ref(false);
@@ -215,6 +234,18 @@ function onClose() {
       </label>
     </template>
 
+    <!-- Help Button for structural modes -->
+    <button
+      v-if="activeProvider && activeProvider.examples"
+      class="cm-button help-button"
+      :title="phrase('help')"
+      :aria-label="phrase('help')"
+      type="button"
+      @click="openHelp"
+    >
+      <HelpCircle :size="14" />
+    </button>
+
     <!-- Error indicator for structural modes -->
     <span v-if="structuralError" class="search-error" :title="structuralError"> ⚠️ </span>
 
@@ -222,6 +253,12 @@ function onClose() {
 
     <button name="close" :aria-label="phrase('close')" type="button" @click="onClose">×</button>
   </div>
+  <SearchHelpDialog
+    v-if="showHelpDialog && activeProvider"
+    :active-provider="activeProvider"
+    :title="t('searchHelpTitle', { mode: activeProvider.label })"
+    @closed="onHelpClosed"
+  />
 </template>
 
 <style scoped>
@@ -250,5 +287,12 @@ function onClose() {
 .search-count {
   font-size: 12px;
   color: #6b7280;
+}
+
+.help-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
 }
 </style>

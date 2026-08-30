@@ -2,6 +2,7 @@ import { StructuralSearchProvider, SearchMatch } from '@/composables/search/Stru
 import { DOMParser, type Document, type Node } from '@xmldom/xmldom';
 import { FileType } from '@/utils/fileType';
 import * as xpath from 'xpath';
+import type { I18nSimpleKey } from '@/utils/i18n';
 
 interface XmlNode {
   lineNumber: number;
@@ -18,6 +19,13 @@ export class XPathProvider implements StructuralSearchProvider {
   id = 'xpath';
   label = 'XPath';
   supportedFileTypes: FileType[] = ['html', 'xml'];
+  helpUrl = 'https://developer.mozilla.org/en-US/docs/Web/XPath';
+  examples: { query: string; descriptionKey: I18nSimpleKey }[] = [
+    { query: '//div', descriptionKey: 'helpXPathEx1' },
+    { query: '//div[@class="test"]', descriptionKey: 'helpXPathEx2' },
+    { query: '//a[contains(@href, "example")]', descriptionKey: 'helpXPathEx3' },
+    { query: '//*[@id="main"]//p', descriptionKey: 'helpXPathEx4' },
+  ];
 
   search(text: string, query: string, fileType: FileType): SearchMatch[] {
     if (!query.trim()) return [];

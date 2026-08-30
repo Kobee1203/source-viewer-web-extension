@@ -89,6 +89,11 @@ void load();
   --btn-active-bg: #cfe6ff;
   --btn-active-border: #7fb6ff;
   --btn-active-fg: #003a6b;
+  --dialog-bg: #fff;
+  --dialog-bg-alt: #f0f0f0;
+  --dialog-border: #ccc;
+  --dialog-link: #00e;
+  --dialog-backdrop: rgb(0 0 0 / 20%);
 }
 
 #app-viewer {

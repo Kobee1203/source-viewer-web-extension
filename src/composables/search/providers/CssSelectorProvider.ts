@@ -3,11 +3,19 @@ import * as htmlparser2 from 'htmlparser2';
 import { selectAll } from 'css-select';
 
 import { FileType } from '@/utils/fileType';
+import type { I18nSimpleKey } from '@/utils/i18n';
 
 export class CssSelectorProvider implements StructuralSearchProvider {
   id = 'css-selector';
   label = 'CSS Selector';
   supportedFileTypes: FileType[] = ['html', 'xml'];
+  helpUrl = 'https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_selectors';
+  examples: { query: string; descriptionKey: I18nSimpleKey }[] = [
+    { query: 'div', descriptionKey: 'helpCssEx1' },
+    { query: 'div.test', descriptionKey: 'helpCssEx2' },
+    { query: 'a[href*="example"]', descriptionKey: 'helpCssEx3' },
+    { query: '#main p', descriptionKey: 'helpCssEx4' },
+  ];
 
   search(text: string, query: string, fileType: FileType): SearchMatch[] {
     if (!query.trim()) return [];

@@ -3,11 +3,19 @@ import { JSONPath } from 'jsonpath-plus';
 import { parseTree, findNodeAtLocation } from 'jsonc-parser';
 
 import { FileType } from '@/utils/fileType';
+import type { I18nSimpleKey } from '@/utils/i18n';
 
 export class JsonPathProvider implements StructuralSearchProvider {
   id = 'jsonpath';
   label = 'JSONPath';
   supportedFileTypes: FileType[] = ['json'];
+  helpUrl = 'https://goessner.net/articles/JsonPath/';
+  examples: { query: string; descriptionKey: I18nSimpleKey }[] = [
+    { query: '$[*].name', descriptionKey: 'helpJsonPathEx1' },
+    { query: '$[0:5]', descriptionKey: 'helpJsonPathEx2' },
+    { query: '$..language', descriptionKey: 'helpJsonPathEx3' },
+    { query: '$[*][?(@.language == "Sindhi")]', descriptionKey: 'helpJsonPathEx4' },
+  ];
 
   search(text: string, query: string, _fileType: FileType): SearchMatch[] {
     if (!query.trim()) return [];
