@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import CodeMirror from 'vue-codemirror6';
+import { EditorView } from '@codemirror/view';
 import { useAsyncExtension } from '@/composables/useAsyncExtension';
 import { useCodeSearch } from '@/composables/useCodeSearch';
 import { linkifyPlugin } from '@/utils/cm-linkify';
@@ -15,6 +16,7 @@ const props = defineProps<{
   wrap: boolean;
   themeId?: string;
   themeType?: string;
+  fontSize: number;
 }>();
 
 // Language support and theme are each their own lazy chunk, loaded on demand (see useAsyncExtension).
@@ -23,11 +25,16 @@ const themeExtension = useAsyncExtension(() => props.themeId ?? DEFAULT_THEME_ID
 
 const { searchExtensions, onReady, openSearch } = useCodeSearch(props.language);
 
+const fontSizeExtension = computed(() => {
+  return EditorView.theme({ '&': { fontSize: `${props.fontSize}px` } });
+});
+
 const extensions = computed(() => [
   langSupport.value,
   themeExtension.value,
   linkifyPlugin(props.baseUrl),
   searchExtensions,
+  fontSizeExtension.value,
 ]);
 
 const linkHoverColor = computed(() => (props.themeType === 'dark' ? 'black' : 'white'));
@@ -56,12 +63,6 @@ defineExpose({ openSearch });
 .cm-editor {
   height: 100%;
   outline: none !important;
-}
-
-.cm-scroller {
-  font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-  font-size: 13px;
-  line-height: 1.5;
 }
 
 /* Search panel — styled to match the app toolbar. It renders inside CodeMirror's DOM, so these

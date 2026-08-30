@@ -1,5 +1,6 @@
 import { ref, watch } from 'vue';
 import { browser } from 'wxt/browser';
+import { DEFAULT_FONT_SIZE } from '@/utils/fonts';
 import { DEFAULT_THEME_ID, THEMES } from '@/utils/themes';
 
 /**
@@ -9,14 +10,18 @@ import { DEFAULT_THEME_ID, THEMES } from '@/utils/themes';
 export function usePreferences() {
   const themeId = ref(DEFAULT_THEME_ID);
   const wordWrap = ref(false);
+  const codeFontSize = ref(DEFAULT_FONT_SIZE);
 
-  void browser.storage.local.get(['theme', 'wordWrap']).then((result) => {
+  void browser.storage.local.get(['theme', 'wordWrap', 'codeFontSize']).then((result) => {
     const savedTheme = result.theme;
     if (typeof savedTheme === 'string' && THEMES.some((theme) => theme.id === savedTheme)) {
       themeId.value = savedTheme;
     }
     if (typeof result.wordWrap === 'boolean') {
       wordWrap.value = result.wordWrap;
+    }
+    if (typeof result.codeFontSize === 'number') {
+      codeFontSize.value = result.codeFontSize;
     }
   });
 
@@ -26,6 +31,9 @@ export function usePreferences() {
   watch(wordWrap, (value) => {
     void browser.storage.local.set({ wordWrap: value });
   });
+  watch(codeFontSize, (value) => {
+    void browser.storage.local.set({ codeFontSize: value });
+  });
 
-  return { themeId, wordWrap };
+  return { themeId, wordWrap, codeFontSize };
 }

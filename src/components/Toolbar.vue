@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { Download, FileCode, Palette, Search, WrapText } from '@lucide/vue';
+import { computed } from 'vue';
+import { Download, FileCode, Palette, Search, Type, WrapText } from '@lucide/vue';
 import IconButton from '@/components/IconButton.vue';
 import { downloadSource } from '@/utils/download';
 import type { FileType } from '@/utils/fileType';
+import { DEFAULT_FONT_SIZE } from '@/utils/fonts';
 import { t } from '@/utils/i18n';
 import { openNativeViewer } from '@/utils/nativeViewer';
 import { THEMES } from '@/utils/themes';
@@ -10,6 +12,7 @@ import { THEMES } from '@/utils/themes';
 const props = defineProps<{
   themeId: string;
   wordWrap: boolean;
+  fontSize: number;
   targetUrl: URL | null;
   code: string;
   language: FileType;
@@ -18,8 +21,21 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:themeId': [value: string];
   'update:wordWrap': [value: boolean];
+  'update:fontSize': [value: number];
   search: [];
 }>();
+
+const fontSizes = computed(() => {
+  const sizes: { value: number; label: string }[] = [];
+  const predefined = [8, 9, 10, 11, 12, DEFAULT_FONT_SIZE, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
+  predefined.forEach((size) => sizes.push({ value: size, label: size + 'px' }));
+  return sizes;
+});
+
+function onFontSizeChange(event: Event): void {
+  const value = (event.target as HTMLSelectElement).value;
+  emit('update:fontSize', parseInt(value, 10));
+}
 
 function onThemeChange(event: Event): void {
   emit('update:themeId', (event.target as HTMLSelectElement).value);
@@ -63,7 +79,24 @@ function onNativeAuxClick(event: MouseEvent): void {
 
     <span class="spacer"></span>
 
-    <div class="theme-select">
+    <div class="custom-select">
+      <Type class="lead-ic" :size="20" aria-hidden="true" />
+      <select
+        id="font-size-selector"
+        :value="fontSize"
+        :title="t('viewerFontSize')"
+        :aria-label="t('viewerFontSize')"
+        @change="onFontSizeChange"
+      >
+        <option v-for="size in fontSizes" :key="size.value" :value="size.value">
+          {{ size.label }}
+        </option>
+      </select>
+    </div>
+
+    <span class="sep"></span>
+
+    <div class="custom-select">
       <Palette class="lead-ic" :size="20" aria-hidden="true" />
       <select
         id="theme-selector"
@@ -95,20 +128,20 @@ function onNativeAuxClick(event: MouseEvent): void {
 
 <style scoped>
 /* Single control: appearance icon overlaid on the left of a native <select>. */
-.theme-select {
+.custom-select {
   position: relative;
   display: inline-flex;
   align-items: center;
 }
 
-.theme-select .lead-ic {
+.custom-select .lead-ic {
   position: absolute;
   left: 9px;
   color: var(--select-fg);
   pointer-events: none;
 }
 
-.theme-select select {
+.custom-select select {
   height: 32px;
   padding: 0 10px 0 32px;
   font-family: inherit;

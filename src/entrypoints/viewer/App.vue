@@ -23,7 +23,7 @@ const {
   load,
 } = useSourceFetch();
 
-const { themeId, wordWrap } = usePreferences();
+const { themeId, wordWrap, codeFontSize } = usePreferences();
 
 const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
 
@@ -45,6 +45,7 @@ void load();
     <Toolbar
       v-model:theme-id="themeId"
       v-model:word-wrap="wordWrap"
+      v-model:font-size="codeFontSize"
       :target-url="targetUrl"
       :code="code"
       :language="language"
@@ -60,7 +61,17 @@ void load();
         :message="errorMessage"
       />
       <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
-      <CodeView v-else ref="codeView" :code :language :base-url :wrap="wordWrap" :theme-id :theme-type />
+      <CodeView
+        v-else
+        ref="codeView"
+        :code
+        :language
+        :base-url
+        :wrap="wordWrap"
+        :theme-id
+        :theme-type
+        :font-size="codeFontSize"
+      />
     </div>
 
     <StatusBar

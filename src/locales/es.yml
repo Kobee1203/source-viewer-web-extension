@@ -3,6 +3,7 @@ extDescription: 'Visualiza y formatea código fuente con resaltado de sintaxis: 
 dialogClose: 'Cerrar'
 viewerWordWrap: 'Ajuste de línea'
 viewerTheme: 'Tema:'
+viewerFontSize: 'Tamaño de fuente:'
 viewerLoading: 'Obteniendo el código fuente...'
 errorLoadSource: 'Error: No se pudo cargar el código fuente. $1'
 errorGeneric: 'Error: $1'

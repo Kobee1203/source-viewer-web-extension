@@ -3,6 +3,7 @@ extDescription: 'Visualizza e formatta il codice sorgente con evidenziazione: HT
 dialogClose: 'Chiudi'
 viewerWordWrap: 'A capo automatico'
 viewerTheme: 'Tema:'
+viewerFontSize: 'Dimensione carattere:'
 viewerLoading: 'Recupero del codice sorgente...'
 errorLoadSource: 'Errore: impossibile caricare il codice sorgente. $1'
 errorGeneric: 'Errore: $1'

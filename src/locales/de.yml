@@ -3,6 +3,7 @@ extDescription: 'Quelltext anzeigen und formatieren mit Syntaxhervorhebung: HTML
 dialogClose: 'schließen'
 viewerWordWrap: 'Zeilenumbruch'
 viewerTheme: 'Design:'
+viewerFontSize: 'Schriftgröße:'
 viewerLoading: 'Quelltext wird abgerufen...'
 errorLoadSource: 'Fehler: Quelltext konnte nicht geladen werden. $1'
 errorGeneric: 'Fehler: $1'
