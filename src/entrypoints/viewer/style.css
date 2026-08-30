@@ -19,6 +19,11 @@
   --btn-active-bg: #0e639c;
   --btn-active-border: #17b;
   --btn-active-fg: #fff;
+  --dialog-bg: #1e1e1e;
+  --dialog-bg-alt: #333;
+  --dialog-border: #444;
+  --dialog-link: #3b82f6;
+  --dialog-backdrop: rgb(0 0 0 / 50%);
 }
 
 body {

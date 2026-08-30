@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Type, LayoutGrid } from '@lucide/vue';
-import IconButton from '@/components/IconButton.vue';
+import { LayoutGrid, Type } from '@lucide/vue';
 import FontPreviewControls from '@/components/FontPreviewControls.vue';
+import IconButton from '@/components/IconButton.vue';
 import { t } from '@/utils/i18n';
 
 // Which view is shown; the preview settings only apply to (and only show in) the preview view.

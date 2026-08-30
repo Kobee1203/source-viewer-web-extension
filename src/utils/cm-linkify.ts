@@ -1,9 +1,10 @@
-import { ViewPlugin, Decoration, DecorationSet, EditorView } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
-import { viewerUrl } from '@/utils/viewerUrl';
+import { Decoration, type DecorationSet, type EditorView, ViewPlugin } from '@codemirror/view';
+import type { ViewUpdate } from '@codemirror/view';
+import { extensionToFileType } from '@/utils/fileType';
 import { fontViewerUrl } from '@/utils/fontViewerUrl';
 import { classifyLinkTarget } from '@/utils/linkTarget';
-import { extensionToFileType } from '@/utils/fileType';
+import { viewerUrl } from '@/utils/viewerUrl';
 
 /** Whether `value` is an absolute URL (`http(s)://…`) or protocol-relative (`//…`). */
 function isAbsoluteUrl(value: string): boolean {
@@ -86,7 +87,7 @@ export function linkifyPlugin(baseUrl: string) {
     (view: EditorView) => {
       return {
         decorations: buildDecorations(view, baseUrl),
-        update(update: import('@codemirror/view').ViewUpdate) {
+        update(update: ViewUpdate) {
           if (update.docChanged || update.viewportChanged) {
             this.decorations = buildDecorations(update.view, baseUrl);
           }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, useTemplateRef } from 'vue';
-import Toolbar from '@/components/Toolbar.vue';
 import CodeView from '@/components/CodeView.vue';
-import StatusBar from '@/components/StatusBar.vue';
 import ErrorView from '@/components/ErrorView.vue';
-import { useSourceFetch } from '@/composables/useSourceFetch';
+import StatusBar from '@/components/StatusBar.vue';
+import Toolbar from '@/components/Toolbar.vue';
 import { usePreferences } from '@/composables/usePreferences';
+import { useSourceFetch } from '@/composables/useSourceFetch';
 import { t } from '@/utils/i18n';
 import { getThemeType } from '@/utils/themes';
 
@@ -89,6 +89,11 @@ void load();
   --btn-active-bg: #cfe6ff;
   --btn-active-border: #7fb6ff;
   --btn-active-fg: #003a6b;
+  --dialog-bg: #fff;
+  --dialog-bg-alt: #f0f0f0;
+  --dialog-border: #ccc;
+  --dialog-link: #00e;
+  --dialog-backdrop: rgb(0 0 0 / 20%);
 }
 
 #app-viewer {

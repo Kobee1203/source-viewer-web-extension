@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import CodeMirror from 'vue-codemirror6';
-
-import type { FileType } from '@/utils/fileType';
-import { linkifyPlugin } from '@/utils/cm-linkify';
-import { loadLanguage } from '@/utils/language';
-import { DEFAULT_THEME_ID, getThemeExtension } from '@/utils/themes';
 import { useAsyncExtension } from '@/composables/useAsyncExtension';
 import { useCodeSearch } from '@/composables/useCodeSearch';
+import { linkifyPlugin } from '@/utils/cm-linkify';
+import type { FileType } from '@/utils/fileType';
+import { loadLanguage } from '@/utils/language';
+import { DEFAULT_THEME_ID, getThemeExtension } from '@/utils/themes';
 
 const props = defineProps<{
   code: string;
@@ -22,7 +21,7 @@ const props = defineProps<{
 const langSupport = useAsyncExtension(() => props.language, loadLanguage);
 const themeExtension = useAsyncExtension(() => props.themeId ?? DEFAULT_THEME_ID, getThemeExtension);
 
-const { searchExtensions, onReady, openSearch } = useCodeSearch();
+const { searchExtensions, onReady, openSearch } = useCodeSearch(props.language);
 
 const extensions = computed(() => [
   langSupport.value,

@@ -1,6 +1,6 @@
 import { defineContentScript } from '#imports';
-import { viewerUrl } from '@/utils/viewerUrl';
 import { HIDE_STYLE_ID } from '@/utils/inplace';
+import { viewerUrl } from '@/utils/viewerUrl';
 
 const IFRAME_ID = 'source-viewer-frame';
 

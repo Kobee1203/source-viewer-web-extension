@@ -1,4 +1,4 @@
-import { onUnmounted, ref, type Ref } from 'vue';
+import { type Ref, onUnmounted, ref } from 'vue';
 
 /**
  * Copies text to the clipboard and exposes a transient marker of what was just copied, so a

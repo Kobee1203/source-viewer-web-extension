@@ -1,10 +1,10 @@
 import { ref } from 'vue';
+import { formatSource } from '@/utils/beautify';
+import { mimeToFileType } from '@/utils/contentType';
+import { DEFAULT_FILE_TYPE, type FileType, getFileType } from '@/utils/fileType';
+import { t } from '@/utils/i18n';
 import { requestSource } from '@/utils/messaging';
 import { isRestricted } from '@/utils/restricted';
-import { getFileType, type FileType, DEFAULT_FILE_TYPE } from '@/utils/fileType';
-import { mimeToFileType } from '@/utils/contentType';
-import { formatSource } from '@/utils/beautify';
-import { t } from '@/utils/i18n';
 
 /**
  * Fetches the source of the URL passed via the `?url=` query param (through the

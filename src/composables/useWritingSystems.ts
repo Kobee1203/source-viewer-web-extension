@@ -1,5 +1,5 @@
-import { ref, watch, type Ref } from 'vue';
-import { createCoverageTester, coversAny } from '@/utils/glyphCoverage';
+import { type Ref, ref, watch } from 'vue';
+import { coversAny, createCoverageTester } from '@/utils/glyphCoverage';
 import { WRITING_SYSTEMS, type WritingSystem } from '@/utils/writingSystems';
 
 /**

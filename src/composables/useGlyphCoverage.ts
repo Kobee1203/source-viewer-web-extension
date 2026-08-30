@@ -1,4 +1,4 @@
-import { ref, watch, type Ref } from 'vue';
+import { type Ref, ref, watch } from 'vue';
 import { createCoverageTester } from '@/utils/glyphCoverage';
 import { GLYPH_SAMPLE } from '@/utils/glyphSample';
 
