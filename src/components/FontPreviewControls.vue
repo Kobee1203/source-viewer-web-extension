@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { Bold, Italic, Sun, Moon } from '@lucide/vue';
+import { Bold, Italic, Moon, Sun } from '@lucide/vue';
 import IconButton from '@/components/IconButton.vue';
 import { useWritingSystems } from '@/composables/useWritingSystems';
 import { t } from '@/utils/i18n';

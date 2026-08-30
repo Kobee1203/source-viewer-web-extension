@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { WrapText, Palette, FileCode, Download, Search } from '@lucide/vue';
+import { Download, FileCode, Palette, Search, WrapText } from '@lucide/vue';
 import IconButton from '@/components/IconButton.vue';
-import { THEMES } from '@/utils/themes';
-import { openNativeViewer } from '@/utils/nativeViewer';
 import { downloadSource } from '@/utils/download';
 import type { FileType } from '@/utils/fileType';
 import { t } from '@/utils/i18n';
+import { openNativeViewer } from '@/utils/nativeViewer';
+import { THEMES } from '@/utils/themes';
 
 const props = defineProps<{
   themeId: string;

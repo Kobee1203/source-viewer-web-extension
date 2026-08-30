@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent, onMounted, onUnmounted, ref } from 'vue';
+import { SearchQuery, closeSearchPanel, getSearchQuery, setSearchQuery } from '@codemirror/search';
+import type { EditorView } from '@codemirror/view';
 import { HelpCircle } from '@lucide/vue';
-import { EditorView } from '@codemirror/view';
-import { getSearchQuery, setSearchQuery, SearchQuery, closeSearchPanel } from '@codemirror/search';
 import {
-  performStructuralSearch,
-  nextStructuralMatch,
-  previousStructuralMatch,
-  structuralSearchField,
-  setStructuralSearchState,
   fileTypeFacet,
+  nextStructuralMatch,
+  performStructuralSearch,
+  previousStructuralMatch,
   providers,
+  setStructuralSearchState,
+  structuralSearchField,
 } from '@/composables/search/SearchManager';
 import { t } from '@/utils/i18n';
 

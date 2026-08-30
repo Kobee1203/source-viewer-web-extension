@@ -1,7 +1,7 @@
-import { StructuralSearchProvider, SearchMatch } from '@/composables/search/StructuralSearchProvider';
 import { DOMParser, type Document, type Node } from '@xmldom/xmldom';
-import { FileType } from '@/utils/fileType';
 import * as xpath from 'xpath';
+import type { SearchMatch, StructuralSearchProvider } from '@/composables/search/StructuralSearchProvider';
+import type { FileType } from '@/utils/fileType';
 import type { I18nSimpleKey } from '@/utils/i18n';
 
 interface XmlNode {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { openNativeViewer } from '@/utils/nativeViewer';
 import { useCopyFeedback } from '@/composables/useCopyFeedback';
 import { t } from '@/utils/i18n';
+import { openNativeViewer } from '@/utils/nativeViewer';
 
 const props = defineProps<{ url: URL; message: string }>();
 

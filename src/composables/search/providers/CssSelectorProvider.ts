@@ -1,8 +1,7 @@
-import { StructuralSearchProvider, SearchMatch } from '@/composables/search/StructuralSearchProvider';
-import * as htmlparser2 from 'htmlparser2';
 import { selectAll } from 'css-select';
-
-import { FileType } from '@/utils/fileType';
+import * as htmlparser2 from 'htmlparser2';
+import type { SearchMatch, StructuralSearchProvider } from '@/composables/search/StructuralSearchProvider';
+import type { FileType } from '@/utils/fileType';
 import type { I18nSimpleKey } from '@/utils/i18n';
 
 export class CssSelectorProvider implements StructuralSearchProvider {

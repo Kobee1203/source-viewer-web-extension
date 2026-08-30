@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import FontControls from '@/components/FontControls.vue';
+import FontInfo from '@/components/FontInfo.vue';
 import FontPreview from '@/components/FontPreview.vue';
 import GlyphGrid from '@/components/GlyphGrid.vue';
-import FontInfo from '@/components/FontInfo.vue';
 import { useFontLoad } from '@/composables/useFontLoad';
 import { useFontPreferences } from '@/composables/useFontPreferences';
 import { t } from '@/utils/i18n';

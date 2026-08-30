@@ -1,6 +1,6 @@
 import { onUnmounted, ref } from 'vue';
-import { isRestricted } from '@/utils/restricted';
 import { t } from '@/utils/i18n';
+import { isRestricted } from '@/utils/restricted';
 
 /** CSS font-family the preview renders with. Fixed: only one font is previewed per page. */
 export const PREVIEW_FONT_FAMILY = 'sv-font-preview';

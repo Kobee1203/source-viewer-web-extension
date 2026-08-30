@@ -84,6 +84,7 @@
     "xpath": "^0.0.34"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/js-beautify": "^1.14.3",
     "@vue/eslint-config-typescript": "^14.9.0",
     "@wxt-dev/module-vue": "^1.0.3",

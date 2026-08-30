@@ -1,7 +1,7 @@
 import { defineContentScript } from '#imports';
 import { detectRedirectFileType } from '@/utils/contentType';
-import { requestViewerInjection, requestViewerRedirect } from '@/utils/messaging';
 import { HIDE_STYLE_ID } from '@/utils/inplace';
+import { requestViewerInjection, requestViewerRedirect } from '@/utils/messaging';
 
 /**
  * Auto-opens the in-place code viewer when navigating directly to raw CSS/JS/JSON/XML.

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, useTemplateRef } from 'vue';
-import Toolbar from '@/components/Toolbar.vue';
 import CodeView from '@/components/CodeView.vue';
-import StatusBar from '@/components/StatusBar.vue';
 import ErrorView from '@/components/ErrorView.vue';
-import { useSourceFetch } from '@/composables/useSourceFetch';
+import StatusBar from '@/components/StatusBar.vue';
+import Toolbar from '@/components/Toolbar.vue';
 import { usePreferences } from '@/composables/usePreferences';
+import { useSourceFetch } from '@/composables/useSourceFetch';
 import { t } from '@/utils/i18n';
 import { getThemeType } from '@/utils/themes';
 

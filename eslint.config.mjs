@@ -1,6 +1,6 @@
-import pluginVue from 'eslint-plugin-vue';
-import { withVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
+import { vueTsConfigs, withVueTs } from '@vue/eslint-config-typescript';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import pluginVue from 'eslint-plugin-vue';
 
 export default withVueTs(
   // Project options for the Vue + TypeScript resolution (type-aware linting).
@@ -28,6 +28,14 @@ export default withVueTs(
       // Our single-name view components (Toolbar, etc.) are app-local, not a
       // published component library where clashes with HTML elements matter.
       'vue/multi-word-component-names': 'off',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          fixStyle: 'inline-type-imports',
+        },
+      ],
+      '@typescript-eslint/no-import-type-side-effects': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {

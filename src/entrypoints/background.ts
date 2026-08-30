@@ -1,15 +1,15 @@
-import { defineBackground } from '#imports';
 import { browser } from 'wxt/browser';
-import { isRestricted } from '@/utils/restricted';
+import { defineBackground } from '#imports';
 import {
-  fetchSource,
   type FetchSourceRequest,
   type FetchSourceResponse,
   type RequestViewerInjectionRequest,
   type RequestViewerInjectionResponse,
   type RequestViewerRedirectRequest,
+  fetchSource,
 } from '@/utils/messaging';
-import { createNativeViewerController, type OpenNativeRequest, type OpenNativeResponse } from '@/utils/nativeViewer';
+import { type OpenNativeRequest, type OpenNativeResponse, createNativeViewerController } from '@/utils/nativeViewer';
+import { isRestricted } from '@/utils/restricted';
 import { viewerUrl } from '@/utils/viewerUrl';
 
 export default defineBackground(() => {

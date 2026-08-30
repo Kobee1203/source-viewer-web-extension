@@ -1,4 +1,4 @@
-import { extensionToFileType, type FileType } from '@/utils/fileType';
+import { type FileType, extensionToFileType } from '@/utils/fileType';
 
 // Specific source MIME types we recognise. Suffix families (+json, +xml) are handled below.
 const CSS_MIMES = new Set(['text/css']);

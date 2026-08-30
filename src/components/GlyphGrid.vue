@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Toast from '@/components/Toast.vue';
-import { useGlyphCoverage } from '@/composables/useGlyphCoverage';
 import { useCopyFeedback } from '@/composables/useCopyFeedback';
+import { useGlyphCoverage } from '@/composables/useGlyphCoverage';
 import { codePointLabel } from '@/utils/glyphSample';
 import { t } from '@/utils/i18n';
 

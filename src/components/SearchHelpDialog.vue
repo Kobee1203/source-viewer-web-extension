@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import Dialog from './Dialog.vue';
-import { t } from '@/utils/i18n';
+import { onMounted, ref } from 'vue';
 import type { StructuralSearchProvider } from '@/composables/search/StructuralSearchProvider';
+import { t } from '@/utils/i18n';
+import Dialog from './Dialog.vue';
 
 defineProps<{
   activeProvider: StructuralSearchProvider;

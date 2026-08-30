@@ -1,15 +1,14 @@
-import { EditorView, Panel } from '@codemirror/view';
-import { StateEffect, StateField, RangeSetBuilder, Facet } from '@codemirror/state';
-import { FileType } from '@/utils/fileType';
+import { h, render } from 'vue';
+import { Facet, RangeSetBuilder, StateEffect, StateField } from '@codemirror/state';
+import { EditorView, type Panel } from '@codemirror/view';
 import { Decoration } from '@codemirror/view';
-import { StructuralSearchProvider, SearchMatch } from '@/composables/search/StructuralSearchProvider';
-import { render, h } from 'vue';
 import CustomSearchPanel from '@/components/CustomSearchPanel.vue';
-
+import type { SearchMatch, StructuralSearchProvider } from '@/composables/search/StructuralSearchProvider';
+import { CssSelectorProvider } from '@/composables/search/providers/CssSelectorProvider';
 // Providers
 import { JsonPathProvider } from '@/composables/search/providers/JsonPathProvider';
-import { CssSelectorProvider } from '@/composables/search/providers/CssSelectorProvider';
 import { XPathProvider } from '@/composables/search/providers/XPathProvider';
+import type { FileType } from '@/utils/fileType';
 
 export const fileTypeFacet = Facet.define<FileType, FileType>({
   combine: (values) => values[values.length - 1] || 'html',

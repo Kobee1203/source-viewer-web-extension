@@ -1,5 +1,5 @@
-import { FileType } from '@/utils/fileType';
-import { type I18nSimpleKey } from '@/utils/i18n';
+import type { FileType } from '@/utils/fileType';
+import type { I18nSimpleKey } from '@/utils/i18n';
 
 export interface SearchMatch {
   from: number;

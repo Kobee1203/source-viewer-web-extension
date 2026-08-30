@@ -1,8 +1,7 @@
-import { StructuralSearchProvider, SearchMatch } from '@/composables/search/StructuralSearchProvider';
+import { findNodeAtLocation, parseTree } from 'jsonc-parser';
 import { JSONPath } from 'jsonpath-plus';
-import { parseTree, findNodeAtLocation } from 'jsonc-parser';
-
-import { FileType } from '@/utils/fileType';
+import type { SearchMatch, StructuralSearchProvider } from '@/composables/search/StructuralSearchProvider';
+import type { FileType } from '@/utils/fileType';
 import type { I18nSimpleKey } from '@/utils/i18n';
 
 export class JsonPathProvider implements StructuralSearchProvider {

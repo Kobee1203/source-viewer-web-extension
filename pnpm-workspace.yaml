@@ -1,4 +1,5 @@
 allowBuilds:
   esbuild: true
   spawn-sync: true
+  unrs-resolver: true
   vue-demi: true

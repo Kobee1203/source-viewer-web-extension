@@ -1,10 +1,10 @@
-import { ViewPlugin, Decoration, DecorationSet, EditorView } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
-import { ViewUpdate } from '@codemirror/view';
-import { viewerUrl } from '@/utils/viewerUrl';
+import { Decoration, type DecorationSet, type EditorView, ViewPlugin } from '@codemirror/view';
+import type { ViewUpdate } from '@codemirror/view';
+import { extensionToFileType } from '@/utils/fileType';
 import { fontViewerUrl } from '@/utils/fontViewerUrl';
 import { classifyLinkTarget } from '@/utils/linkTarget';
-import { extensionToFileType } from '@/utils/fileType';
+import { viewerUrl } from '@/utils/viewerUrl';
 
 /** Whether `value` is an absolute URL (`http(s)://…`) or protocol-relative (`//…`). */
 function isAbsoluteUrl(value: string): boolean {

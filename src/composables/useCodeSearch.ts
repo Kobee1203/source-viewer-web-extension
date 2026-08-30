@@ -1,10 +1,10 @@
 import { onMounted, onUnmounted, shallowRef } from 'vue';
-import { EditorView } from '@codemirror/view';
+import { getSearchQuery, openSearchPanel, search, setSearchQuery } from '@codemirror/search';
 import { EditorState, type Extension } from '@codemirror/state';
-import { search, openSearchPanel, setSearchQuery, getSearchQuery } from '@codemirror/search';
+import { EditorView } from '@codemirror/view';
+import { createStructuralSearchPanel, fileTypeFacet, structuralSearchField } from '@/composables/search/SearchManager';
+import type { FileType } from '@/utils/fileType';
 import { t } from '@/utils/i18n';
-import { createStructuralSearchPanel, structuralSearchField, fileTypeFacet } from '@/composables/search/SearchManager';
-import { FileType } from '@/utils/fileType';
 
 /**
  * Full-document search for the code viewer, bound to the OS find shortcut.

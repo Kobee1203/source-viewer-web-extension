@@ -1,4 +1,4 @@
-import { shallowRef, watch, onWatcherCleanup, type ShallowRef } from 'vue';
+import { type ShallowRef, onWatcherCleanup, shallowRef, watch } from 'vue';
 import type { Extension } from '@codemirror/state';
 
 /**
