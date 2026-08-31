@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Font Size Selector**: A new dropdown in the toolbar allows you to adjust the code viewer's font size (from 8px up to 72px). The selection is saved and applied persistently across files, with an option to revert to the theme's default size.
 - **Structural Search Modes**: The search panel now supports advanced structural search engines: **XPath** (for HTML/XML), **CSS Selectors** (for HTML/XML), and **JSONPath** (for JSON).
   - **Search Help Modal**: A new help icon in the search panel provides official documentation links and concrete, localized query examples for each structural search mode.
 
