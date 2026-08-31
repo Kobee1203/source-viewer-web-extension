@@ -33,9 +33,20 @@ export class XPathProvider implements StructuralSearchProvider {
     let doc: Document;
     try {
       const mimeType = fileType === 'xml' ? 'text/xml' : 'text/html';
+
+      // xmldom is a strict XML parser and throws fatal errors on common HTML structures
+      // (like unclosed tags). We override the default domHandler to ignore fatal errors.
+      // @ts-expect-error accessing internal domHandler to extend it
+      const DefaultDOMHandler = new DOMParser().domHandler;
+      class TolerantDOMHandler extends DefaultDOMHandler {
+        fatalError() {
+          // ignore
+        }
+      }
+
       doc = new DOMParser({
         locator: true,
-        errorHandler: () => {}, // ignore errors
+        domHandler: TolerantDOMHandler,
       }).parseFromString(text, mimeType);
 
       const stripNamespaces = (node: Node) => {
