@@ -3,6 +3,7 @@ extDescription: 'Affichez et mettez en forme le code source avec coloration synt
 dialogClose: 'Fermer'
 viewerWordWrap: 'Retour à la ligne automatique'
 viewerTheme: 'Thème :'
+viewerFontSize: 'Taille de police :'
 viewerLoading: 'Récupération du code source...'
 errorLoadSource: 'Erreur : Impossible de charger la source. $1'
 errorGeneric: 'Erreur : $1'

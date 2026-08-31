@@ -3,6 +3,7 @@ extDescription: 'Veja e formate o código-fonte com realce de sintaxe: HTML, CSS
 dialogClose: 'Fechar'
 viewerWordWrap: 'Quebra de linha'
 viewerTheme: 'Tema:'
+viewerFontSize: 'Tamanho da fonte:'
 viewerLoading: 'Obtendo o código-fonte...'
 errorLoadSource: 'Erro: não foi possível carregar o código-fonte. $1'
 errorGeneric: 'Erro: $1'
