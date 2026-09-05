@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Download, FileCode, Palette, Search, Type, WrapText } from '@lucide/vue';
+import { Download, FileCode, Palette, PanelLeft, Search, Type, WrapText } from '@lucide/vue';
 import IconButton from '@/components/IconButton.vue';
 import { downloadSource } from '@/utils/download';
 import type { FileType } from '@/utils/fileType';
@@ -17,12 +17,14 @@ const props = defineProps<{
   code: string;
   language: FileType;
   contentDisposition: string | null;
+  sidebarOpen: boolean;
 }>();
 const emit = defineEmits<{
   'update:themeId': [value: string];
   'update:wordWrap': [value: boolean];
   'update:fontSize': [value: number];
   search: [];
+  'toggle-sidebar': [];
 }>();
 
 const fontSizes = computed(() => {
@@ -73,6 +75,10 @@ function onNativeAuxClick(event: MouseEvent): void {
 
 <template>
   <div class="toolbar">
+    <IconButton v-if="code" :active="sidebarOpen" :label="t('viewerToggleSidebar')" @click="emit('toggle-sidebar')">
+      <PanelLeft :size="20" />
+    </IconButton>
+
     <IconButton :active="wordWrap" :label="t('viewerWordWrap')" @click="toggleWrap">
       <WrapText :size="20" />
     </IconButton>

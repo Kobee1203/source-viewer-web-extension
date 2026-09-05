@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, useTemplateRef } from 'vue';
+import { computed, onMounted, useTemplateRef, watch } from 'vue';
 import CodeView from '@/components/CodeView.vue';
 import ErrorView from '@/components/ErrorView.vue';
+import ReferenceSidebar from '@/components/ReferenceSidebar.vue';
 import StatusBar from '@/components/StatusBar.vue';
 import Toolbar from '@/components/Toolbar.vue';
 import { usePreferences } from '@/composables/usePreferences';
+import { useReferenceSidebar } from '@/composables/useReferenceSidebar';
 import { useSourceFetch } from '@/composables/useSourceFetch';
 import { t } from '@/utils/i18n';
 import { getThemeType } from '@/utils/themes';
@@ -25,17 +27,35 @@ const {
 
 const { themeId, wordWrap, codeFontSize } = usePreferences();
 
-const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
+const sidebar = useReferenceSidebar();
 
+const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
 const themeType = computed(() => getThemeType(themeId.value));
 
 const codeView = useTemplateRef('codeView');
 const appRoot = useTemplateRef('appRoot');
 
-// Take keyboard focus on load so the Cmd/Ctrl-F interceptor (in CodeView) works without the user
-// first clicking — notably in the in-place iframe, which otherwise stays unfocused and lets the
-// browser's native find open instead.
 onMounted(() => appRoot.value?.focus());
+
+// Populate the sidebar whenever a new source finishes loading (guards: sidebar open, code non-empty).
+watch([code, baseUrl], ([newCode, newBase]) => {
+  if (!sidebar.isOpen.value || !newCode || !newBase) return;
+  sidebar.initFromSource(newCode, newBase);
+});
+
+// When the sidebar is opened after the source is already loaded, populate it immediately.
+watch(sidebar.isOpen, (open) => {
+  if (open && !sidebar.rootUrl.value && code.value && baseUrl.value) {
+    sidebar.initFromSource(code.value, baseUrl.value);
+  }
+});
+
+// Clear the sidebar's loading spinner if the fetch fails so it doesn't spin indefinitely.
+watch(loading, (isLoading) => {
+  if (!isLoading && errorMessage.value) {
+    sidebar.handleLoadError();
+  }
+});
 
 void load();
 </script>
@@ -50,28 +70,44 @@ void load();
       :code="code"
       :language="language"
       :content-disposition="contentDisposition"
+      :sidebar-open="sidebar.isOpen.value"
       @search="codeView?.openSearch()"
+      @toggle-sidebar="sidebar.toggle()"
     />
 
-    <div id="content">
-      <div v-if="loading" class="loader">{{ t('viewerLoading') }}</div>
-      <ErrorView
-        v-else-if="errorMessage && errorWithNativeButton && targetUrl"
-        :url="targetUrl"
-        :message="errorMessage"
+    <div id="main-area">
+      <ReferenceSidebar
+        v-if="sidebar.isOpen.value"
+        :roots="sidebar.roots.value"
+        :active-url="sidebar.activeUrl.value"
+        :root-url="sidebar.rootUrl.value"
+        :root-filename="sidebar.rootFilename.value"
+        @navigate="(node) => sidebar.navigateTo(node, load)"
+        @navigate-root="sidebar.navigateToRoot(load)"
+        @toggle-expand="sidebar.toggleExpand"
+        @close="sidebar.toggle()"
       />
-      <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
-      <CodeView
-        v-else
-        ref="codeView"
-        :code
-        :language
-        :base-url
-        :wrap="wordWrap"
-        :theme-id
-        :theme-type
-        :font-size="codeFontSize"
-      />
+
+      <div id="content">
+        <div v-if="loading" class="loader">{{ t('viewerLoading') }}</div>
+        <ErrorView
+          v-else-if="errorMessage && errorWithNativeButton && targetUrl"
+          :url="targetUrl"
+          :message="errorMessage"
+        />
+        <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
+        <CodeView
+          v-else
+          ref="codeView"
+          :code
+          :language
+          :base-url
+          :wrap="wordWrap"
+          :theme-id
+          :theme-type
+          :font-size="codeFontSize"
+        />
+      </div>
     </div>
 
     <StatusBar
@@ -115,12 +151,15 @@ void load();
   outline: none; /* focused on load only to capture keyboard — no focus ring wanted */
 }
 
+#main-area {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  min-height: 0;
+}
+
 #content {
   flex: 1;
-
-  /* min-height: 0 lets this flex child shrink to the available height instead of growing with its
-     content, so CodeMirror's scroller gets a correct viewport height and can scroll matches (even
-     far off-screen ones) precisely into view. */
   min-height: 0;
   overflow: auto;
   background: inherit;

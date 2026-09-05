@@ -22,10 +22,29 @@ export function useSourceFetch() {
   const httpStatus = ref<number | null>(null);
   const httpStatusText = ref('');
 
-  async function load(): Promise<void> {
-    const params = new URLSearchParams(window.location.search);
-    const urlParam = params.get('url');
-    if (!urlParam) return; // no target: leave the loader visible
+  async function load(explicitUrl?: string): Promise<void> {
+    // Reset reactive state so a re-fetch always starts from a clean slate.
+    loading.value = true;
+    errorMessage.value = null;
+    errorWithNativeButton.value = false;
+    code.value = '';
+    byteSize.value = null;
+    contentDisposition.value = null;
+    httpStatus.value = null;
+    httpStatusText.value = '';
+
+    const urlParam = explicitUrl ?? new URLSearchParams(window.location.search).get('url');
+    if (!urlParam) {
+      loading.value = false;
+      return;
+    }
+
+    // Keep the address bar in sync when navigating internally from the sidebar.
+    if (explicitUrl) {
+      const next = new URL(window.location.href);
+      next.searchParams.set('url', explicitUrl);
+      history.pushState(null, '', next.toString());
+    }
 
     let target: URL;
     try {
