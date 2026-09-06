@@ -40,8 +40,14 @@ export function useSourceFetch() {
     }
 
     // Keep the address bar in sync when navigating internally from the sidebar.
+    // Preserve the `root` param (set on first navigation) so that a page reload can
+    // reconstruct the initial VFS tree even when the viewer is showing a child file.
     if (explicitUrl) {
       const next = new URL(window.location.href);
+      if (!next.searchParams.has('root')) {
+        const currentUrl = next.searchParams.get('url');
+        if (currentUrl) next.searchParams.set('root', currentUrl);
+      }
       next.searchParams.set('url', explicitUrl);
       history.pushState(null, '', next.toString());
     }

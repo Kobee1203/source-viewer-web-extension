@@ -1,172 +1,224 @@
 import { ref } from 'vue';
-import type { ReferenceEntry } from '@/utils/extractReferences';
+import type { VfsFileNode, VfsFolderNode, VfsNode } from '@/utils/buildVfsTree';
+import { insertIntoVfs } from '@/utils/buildVfsTree';
+import { mimeToFileType } from '@/utils/contentType';
 import { extractReferences } from '@/utils/extractReferences';
+import { getFileType } from '@/utils/fileType';
 import { fontViewerUrl } from '@/utils/fontViewerUrl';
+import { requestSource } from '@/utils/messaging';
 
-export interface ReferenceNode extends ReferenceEntry {
-  /** Child references of this file; null = not yet loaded. */
-  children: ReferenceNode[] | null;
-  isExpanded: boolean;
-  isLoading: boolean;
-  /** True when this URL already appears in an ancestor — prevents infinite recursion. */
-  isCircular: boolean;
-  /** Set of ancestor URLs used for circular-reference detection. Not reactive on purpose. */
-  ancestorUrls: ReadonlySet<string>;
-}
+export type { VfsFileNode, VfsFolderNode, VfsNode } from '@/utils/buildVfsTree';
 
-function filenameFromUrl(urlStr: string): string {
-  try {
-    const u = new URL(urlStr);
-    const parts = u.pathname.split('/').filter(Boolean);
-    return parts.pop() ?? urlStr;
-  } catch {
-    return urlStr;
-  }
-}
+// ---------------------------------------------------------------------------
+// Tree helpers
+// ---------------------------------------------------------------------------
 
-function makeNode(entry: ReferenceEntry, ancestorUrls: ReadonlySet<string>): ReferenceNode {
-  return {
-    ...entry,
-    children: null,
-    isExpanded: false,
-    isLoading: false,
-    isCircular: ancestorUrls.has(entry.url),
-    ancestorUrls,
-  };
-}
-
-function findNode(url: string, nodes: ReferenceNode[]): ReferenceNode | null {
+function findFileNode(url: string, nodes: VfsNode[]): VfsFileNode | null {
   for (const node of nodes) {
-    if (node.url === url) return node;
-    if (node.children) {
-      const found = findNode(url, node.children);
+    if (node.kind === 'file' && node.url === url) return node;
+    if (node.kind === 'folder') {
+      const found = findFileNode(url, node.children);
       if (found) return found;
     }
   }
   return null;
 }
 
+function hostnameOf(urlStr: string): string {
+  try {
+    return new URL(urlStr).hostname;
+  } catch {
+    return urlStr;
+  }
+}
+
+function filenameOf(urlStr: string): string {
+  try {
+    const u = new URL(urlStr);
+    const parts = u.pathname.split('/').filter(Boolean);
+    return parts.pop() ?? u.hostname;
+  } catch {
+    return urlStr;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Composable
+// ---------------------------------------------------------------------------
+
 export function useReferenceSidebar() {
   const isOpen = ref(false);
-  const roots = ref<ReferenceNode[]>([]);
+  /** The virtual file-system tree — mutated in place so Vue's Proxy tracks changes. */
+  const vfsTree = ref<VfsNode[]>([]);
   /** URL of the file currently displayed in the viewer. */
   const activeUrl = ref('');
-  /** URL of the initial (root) file — used for the "back to root" action. */
+  /** Hostname of the initial (root) file — used to classify internal vs external refs. */
+  const rootHostname = ref('');
+  /** URL of the initial (root) file — used for the "back to root" breadcrumb. */
   const rootUrl = ref('');
   /** Display name of the root file. */
   const rootFilename = ref('');
-  /** URL of the node currently waiting for its children to be populated after a fetch. */
-  const pendingNodeUrl = ref<string | null>(null);
+  /**
+   * The file node that is waiting for its references to be loaded.
+   * Set in `navigateTo`; cleared in `initFromSource` once the fetch completes.
+   */
+  const pendingFileUrl = ref<string | null>(null);
+
+  // ── Private helpers ───────────────────────────────────────────────────────
+
+  function setRootInfo(urlStr: string): void {
+    if (rootUrl.value) return; // already initialised — do not overwrite
+    rootUrl.value = urlStr;
+    rootFilename.value = filenameOf(urlStr);
+    rootHostname.value = hostnameOf(urlStr);
+  }
+
+  // ── Public API ────────────────────────────────────────────────────────────
 
   function toggle(): void {
     isOpen.value = !isOpen.value;
   }
 
   /**
-   * Called whenever the viewer loads a new Source.
-   * - On first load: initializes the root list from the source's references.
-   * - On subsequent in-page navigation: populates the pending node's children.
+   * Inserts references extracted from a loaded source into the global VFS tree.
+   * Called by App.vue whenever the viewer finishes loading a new source.
+   *
+   * @param source    Formatted source text (as displayed in the viewer).
+   * @param baseUrl   Absolute URL of the loaded source.
+   * @param markCurrentAsExplored
+   *   Set to `true` when called after a page reload with `?root≠url` so that the
+   *   current file node (already in the tree from the root seeding) is marked as
+   *   explored without going through the normal `pendingFileUrl` flow.
    */
-  function initFromSource(source: string, baseUrl: string): void {
+  function initFromSource(source: string, baseUrl: string, markCurrentAsExplored = false): void {
+    setRootInfo(baseUrl);
+    activeUrl.value = baseUrl;
+
     const refs = extractReferences(source, baseUrl);
-
-    if (!rootUrl.value) {
-      // First load — initialize root state
-      rootUrl.value = baseUrl;
-      rootFilename.value = filenameFromUrl(baseUrl);
-      activeUrl.value = baseUrl;
-      const rootAncestors = new Set<string>([baseUrl]);
-      roots.value = refs.map((r) => makeNode(r, rootAncestors));
-      return;
+    for (const ref of refs) {
+      insertIntoVfs(vfsTree.value, ref, rootHostname.value, rootUrl.value);
     }
 
-    // Subsequent in-page navigation — populate the pending node's children
-    const targetUrl = pendingNodeUrl.value;
-    if (targetUrl === null) return; // navigated to an already-loaded node, nothing to do
-
-    const node = findNode(targetUrl, roots.value);
-    if (node?.isLoading) {
-      const childAncestors = new Set([...node.ancestorUrls, node.url]);
-      node.children = refs.map((r) => makeNode(r, childAncestors));
-      node.isLoading = false;
-      node.isExpanded = true;
+    // Update whichever file node was waiting for its references.
+    const pendingUrl = pendingFileUrl.value;
+    if (pendingUrl !== null) {
+      const node = findFileNode(pendingUrl, vfsTree.value);
+      if (node) {
+        node.isLoading = false;
+        node.isExplored = true;
+        node.hasReferences = refs.length > 0;
+      }
+      pendingFileUrl.value = null;
+    } else if (markCurrentAsExplored) {
+      // Reload case: the current file was already in the tree from root seeding.
+      const node = findFileNode(baseUrl, vfsTree.value);
+      if (node) {
+        node.isExplored = true;
+        node.hasReferences = refs.length > 0;
+      }
     }
-    pendingNodeUrl.value = null;
   }
 
   /**
-   * Navigates the viewer to the given node.
-   * Font files open in a new tab (they use a separate Extension Page — the Font Viewer —
-   * so in-page navigation is not possible without losing the sidebar state).
-   * Source files navigate in-page so the sidebar tree is preserved.
+   * Fetches the root source independently and seeds the VFS tree from it.
+   * Used on page reload when `?root` differs from `?url`: the viewer shows the
+   * last-visited file, but the sidebar should be rooted at the initial source.
    */
-  function navigateTo(node: ReferenceNode, loadFn: (url: string) => Promise<void>): void {
-    if (node.isCircular) return;
+  async function seedFromRootUrl(urlStr: string): Promise<void> {
+    setRootInfo(urlStr);
+    try {
+      const response = await requestSource(urlStr);
+      if (!response.ok) return;
+      const target = new URL(urlStr);
+      const fileType = mimeToFileType(response.contentType) ?? getFileType(target);
+      // Extract refs from raw text — no need to beautify for reference scanning.
+      const { formatSource } = await import('@/utils/beautify');
+      const formatted = formatSource(response.text, fileType);
+      const refs = extractReferences(formatted, urlStr);
+      for (const ref of refs) {
+        insertIntoVfs(vfsTree.value, ref, rootHostname.value, rootUrl.value);
+      }
+    } catch {
+      // Silent fail: the sidebar will simply not have the initial root's references.
+    }
+  }
 
-    if (node.linkTarget === 'font') {
-      window.open(fontViewerUrl(node.url), '_blank', 'noopener,noreferrer');
+  /**
+   * Navigate the viewer to a VFS node (file or clickable folder).
+   * - Font files open in a new tab (Font Viewer is a separate Extension Page).
+   * - Source files navigate in-page to preserve sidebar state.
+   */
+  function navigateTo(node: VfsNode, loadFn: (url: string) => Promise<void>): void {
+    const url = node.url;
+    if (!url) return;
+
+    if (
+      (node.kind === 'file' && node.linkTarget === 'font') ||
+      (node.kind === 'folder' && node.linkTarget === 'font')
+    ) {
+      window.open(fontViewerUrl(url), '_blank', 'noopener,noreferrer');
       return;
     }
 
-    activeUrl.value = node.url;
+    activeUrl.value = url;
 
-    if (node.children === null) {
+    if (node.kind === 'file' && !node.isExplored) {
       node.isLoading = true;
-      pendingNodeUrl.value = node.url;
+      pendingFileUrl.value = url;
     }
 
-    void loadFn(node.url);
+    void loadFn(url);
   }
 
-  /** Navigates the viewer back to the initial root file. */
+  /** Navigate the viewer back to the initial root file. */
   function navigateToRoot(loadFn: (url: string) => Promise<void>): void {
     if (!rootUrl.value || activeUrl.value === rootUrl.value) return;
     activeUrl.value = rootUrl.value;
     void loadFn(rootUrl.value);
   }
 
-  /** Toggle expand/collapse of a node whose children have already been loaded. */
-  function toggleExpand(node: ReferenceNode): void {
-    if (node.children !== null || node.isLoading) {
-      node.isExpanded = !node.isExpanded;
-    }
+  /** Toggle the expand/collapse state of a folder node. */
+  function toggleFolder(node: VfsFolderNode): void {
+    node.isExpanded = !node.isExpanded;
   }
 
   /**
-   * Clears the loading state when a fetch fails, so the node doesn't spin indefinitely.
-   * Sets children to an empty array to signal "loaded but empty".
+   * Clears the loading state when a fetch fails, preventing the node from
+   * spinning indefinitely.
    */
   function handleLoadError(): void {
-    const targetUrl = pendingNodeUrl.value;
-    if (targetUrl === null) return;
-    const node = findNode(targetUrl, roots.value);
+    if (pendingFileUrl.value === null) return;
+    const node = findFileNode(pendingFileUrl.value, vfsTree.value);
     if (node) {
       node.isLoading = false;
-      node.children = [];
+      node.isExplored = true;
+      node.hasReferences = false;
     }
-    pendingNodeUrl.value = null;
+    pendingFileUrl.value = null;
   }
 
-  /** Resets all sidebar state — call when performing a top-level navigation. */
+  /** Resets all state (e.g. when opening a completely new top-level URL). */
   function reset(): void {
-    roots.value = [];
+    vfsTree.value = [];
     activeUrl.value = '';
     rootUrl.value = '';
+    rootHostname.value = '';
     rootFilename.value = '';
-    pendingNodeUrl.value = null;
+    pendingFileUrl.value = null;
   }
 
   return {
     isOpen,
-    roots,
+    vfsTree,
     activeUrl,
     rootUrl,
     rootFilename,
     toggle,
     initFromSource,
+    seedFromRootUrl,
     navigateTo,
     navigateToRoot,
-    toggleExpand,
+    toggleFolder,
     handleLoadError,
     reset,
   };

@@ -2,30 +2,25 @@
 import { provide, ref } from 'vue';
 import { X } from '@lucide/vue';
 import ReferenceTreeNode from '@/components/ReferenceTreeNode.vue';
-import type { ReferenceNode } from '@/composables/useReferenceSidebar';
+import type { VfsFolderNode, VfsNode } from '@/composables/useReferenceSidebar';
 import { t } from '@/utils/i18n';
 
 const props = defineProps<{
-  roots: ReferenceNode[];
+  vfsTree: VfsNode[];
   activeUrl: string;
-  rootUrl: string;
-  rootFilename: string;
 }>();
 
 const emit = defineEmits<{
-  navigate: [node: ReferenceNode];
-  'navigate-root': [];
-  'toggle-expand': [node: ReferenceNode];
+  navigate: [node: VfsNode];
+  'toggle-folder': [node: VfsFolderNode];
   close: [];
 }>();
 
-// Provide callbacks and activeUrl down to all ReferenceTreeNode descendants
-// to avoid prop-drilling through arbitrarily deep recursive trees.
-provide('sidebarActiveUrl', () => props.activeUrl);
-provide('sidebarNavigate', (node: ReferenceNode) => emit('navigate', node));
-provide('sidebarToggleExpand', (node: ReferenceNode) => emit('toggle-expand', node));
+provide<() => string>('sidebarActiveUrl', () => props.activeUrl);
+provide<(node: VfsNode) => void>('sidebarNavigate', (node) => emit('navigate', node));
+provide<(node: VfsFolderNode) => void>('sidebarToggleFolder', (node) => emit('toggle-folder', node));
 
-// Resize logic — updates a CSS custom property on the sidebar element
+// ── Resize logic ──────────────────────────────────────────────────────────────
 const sidebarEl = ref<HTMLElement | null>(null);
 const DEFAULT_WIDTH = 260;
 const MIN_WIDTH = 160;
@@ -33,7 +28,6 @@ const MIN_WIDTH = 160;
 function onResizePointerDown(event: PointerEvent): void {
   const handle = event.currentTarget as HTMLElement;
   handle.setPointerCapture(event.pointerId);
-
   const startX = event.clientX;
   const startWidth = sidebarEl.value?.offsetWidth ?? DEFAULT_WIDTH;
 
@@ -49,6 +43,16 @@ function onResizePointerDown(event: PointerEvent): void {
 
   handle.addEventListener('pointermove', onMove);
   handle.addEventListener('pointerup', onUp);
+}
+
+/** True when the first VFS node is the root-domain folder (always the case once seeded). */
+function hasSeparator(): boolean {
+  const first = props.vfsTree[0];
+  return props.vfsTree.length > 1 && first?.kind === 'folder' && first.isRootDomain;
+}
+
+function nodeKey(node: VfsNode): string {
+  return node.kind === 'file' ? `f:${node.url}` : `d:${node.key}`;
 }
 </script>
 
@@ -73,17 +77,17 @@ function onResizePointerDown(event: PointerEvent): void {
       </button>
     </div>
 
-    <!-- Root file breadcrumb (only shown when navigated away from root) -->
-    <div v-if="rootUrl && activeUrl !== rootUrl" class="root-crumb">
-      <button type="button" class="root-crumb-btn" :title="rootUrl" @click="emit('navigate-root')">
-        ← {{ rootFilename }}
-      </button>
-    </div>
-
-    <!-- Tree -->
+    <!-- VFS tree -->
     <div class="sidebar-body">
-      <ul v-if="roots.length > 0" class="root-list">
-        <ReferenceTreeNode v-for="node in roots" :key="node.url" :node="node" />
+      <ul v-if="vfsTree.length > 0" class="root-list">
+        <template v-for="(node, idx) in vfsTree" :key="nodeKey(node)">
+          <!--
+            Separator between the root-domain folder (index 0) and external
+            domain folders (index 1+). Only rendered once, between both groups.
+          -->
+          <li v-if="idx === 1 && hasSeparator()" class="tree-separator" role="separator" />
+          <ReferenceTreeNode :node="node" />
+        </template>
       </ul>
       <div v-else class="sidebar-empty">{{ t('sidebarEmpty') }}</div>
     </div>
@@ -143,33 +147,6 @@ function onResizePointerDown(event: PointerEvent): void {
   opacity: 1;
 }
 
-.root-crumb {
-  flex-shrink: 0;
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--toolbar-border);
-}
-
-.root-crumb-btn {
-  max-width: 100%;
-  padding: 2px 6px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: inherit;
-  font-size: 11px;
-  color: var(--app-fg);
-  white-space: nowrap;
-  cursor: pointer;
-  background: none;
-  border: none;
-  border-radius: 3px;
-  opacity: 0.75;
-}
-
-.root-crumb-btn:hover {
-  background: var(--btn-bg-hover);
-  opacity: 1;
-}
-
 .sidebar-body {
   flex: 1;
   padding: 4px 0;
@@ -186,6 +163,15 @@ function onResizePointerDown(event: PointerEvent): void {
   font-size: 12px;
   font-style: italic;
   opacity: 0.5;
+}
+
+/* Visual separator between root-domain folder and external domain folders */
+.tree-separator {
+  height: 1px;
+  margin: 4px 8px;
+  list-style: none;
+  background: var(--toolbar-border);
+  opacity: 0.6;
 }
 
 /* Resize handle — thin bar on the right edge */

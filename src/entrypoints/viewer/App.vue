@@ -35,22 +35,37 @@ const themeType = computed(() => getThemeType(themeId.value));
 const codeView = useTemplateRef('codeView');
 const appRoot = useTemplateRef('appRoot');
 
-onMounted(() => appRoot.value?.focus());
+// Detect reload with a distinct ?root param (user had navigated away before reloading).
+const searchParams = new URLSearchParams(window.location.search);
+const rootParam = searchParams.get('root') ?? '';
+const urlParam = searchParams.get('url') ?? '';
+const hasDistinctRoot = !!rootParam && rootParam !== urlParam;
 
-// Populate the sidebar whenever a new source finishes loading (guards: sidebar open, code non-empty).
-watch([code, baseUrl], ([newCode, newBase]) => {
-  if (!sidebar.isOpen.value || !newCode || !newBase) return;
-  sidebar.initFromSource(newCode, newBase);
-});
-
-// When the sidebar is opened after the source is already loaded, populate it immediately.
-watch(sidebar.isOpen, (open) => {
-  if (open && !sidebar.rootUrl.value && code.value && baseUrl.value) {
-    sidebar.initFromSource(code.value, baseUrl.value);
+onMounted(() => {
+  appRoot.value?.focus();
+  // Pre-seed the sidebar from the initial root source when the page was reloaded
+  // while the viewer was showing a child file. This fires immediately so the VFS tree
+  // is populated by the time the user opens the sidebar.
+  if (hasDistinctRoot) {
+    void sidebar.seedFromRootUrl(rootParam);
   }
 });
 
-// Clear the sidebar's loading spinner if the fetch fails so it doesn't spin indefinitely.
+// When the source finishes loading and the sidebar is open: insert its refs into the VFS.
+watch([code, baseUrl], ([newCode, newBase]) => {
+  if (!sidebar.isOpen.value || !newCode || !newBase) return;
+  sidebar.initFromSource(newCode, newBase, hasDistinctRoot);
+});
+
+// When the sidebar is opened and has not yet been populated from the current source: do it now.
+watch(sidebar.isOpen, (open) => {
+  if (!open || !code.value || !baseUrl.value) return;
+  if (!sidebar.rootUrl.value) {
+    sidebar.initFromSource(code.value, baseUrl.value, hasDistinctRoot);
+  }
+});
+
+// Clear the sidebar loading spinner when a fetch fails so the node doesn't spin forever.
 watch(loading, (isLoading) => {
   if (!isLoading && errorMessage.value) {
     sidebar.handleLoadError();
@@ -78,13 +93,10 @@ void load();
     <div id="main-area">
       <ReferenceSidebar
         v-if="sidebar.isOpen.value"
-        :roots="sidebar.roots.value"
+        :vfs-tree="sidebar.vfsTree.value"
         :active-url="sidebar.activeUrl.value"
-        :root-url="sidebar.rootUrl.value"
-        :root-filename="sidebar.rootFilename.value"
         @navigate="(node) => sidebar.navigateTo(node, load)"
-        @navigate-root="sidebar.navigateToRoot(load)"
-        @toggle-expand="sidebar.toggleExpand"
+        @toggle-folder="sidebar.toggleFolder"
         @close="sidebar.toggle()"
       />
 
