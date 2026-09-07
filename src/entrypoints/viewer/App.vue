@@ -16,6 +16,7 @@ const {
   errorMessage,
   errorWithNativeButton,
   code,
+  rawCode,
   language,
   byteSize,
   targetUrl,
@@ -81,6 +82,7 @@ void load();
       v-model:font-size="codeFontSize"
       :target-url="targetUrl"
       :code="code"
+      :raw-code="rawCode"
       :language="language"
       :content-disposition="contentDisposition"
       :sidebar-open="sidebar.isOpen.value"

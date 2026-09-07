@@ -15,6 +15,7 @@ export function useSourceFetch() {
   const errorMessage = ref<string | null>(null);
   const errorWithNativeButton = ref(false);
   const code = ref('');
+  const rawCode = ref('');
   const language = ref<FileType>(DEFAULT_FILE_TYPE);
   const byteSize = ref<number | null>(null);
   const targetUrl = ref<URL | null>(null);
@@ -28,6 +29,7 @@ export function useSourceFetch() {
     errorMessage.value = null;
     errorWithNativeButton.value = false;
     code.value = '';
+    rawCode.value = '';
     byteSize.value = null;
     contentDisposition.value = null;
     httpStatus.value = null;
@@ -88,6 +90,7 @@ export function useSourceFetch() {
       // Prefer the response's real MIME (handles extensionless URLs like fonts.googleapis.com/css2?…); fall back to the URL extension.
       const type = mimeToFileType(response.contentType) ?? getFileType(target);
       language.value = type;
+      rawCode.value = response.text;
       code.value = formatSource(response.text, type);
       loading.value = false;
     } catch (err) {
@@ -102,6 +105,7 @@ export function useSourceFetch() {
     errorMessage,
     errorWithNativeButton,
     code,
+    rawCode,
     language,
     byteSize,
     targetUrl,
