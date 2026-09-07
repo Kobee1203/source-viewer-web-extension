@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - **Reference Sidebar & Site Tree**: A collapsible left sidebar in the Source Viewer displays an interactive virtual file system (VFS) tree of all resources referenced in the viewed source file (scripts, stylesheets, fonts, XML, JSON).
   - **Hierarchical Site Tree**: Internal references are organized into an expandable root-domain folder with subdirectories reflecting the site's path structure. External references are neatly grouped under their respective domain folders.
+  - **Direct Dependencies & Shortcut Navigation**: Explored source files display an expandable chevron listing their direct references underneath with distinct shortcut badges. Clicking a shortcut navigates to the file, automatically expands any collapsed parent folders in the tree to reveal the canonical file, and smoothly scrolls to it with a pulse highlight animation.
   - **Dynamic In-Page Navigation & Exploration**: Clicking files loads them in the viewer and injects their discovered references into the site tree.
   - **Font Routing**: Web fonts open directly in the dedicated Font Viewer in a separate tab.
   - **State Preservation Across Reloads**: The initial site tree is preserved across page reloads and internal navigation via root URL tracking (`?url=...&root=...`).
