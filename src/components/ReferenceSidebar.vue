@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { provide, ref } from 'vue';
+import { nextTick, provide, ref } from 'vue';
 import { X } from '@lucide/vue';
 import ReferenceTreeNode from '@/components/ReferenceTreeNode.vue';
-import type { VfsFolderNode, VfsNode } from '@/composables/useReferenceSidebar';
+import type { ReferenceEntry, VfsFileNode, VfsFolderNode, VfsNode } from '@/composables/useReferenceSidebar';
 import { t } from '@/utils/i18n';
 
 const props = defineProps<{
@@ -12,16 +12,39 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   navigate: [node: VfsNode];
+  'navigate-shortcut': [ref: ReferenceEntry];
   'toggle-folder': [node: VfsFolderNode];
+  'toggle-file': [node: VfsFileNode];
   close: [];
 }>();
 
+const sidebarEl = ref<HTMLElement | null>(null);
+
+function scrollToNode(url: string): void {
+  const container = sidebarEl.value;
+  if (!container) return;
+  const selector = `li.canonical-node[data-vfs-url="${CSS.escape(url)}"] > .node-row, li.vfs-node[data-vfs-url="${CSS.escape(url)}"]:not([data-vfs-shortcut]) > .node-row`;
+  const el = container.querySelector<HTMLElement>(selector);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    el.classList.remove('highlight-pulse');
+    void el.offsetWidth;
+    el.classList.add('highlight-pulse');
+  }
+}
+
 provide<() => string>('sidebarActiveUrl', () => props.activeUrl);
 provide<(node: VfsNode) => void>('sidebarNavigate', (node) => emit('navigate', node));
+provide<(ref: ReferenceEntry) => void>('sidebarNavigateShortcut', (ref) => {
+  emit('navigate-shortcut', ref);
+  void nextTick(() => {
+    scrollToNode(ref.url);
+  });
+});
 provide<(node: VfsFolderNode) => void>('sidebarToggleFolder', (node) => emit('toggle-folder', node));
+provide<(node: VfsFileNode) => void>('sidebarToggleFile', (node) => emit('toggle-file', node));
 
 // ── Resize logic ──────────────────────────────────────────────────────────────
-const sidebarEl = ref<HTMLElement | null>(null);
 const DEFAULT_WIDTH = 260;
 const MIN_WIDTH = 160;
 const defaultWidth = `${DEFAULT_WIDTH}px`;

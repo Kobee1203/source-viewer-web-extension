@@ -52,6 +52,10 @@ export interface VfsFileNode {
    * false = no references (chevron disappears after exploration)
    */
   hasReferences: boolean | null;
+  /** Whether direct references under this file node are expanded. */
+  isExpanded: boolean;
+  /** Direct references extracted from this file when explored. */
+  references: ReferenceEntry[];
 }
 
 export type VfsNode = VfsFolderNode | VfsFileNode;
@@ -193,6 +197,8 @@ export function insertIntoVfs(
       isExplored: false,
       isLoading: false,
       hasReferences: null,
+      isExpanded: false,
+      references: [],
     };
     insertSorted(currentLevel, fileNode);
   } else {

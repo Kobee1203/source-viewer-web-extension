@@ -5,8 +5,8 @@ export default { name: 'ReferenceTreeNode' };
 
 <script setup lang="ts">
 import { inject } from 'vue';
-import { ChevronDown, ChevronRight, Folder, FolderOpen, Loader } from '@lucide/vue';
-import type { VfsFileNode, VfsFolderNode, VfsNode } from '@/composables/useReferenceSidebar';
+import { ArrowUpRight, ChevronDown, ChevronRight, Folder, FolderOpen, Loader } from '@lucide/vue';
+import type { ReferenceEntry, VfsFileNode, VfsFolderNode, VfsNode } from '@/composables/useReferenceSidebar';
 import type { FileType } from '@/utils/fileType';
 
 defineProps<{ node: VfsNode }>();
@@ -15,7 +15,9 @@ defineProps<{ node: VfsNode }>();
 // through arbitrarily deep recursive trees.
 const activeUrl = inject<() => string>('sidebarActiveUrl')!;
 const onNavigate = inject<(node: VfsNode) => void>('sidebarNavigate')!;
+const onNavigateShortcut = inject<(ref: ReferenceEntry) => void>('sidebarNavigateShortcut')!;
 const onToggleFolder = inject<(node: VfsFolderNode) => void>('sidebarToggleFolder')!;
+const onToggleFile = inject<(node: VfsFileNode) => void>('sidebarToggleFile')!;
 
 // ── File type display ────────────────────────────────────────────────────────
 
@@ -35,19 +37,19 @@ const FILE_TYPE_COLORS: Record<FileType, string> = {
   xml: '#2e7d32',
 };
 
-function badgeLabel(node: VfsFileNode): string {
-  if (node.linkTarget === 'font') return 'FONT';
-  if (node.fileType) return FILE_TYPE_LABELS[node.fileType];
+function badgeLabel(item: { linkTarget: 'source' | 'font' | null; fileType?: FileType | null }): string {
+  if (item.linkTarget === 'font') return 'FONT';
+  if (item.fileType) return FILE_TYPE_LABELS[item.fileType];
   return 'SRC';
 }
 
-function badgeColor(node: VfsFileNode): string {
-  if (node.linkTarget === 'font') return '#7b1fa2';
-  if (node.fileType) return FILE_TYPE_COLORS[node.fileType];
+function badgeColor(item: { linkTarget: 'source' | 'font' | null; fileType?: FileType | null }): string {
+  if (item.linkTarget === 'font') return '#7b1fa2';
+  if (item.fileType) return FILE_TYPE_COLORS[item.fileType];
   return '#607d8b';
 }
 
-// ── File node chevron visibility ──────────────────────────────────────────────
+// ── File node chevron visibility & click ─────────────────────────────────────
 
 /**
  * Show a chevron on a file node when:
@@ -58,6 +60,15 @@ function showFileChevron(node: VfsFileNode): boolean {
   return node.linkTarget === 'source' && (node.isLoading || !node.isExplored || node.hasReferences === true);
 }
 
+function onFileChevronClick(node: VfsFileNode): void {
+  if (node.isLoading) return;
+  if (node.isExplored && node.hasReferences) {
+    onToggleFile(node);
+  } else if (!node.isExplored) {
+    onNavigate(node);
+  }
+}
+
 function nodeKey(n: VfsNode): string {
   return n.kind === 'file' ? `f:${n.url}` : `d:${n.key}`;
 }
@@ -65,7 +76,7 @@ function nodeKey(n: VfsNode): string {
 
 <template>
   <!-- ── Folder node ─────────────────────────────────────────────────── -->
-  <li v-if="node.kind === 'folder'" class="vfs-node">
+  <li v-if="node.kind === 'folder'" class="vfs-node canonical-node" :data-vfs-url="node.url ?? undefined">
     <div class="node-row" :class="{ active: node.url !== null && node.url === activeUrl() }">
       <!-- Expand / collapse chevron (only if folder has children) -->
       <button
@@ -104,18 +115,22 @@ function nodeKey(n: VfsNode): string {
   </li>
 
   <!-- ── File node ───────────────────────────────────────────────────── -->
-  <li v-else class="vfs-node" :class="{ active: node.url === activeUrl() }">
+  <li v-else class="vfs-node canonical-node" :class="{ active: node.url === activeUrl() }" :data-vfs-url="node.url">
     <div class="node-row">
-      <!-- Explore chevron / loading spinner -->
+      <!-- Explore / collapse chevron / loading spinner -->
       <button
         v-if="showFileChevron(node)"
         type="button"
         class="chevron-btn"
-        :title="node.url"
-        @click="onNavigate(node)"
+        :title="node.isExplored && node.hasReferences ? undefined : node.url"
+        :aria-expanded="node.isExplored && node.hasReferences ? node.isExpanded : undefined"
+        @click.stop="onFileChevronClick(node)"
       >
         <Loader v-if="node.isLoading" :size="14" class="spin" />
-        <ChevronDown v-else-if="node.isExplored && node.hasReferences" :size="14" />
+        <template v-else-if="node.isExplored && node.hasReferences">
+          <ChevronDown v-if="node.isExpanded" :size="14" />
+          <ChevronRight v-else :size="14" />
+        </template>
         <ChevronRight v-else :size="14" />
       </button>
       <span v-else class="chevron-placeholder" />
@@ -133,6 +148,36 @@ function nodeKey(n: VfsNode): string {
       <!-- Occurrence count badge (shown when referenced more than once) -->
       <span v-if="node.count > 1" class="count-badge">×{{ node.count }}</span>
     </div>
+
+    <!-- Direct references list (shortcuts) -->
+    <ul v-if="node.isExpanded && node.references.length > 0" class="child-list">
+      <li
+        v-for="ref in node.references"
+        :key="`ref:${ref.url}`"
+        class="vfs-node shortcut-node"
+        :class="{ active: ref.url === activeUrl() }"
+        data-vfs-shortcut="true"
+        :data-vfs-url="ref.url"
+      >
+        <div class="node-row" @click="onNavigateShortcut(ref)">
+          <span class="chevron-placeholder" />
+
+          <!-- Shortcut badge (Option B) -->
+          <span class="ft-badge ft-badge-shortcut" :style="{ borderColor: badgeColor(ref), color: badgeColor(ref) }">
+            <ArrowUpRight :size="10" class="shortcut-arrow" />
+            {{ badgeLabel(ref) }}
+          </span>
+
+          <!-- Filename button -->
+          <button type="button" class="node-name-btn" :title="ref.url">
+            {{ ref.filename }}
+          </button>
+
+          <!-- Occurrence count badge -->
+          <span v-if="ref.count > 1" class="count-badge">×{{ ref.count }}</span>
+        </div>
+      </li>
+    </ul>
   </li>
 </template>
 
@@ -197,6 +242,28 @@ function nodeKey(n: VfsNode): string {
   color: #fff;
   letter-spacing: 0.03em;
   border-radius: 3px;
+}
+
+.ft-badge-shortcut {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  padding: 0 3px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+  background: color-mix(in srgb, currentcolor 12%, transparent);
+  border: 1px dashed currentcolor;
+  border-radius: 3px;
+}
+
+.shortcut-arrow {
+  flex-shrink: 0;
+}
+
+.shortcut-node .node-row {
+  cursor: pointer;
 }
 
 .node-name-btn {
@@ -265,5 +332,19 @@ function nodeKey(n: VfsNode): string {
 
 .spin {
   animation: spin 1s linear infinite;
+}
+
+@keyframes target-pulse {
+  0% {
+    box-shadow: inset 0 0 0 2px var(--btn-active-border);
+  }
+
+  100% {
+    box-shadow: inset 0 0 0 2px transparent;
+  }
+}
+
+.node-row.highlight-pulse {
+  animation: target-pulse 1.5s ease-out;
 }
 </style>

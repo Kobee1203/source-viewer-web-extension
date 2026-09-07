@@ -96,7 +96,9 @@ void load();
         :vfs-tree="sidebar.vfsTree.value"
         :active-url="sidebar.activeUrl.value"
         @navigate="(node) => sidebar.navigateTo(node, load)"
+        @navigate-shortcut="(ref) => sidebar.navigateToShortcut(ref, load)"
         @toggle-folder="sidebar.toggleFolder"
+        @toggle-file="sidebar.toggleFile"
         @close="sidebar.toggle()"
       />
 

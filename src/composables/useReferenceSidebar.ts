@@ -2,16 +2,43 @@ import { ref } from 'vue';
 import type { VfsFileNode, VfsFolderNode, VfsNode } from '@/utils/buildVfsTree';
 import { insertIntoVfs } from '@/utils/buildVfsTree';
 import { mimeToFileType } from '@/utils/contentType';
+import type { ReferenceEntry } from '@/utils/extractReferences';
 import { extractReferences } from '@/utils/extractReferences';
 import { getFileType } from '@/utils/fileType';
 import { fontViewerUrl } from '@/utils/fontViewerUrl';
 import { requestSource } from '@/utils/messaging';
 
 export type { VfsFileNode, VfsFolderNode, VfsNode } from '@/utils/buildVfsTree';
+export type { ReferenceEntry } from '@/utils/extractReferences';
 
 // ---------------------------------------------------------------------------
 // Tree helpers
 // ---------------------------------------------------------------------------
+
+interface FoundNode {
+  node: VfsNode;
+  ancestors: VfsFolderNode[];
+}
+
+function findNodeAndAncestors(url: string, nodes: VfsNode[], ancestors: VfsFolderNode[] = []): FoundNode | null {
+  for (const item of nodes) {
+    if (item.kind === 'file' && item.url === url) {
+      return { node: item, ancestors };
+    }
+  }
+  for (const item of nodes) {
+    if (item.kind === 'folder') {
+      const found = findNodeAndAncestors(url, item.children, [...ancestors, item]);
+      if (found) return found;
+    }
+  }
+  for (const item of nodes) {
+    if (item.url === url) {
+      return { node: item, ancestors };
+    }
+  }
+  return null;
+}
 
 function findFileNode(url: string, nodes: VfsNode[]): VfsFileNode | null {
   for (const node of nodes) {
@@ -107,6 +134,8 @@ export function useReferenceSidebar() {
         node.isLoading = false;
         node.isExplored = true;
         node.hasReferences = refs.length > 0;
+        node.references = refs;
+        node.isExpanded = refs.length > 0;
       }
       pendingFileUrl.value = null;
     } else if (markCurrentAsExplored) {
@@ -115,6 +144,18 @@ export function useReferenceSidebar() {
       if (node) {
         node.isExplored = true;
         node.hasReferences = refs.length > 0;
+        node.references = refs;
+        node.isExpanded = refs.length > 0;
+      }
+    } else {
+      const node = findFileNode(baseUrl, vfsTree.value);
+      if (node) {
+        node.isExplored = true;
+        node.hasReferences = refs.length > 0;
+        node.references = refs;
+        if (!node.isExpanded && refs.length > 0) {
+          node.isExpanded = true;
+        }
       }
     }
   }
@@ -152,6 +193,8 @@ export function useReferenceSidebar() {
     const url = node.url;
     if (!url) return;
 
+    activeUrl.value = url;
+
     if (
       (node.kind === 'file' && node.linkTarget === 'font') ||
       (node.kind === 'folder' && node.linkTarget === 'font')
@@ -159,8 +202,6 @@ export function useReferenceSidebar() {
       window.open(fontViewerUrl(url), '_blank', 'noopener,noreferrer');
       return;
     }
-
-    activeUrl.value = url;
 
     if (node.kind === 'file' && !node.isExplored) {
       node.isLoading = true;
@@ -177,8 +218,47 @@ export function useReferenceSidebar() {
     void loadFn(rootUrl.value);
   }
 
+  /**
+   * Expands all ancestor folders of the node matching `url` so that the node
+   * is visible in the tree. Returns the node if found.
+   */
+  function revealNode(url: string): VfsNode | null {
+    const found = findNodeAndAncestors(url, vfsTree.value);
+    if (found) {
+      for (const ancestor of found.ancestors) {
+        ancestor.isExpanded = true;
+      }
+      return found.node;
+    }
+    return null;
+  }
+
+  /**
+   * Navigate to a referenced file from a shortcut:
+   * - Expands all ancestor folders so the canonical node is visible in the tree.
+   * - Sets the file as active and triggers load (or opens font viewer).
+   */
+  function navigateToShortcut(refEntry: ReferenceEntry, loadFn: (url: string) => Promise<void>): void {
+    const targetNode = revealNode(refEntry.url);
+    if (targetNode) {
+      navigateTo(targetNode, loadFn);
+    } else {
+      activeUrl.value = refEntry.url;
+      if (refEntry.linkTarget === 'font') {
+        window.open(fontViewerUrl(refEntry.url), '_blank', 'noopener,noreferrer');
+      } else {
+        void loadFn(refEntry.url);
+      }
+    }
+  }
+
   /** Toggle the expand/collapse state of a folder node. */
   function toggleFolder(node: VfsFolderNode): void {
+    node.isExpanded = !node.isExpanded;
+  }
+
+  /** Toggle the expand/collapse state of a file node's direct references. */
+  function toggleFile(node: VfsFileNode): void {
     node.isExpanded = !node.isExpanded;
   }
 
@@ -193,6 +273,8 @@ export function useReferenceSidebar() {
       node.isLoading = false;
       node.isExplored = true;
       node.hasReferences = false;
+      node.references = [];
+      node.isExpanded = false;
     }
     pendingFileUrl.value = null;
   }
@@ -218,7 +300,10 @@ export function useReferenceSidebar() {
     seedFromRootUrl,
     navigateTo,
     navigateToRoot,
+    navigateToShortcut,
+    revealNode,
     toggleFolder,
+    toggleFile,
     handleLoadError,
     reset,
   };
