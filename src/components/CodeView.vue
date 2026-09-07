@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, shallowRef } from 'vue';
 import CodeMirror from 'vue-codemirror6';
 import { EditorView } from '@codemirror/view';
 import { useAsyncExtension } from '@/composables/useAsyncExtension';
@@ -25,6 +25,19 @@ const themeExtension = useAsyncExtension(() => props.themeId ?? DEFAULT_THEME_ID
 
 const { searchExtensions, onReady, openSearch } = useCodeSearch(props.language);
 
+const editorView = shallowRef<EditorView>();
+
+function handleReady(payload: { view: EditorView }): void {
+  editorView.value = payload.view;
+  onReady(payload);
+  payload.view.scrollDOM.focus();
+}
+
+function onClick(event: MouseEvent): void {
+  if ((event.target as HTMLElement | null)?.closest('.cm-panels')) return;
+  editorView.value?.scrollDOM.focus();
+}
+
 const fontSizeExtension = computed(() => {
   return EditorView.theme({ '&': { fontSize: `${props.fontSize}px` } });
 });
@@ -43,8 +56,8 @@ defineExpose({ openSearch });
 </script>
 
 <template>
-  <div class="code-view">
-    <CodeMirror :model-value="code" basic readonly disabled :wrap :extensions @ready="onReady" />
+  <div class="code-view" @click="onClick">
+    <CodeMirror :model-value="code" basic readonly disabled :wrap :extensions @ready="handleReady" />
   </div>
 </template>
 
@@ -62,6 +75,10 @@ defineExpose({ openSearch });
 
 .cm-editor {
   height: 100%;
+  outline: none !important;
+}
+
+.cm-scroller {
   outline: none !important;
 }
 
