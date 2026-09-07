@@ -33,7 +33,6 @@ const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
 const themeType = computed(() => getThemeType(themeId.value));
 
 const codeView = useTemplateRef('codeView');
-const appRoot = useTemplateRef('appRoot');
 
 // Detect reload with a distinct ?root param (user had navigated away before reloading).
 const searchParams = new URLSearchParams(window.location.search);
@@ -42,7 +41,6 @@ const urlParam = searchParams.get('url') ?? '';
 const hasDistinctRoot = !!rootParam && rootParam !== urlParam;
 
 onMounted(() => {
-  appRoot.value?.focus();
   // Pre-seed the sidebar from the initial root source when the page was reloaded
   // while the viewer was showing a child file. This fires immediately so the VFS tree
   // is populated by the time the user opens the sidebar.
@@ -76,7 +74,7 @@ void load();
 </script>
 
 <template>
-  <div id="app-viewer" ref="appRoot" tabindex="-1" :data-theme-type="themeType">
+  <div id="app-viewer" :data-theme-type="themeType">
     <Toolbar
       v-model:theme-id="themeId"
       v-model:word-wrap="wordWrap"
@@ -164,7 +162,6 @@ void load();
   flex-direction: column;
   height: 100vh;
   margin: 0;
-  outline: none; /* focused on load only to capture keyboard — no focus ring wanted */
 }
 
 #main-area {
