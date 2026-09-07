@@ -4,8 +4,9 @@ import type { FileType } from '@/utils/fileType';
  * Downloads the (formatted) source shown in the viewer — see the download button in `Toolbar.vue`.
  *
  * The file is named after (in priority order) the server's `Content-Disposition` filename, the
- * URL's last path segment when it looks like a filename, or a `download.<ext>` default. HTML is
- * post-processed so it renders correctly when opened locally: a `<base>` pointing at the original
+ * URL's last path segment when it looks like a filename, the document's `<title>` (formatted as
+ * `"{title} - {hostname}.html"` for HTML or `"{title}.<ext>"` for others), or a `download.<ext>`
+ * default. HTML is post-processed so it renders correctly when opened locally: a `<base>` pointing at the original
  * URL lets the browser resolve every relative asset against the origin, and a leading
  * `<meta charset="utf-8">` matches our UTF-8 output. CSS can't carry a `<base>`, so a downloaded
  * stylesheet instead gets its relative `url(...)`/`@import` targets resolved to absolute against
@@ -69,11 +70,80 @@ function looksLikeFilename(segment: string): boolean {
   return /\.[A-Za-z0-9]{1,5}$/.test(segment);
 }
 
+/** Maximum length for the extracted title component of a filename. */
+const MAX_TITLE_LENGTH = 100;
+
+/** Maximum total length for the generated filename across all filesystems. */
+const MAX_FILENAME_LENGTH = 200;
+
+/** Decodes common and numeric HTML entities into plain characters. */
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#(\d+);/g, (_, dec: string) => {
+      try {
+        return String.fromCodePoint(parseInt(dec, 10));
+      } catch {
+        return '';
+      }
+    })
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) => {
+      try {
+        return String.fromCodePoint(parseInt(hex, 16));
+      } catch {
+        return '';
+      }
+    });
+}
+
+/** Extracts the text inside the first `<title>...</title>` tag, or `null` if none. */
+export function extractDocumentTitle(code?: string | null): string | null {
+  if (!code) return null;
+  const match = /<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(code);
+  return match ? match[1] : null;
+}
+
 /**
- * Derives the download filename: `Content-Disposition` → URL last path segment (when it looks
- * like a filename) → `download.<ext>` for the detected type.
+ * Sanitizes a title for safe use in a filename: decodes HTML entities, collapses whitespace,
+ * replaces filesystem-unsafe characters with a hyphen, trims separator noise, and limits length.
  */
-export function deriveFilename(target: URL, type: FileType, contentDisposition?: string | null): string {
+export function sanitizeTitle(title: string, maxLength = MAX_TITLE_LENGTH): string | null {
+  let cleaned = decodeHtmlEntities(title)
+    .replace(/[/\\:*?"<>|\x00-\x1f\x7f]+/g, '-')
+    .replace(/(\s*-\s*)+/g, ' - ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^[-.\s]+|[-.\s]+$/g, '');
+
+  if (cleaned.length > maxLength) {
+    cleaned = cleaned
+      .slice(0, maxLength)
+      .trim()
+      .replace(/[-.\s]+$/, '');
+  }
+  return cleaned || null;
+}
+
+/**
+ * Derives the download filename in priority order:
+ * 1. Server's `Content-Disposition` header filename.
+ * 2. URL's last path segment when it looks like a filename (e.g. `index.html`, `style.css`).
+ * 3. Document `<title>`:
+ *    - For HTML: `"{title} - {hostname}.html"` (capped at 200 chars).
+ *    - For other types: `"{title}.{ext}"` (capped at 200 chars).
+ * 4. Default fallback: `download.<ext>`.
+ */
+export function deriveFilename(
+  target: URL,
+  type: FileType,
+  contentDisposition?: string | null,
+  code?: string | null,
+): string {
   const fromHeader = filenameFromContentDisposition(contentDisposition);
   if (fromHeader) return fromHeader;
 
@@ -86,7 +156,31 @@ export function deriveFilename(target: URL, type: FileType, contentDisposition?:
   }
   if (segment && looksLikeFilename(segment)) return segment;
 
-  return DEFAULT_BASENAME + EXTENSION[type];
+  const rawTitle = extractDocumentTitle(code);
+  const title = rawTitle ? sanitizeTitle(rawTitle, MAX_TITLE_LENGTH) : null;
+  const ext = EXTENSION[type];
+
+  if (title) {
+    let candidate: string;
+    if (type === 'html') {
+      const hostname = target.hostname.trim();
+      candidate = hostname ? `${title} - ${hostname}${ext}` : `${title}${ext}`;
+    } else {
+      candidate = `${title}${ext}`;
+    }
+
+    if (candidate.length > MAX_FILENAME_LENGTH) {
+      const allowedBaseLength = MAX_FILENAME_LENGTH - ext.length;
+      candidate =
+        candidate
+          .slice(0, allowedBaseLength)
+          .trim()
+          .replace(/[-.\s]+$/, '') + ext;
+    }
+    return candidate;
+  }
+
+  return DEFAULT_BASENAME + ext;
 }
 
 /**
@@ -170,7 +264,7 @@ export function buildDownloadContent(code: string, type: FileType, target: URL):
  */
 export function downloadSource(code: string, type: FileType, target: URL, contentDisposition?: string | null): void {
   const content = buildDownloadContent(code, type, target);
-  const filename = deriveFilename(target, type, contentDisposition);
+  const filename = deriveFilename(target, type, contentDisposition, code);
 
   const url = URL.createObjectURL(new Blob([content], { type: MIME[type] }));
   const anchor = document.createElement('a');

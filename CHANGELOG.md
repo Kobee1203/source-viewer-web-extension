@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
   - **State Preservation Across Reloads**: The initial site tree is preserved across page reloads and internal navigation via root URL tracking (`?url=...&root=...`).
   - **Resizable Sidebar**: The panel can be resized horizontally via a drag handle on its right edge.
 - **Viewer Tab Favicon**: Added favicon to the Source Code Viewer, Font Viewer, and in-place viewer tabs so they are easily identifiable among open browser tabs (#20).
+- **Improved Download Filenames**: Downloaded source files now derive meaningful names from the original page's `<title>` (formatted as `"{title} - {hostname}.html"`) when the URL path lacks a specific filename, replacing generic `download.html` names with sanitized, safe titles (#20).
 
 ### Fixed
 
