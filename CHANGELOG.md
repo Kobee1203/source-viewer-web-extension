@@ -14,6 +14,10 @@ All notable changes to this project will be documented in this file.
   - **State Preservation Across Reloads**: The initial site tree is preserved across page reloads and internal navigation via root URL tracking (`?url=...&root=...`).
   - **Resizable Sidebar**: The panel can be resized horizontally via a drag handle on its right edge.
 
+### Fixed
+
+- **Keyboard Navigation in Code Viewer**: Arrow keys (`↑`, `↓`, `←`, `→`) and page keys (`PgUp`, `PgDn`) were not scrolling the code viewer on initial load or after clicking into the code due to a focus trap on the non-scrollable root element. Focus is now assigned directly to CodeMirror's scroller, and the browser focus ring is suppressed.
+
 ## [1.9.0] - 2026-08-31
 
 ### Added
