@@ -1,3 +1,4 @@
+import sanitize from 'sanitize-filename';
 import type { FileType } from '@/utils/fileType';
 
 /**
@@ -76,45 +77,31 @@ const MAX_TITLE_LENGTH = 100;
 /** Maximum total length for the generated filename across all filesystems. */
 const MAX_FILENAME_LENGTH = 200;
 
-/** Decodes common and numeric HTML entities into plain characters. */
-function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&#(\d+);/g, (_, dec: string) => {
-      try {
-        return String.fromCodePoint(parseInt(dec, 10));
-      } catch {
-        return '';
-      }
-    })
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) => {
-      try {
-        return String.fromCodePoint(parseInt(hex, 16));
-      } catch {
-        return '';
-      }
-    });
-}
-
-/** Extracts the text inside the first `<title>...</title>` tag, or `null` if none. */
+/** Extracts the document `<title>`, decoding HTML entities via DOMParser. Returns `null` if none. */
 export function extractDocumentTitle(code?: string | null): string | null {
   if (!code) return null;
   const match = /<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(code);
-  return match ? match[1] : null;
+  if (!match) return null;
+
+  if (typeof DOMParser !== 'undefined') {
+    try {
+      const doc = new DOMParser().parseFromString(match[0], 'text/html');
+      const title = doc.title || doc.querySelector('title')?.textContent;
+      return title?.trim() || null;
+    } catch {
+      // fall through to raw regex match if DOMParser fails
+    }
+  }
+
+  return match[1].trim() || null;
 }
 
 /**
- * Sanitizes a title for safe use in a filename: decodes HTML entities, collapses whitespace,
- * replaces filesystem-unsafe characters with a hyphen, trims separator noise, and limits length.
+ * Sanitizes a title for safe use in a filename: replaces filesystem-unsafe characters and reserved
+ * names via `sanitize-filename`, collapses separator noise and whitespace, and limits length.
  */
 export function sanitizeTitle(title: string, maxLength = MAX_TITLE_LENGTH): string | null {
-  let cleaned = decodeHtmlEntities(title)
-    .replace(/[/\\:*?"<>|\x00-\x1f\x7f]+/g, '-')
+  let cleaned = sanitize(title, { replacement: '-' })
     .replace(/(\s*-\s*)+/g, ' - ')
     .replace(/\s+/g, ' ')
     .trim()

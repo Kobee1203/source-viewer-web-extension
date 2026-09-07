@@ -79,6 +79,7 @@
     "js-beautify": "^1.15.4",
     "jsonc-parser": "^3.3.1",
     "jsonpath-plus": "^10.4.0",
+    "sanitize-filename": "^1.6.4",
     "vue": "^3.5.39",
     "vue-codemirror6": "^1.6.1",
     "xpath": "^0.0.34"
