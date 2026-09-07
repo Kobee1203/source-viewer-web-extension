@@ -137,6 +137,8 @@ void load();
   --app-fg: #000;
   --toolbar-bg: #ddd;
   --toolbar-border: #ccc;
+  --sidebar-bg: #ddd;
+  --sidebar-border: #ccc;
   --select-bg: #fff;
   --select-fg: #000;
   --select-border: #aaa;

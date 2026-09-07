@@ -24,6 +24,8 @@ provide<(node: VfsFolderNode) => void>('sidebarToggleFolder', (node) => emit('to
 const sidebarEl = ref<HTMLElement | null>(null);
 const DEFAULT_WIDTH = 260;
 const MIN_WIDTH = 160;
+const defaultWidth = `${DEFAULT_WIDTH}px`;
+const minWidth = `${MIN_WIDTH}px`;
 
 function onResizePointerDown(event: PointerEvent): void {
   const handle = event.currentTarget as HTMLElement;
@@ -57,12 +59,7 @@ function nodeKey(node: VfsNode): string {
 </script>
 
 <template>
-  <aside
-    ref="sidebarEl"
-    class="reference-sidebar"
-    :style="{ '--sidebar-width': `${DEFAULT_WIDTH}px` }"
-    :aria-label="t('sidebarTitle')"
-  >
+  <aside ref="sidebarEl" class="reference-sidebar" :aria-label="t('sidebarTitle')">
     <!-- Header -->
     <div class="sidebar-header">
       <span class="sidebar-title">{{ t('sidebarTitle') }}</span>
@@ -103,11 +100,11 @@ function nodeKey(node: VfsNode): string {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
-  width: var(--sidebar-width, 260px);
-  min-width: 160px;
+  width: var(--sidebar-width, v-bind(defaultWidth));
+  min-width: v-bind(minWidth);
   overflow: hidden;
-  background: var(--toolbar-bg);
-  border-right: 1px solid var(--toolbar-border);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
 }
 
 .sidebar-header {
@@ -116,7 +113,7 @@ function nodeKey(node: VfsNode): string {
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  border-bottom: 1px solid var(--toolbar-border);
+  border-bottom: 1px solid var(--sidebar-border);
 }
 
 .sidebar-title {
@@ -170,7 +167,7 @@ function nodeKey(node: VfsNode): string {
   height: 1px;
   margin: 4px 8px;
   list-style: none;
-  background: var(--toolbar-border);
+  background: var(--sidebar-border);
   opacity: 0.6;
 }
 
