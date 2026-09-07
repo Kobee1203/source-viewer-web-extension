@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
   - **Font Routing**: Web fonts open directly in the dedicated Font Viewer in a separate tab.
   - **State Preservation Across Reloads**: The initial site tree is preserved across page reloads and internal navigation via root URL tracking (`?url=...&root=...`).
   - **Resizable Sidebar**: The panel can be resized horizontally via a drag handle on its right edge.
+- **Viewer Tab Favicon**: Added favicon to the Source Code Viewer and Font Viewer tabs so they are easily identifiable among open browser tabs (#20).
 
 ### Fixed
 
