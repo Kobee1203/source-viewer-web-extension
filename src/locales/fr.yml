@@ -12,7 +12,11 @@ errorRestricted: "Pour des raisons de sécurité, le navigateur ne permet pas au
 viewerOpenNative: 'Ouvrir avec le visualiseur natif du navigateur'
 errorRestrictedApi: "Le navigateur interdit aux extensions d'ouvrir ce type de page. Veuillez copier et coller l'URL suivante dans votre barre d'adresse :"
 viewerPageSize: 'Poids de la page : $1'
-viewerCopyUrl: 'Copier dans le presse-papiers'
+viewerCopy: 'Copier le code source formaté'
+viewerCopyRaw: 'Copier le code source brut'
+viewerCopyUrl: "Copier l'URL de la source"
+viewerCopyOptions: 'Plus d’options de copie'
+viewerCopyFailed: 'Échec de la copie dans le presse-papiers'
 viewerCopied: 'Copié !'
 viewerDownload: 'Télécharger'
 viewerSearch: 'Rechercher'

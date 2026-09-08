@@ -12,7 +12,11 @@ errorRestricted: "For security reasons, the browser does not allow extensions to
 viewerOpenNative: "Open in browser's native viewer"
 errorRestrictedApi: 'The browser prohibits extensions from opening this type of page. Please copy and paste the following URL into your address bar:'
 viewerPageSize: 'Page weight: $1'
-viewerCopyUrl: 'Copy to clipboard'
+viewerCopy: 'Copy formatted source'
+viewerCopyRaw: 'Copy raw source'
+viewerCopyUrl: 'Copy source URL'
+viewerCopyOptions: 'More copy options'
+viewerCopyFailed: 'Failed to copy to clipboard'
 viewerCopied: 'Copied!'
 viewerDownload: 'Download'
 viewerSearch: 'Search'
