@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import {
   Check,
   Copy,
@@ -10,12 +10,16 @@ import {
   Palette,
   PanelLeft,
   Search,
+  Settings,
   Type,
   WrapText,
+  X,
 } from '@lucide/vue';
 import DropdownButton, { type DropdownMenuItem } from '@/components/DropdownButton.vue';
 import IconButton from '@/components/IconButton.vue';
+import SettingsDialog from '@/components/SettingsDialog.vue';
 import { useCopyFeedback } from '@/composables/useCopyFeedback';
+import type { OpenInMode } from '@/composables/usePreferences';
 import { downloadSource } from '@/utils/download';
 import type { FileType } from '@/utils/fileType';
 import { DEFAULT_FONT_SIZE } from '@/utils/fonts';
@@ -27,6 +31,7 @@ const props = defineProps<{
   themeId: string;
   wordWrap: boolean;
   fontSize: number;
+  openIn?: OpenInMode;
   targetUrl: URL | null;
   code: string;
   rawCode: string;
@@ -38,9 +43,17 @@ const emit = defineEmits<{
   'update:themeId': [value: string];
   'update:wordWrap': [value: boolean];
   'update:fontSize': [value: number];
+  'update:openIn': [value: OpenInMode];
   search: [];
   'toggle-sidebar': [];
 }>();
+
+const showSettings = ref(false);
+const isInplace = typeof window !== 'undefined' && window.parent !== window;
+
+function onCloseInplace(): void {
+  window.parent.postMessage({ type: 'CLOSE_INPLACE_VIEWER' }, '*');
+}
 
 const { copied, copy } = useCopyFeedback<boolean>(2000);
 
@@ -196,6 +209,21 @@ function onNativeAuxClick(event: MouseEvent): void {
         <FileCode :size="20" />
       </IconButton>
     </template>
+
+    <span class="sep"></span>
+    <IconButton :label="t('settingsTitle')" @click="showSettings = true">
+      <Settings :size="20" />
+    </IconButton>
+    <IconButton v-if="isInplace" :label="t('viewerClose')" @click="onCloseInplace">
+      <X :size="20" />
+    </IconButton>
+
+    <SettingsDialog
+      v-if="showSettings && openIn"
+      :open-in="openIn"
+      @update:open-in="(val) => emit('update:openIn', val)"
+      @closed="showSettings = false"
+    />
   </div>
 </template>
 

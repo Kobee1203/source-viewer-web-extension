@@ -26,7 +26,7 @@ const {
   load,
 } = useSourceFetch();
 
-const { themeId, wordWrap, codeFontSize } = usePreferences();
+const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
 
 const sidebar = useReferenceSidebar();
 
@@ -80,6 +80,7 @@ void load();
       v-model:theme-id="themeId"
       v-model:word-wrap="wordWrap"
       v-model:font-size="codeFontSize"
+      v-model:open-in="openIn"
       :target-url="targetUrl"
       :code="code"
       :raw-code="rawCode"

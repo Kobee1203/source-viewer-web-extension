@@ -1,0 +1,25 @@
+:root {
+  --app-bg: #1e1e1e;
+  --app-fg: #d4d4d4;
+  --select-bg: #555;
+  --select-fg: #fff;
+  --select-border: #666;
+  --border-color: #444;
+}
+
+:root[data-theme-type='light'] {
+  --app-bg: #fff;
+  --app-fg: #1f2328;
+  --select-bg: #f6f8fa;
+  --select-fg: #1f2328;
+  --select-border: #d0d7de;
+  --border-color: #d0d7de;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--app-fg);
+  background: var(--app-bg);
+}
