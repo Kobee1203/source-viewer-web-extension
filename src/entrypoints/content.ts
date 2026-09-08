@@ -12,7 +12,7 @@ import { requestViewerInjection, requestViewerRedirect } from '@/utils/messaging
  * the heavy `inplace-viewer` content script into this tab. `text/html`, `view-source:`
  * pages and our own extension pages never match.
  *
- * Kept intentionally tiny (no Vue/Prism/js-beautify) since it's always-on for every
+ * Kept intentionally tiny (no Vue/CodeMirror/js-beautify) since it's always-on for every
  * http(s) page — the real work lives in `inplace-viewer.content.ts`, only loaded
  * on demand via `browser.scripting.executeScript`.
  */
