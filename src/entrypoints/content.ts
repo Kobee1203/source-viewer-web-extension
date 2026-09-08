@@ -24,17 +24,9 @@ export default defineContentScript({
     const type = detectRedirectFileType(document.contentType, new URL(location.href));
     if (!type) return; // not a handled source type — leave the page alone
 
-    // A page served with CSP `sandbox` (e.g. raw.githubusercontent.com) sandboxes any iframe we
-    // inject, blocking the viewer's scripts — the document then has an opaque ("null") origin.
-    // The in-place iframe can't work here, so navigate the whole tab to the viewer instead.
-    // (The pending message rejects when the navigation tears down this content script — ignore it.)
-    if (window.origin === 'null') {
-      requestViewerRedirect(location.href).catch(() => {});
-      return;
-    }
-
     // Hide the raw content immediately to avoid a flash before the viewer takes
-    // over. `document.documentElement` always exists at document_start.
+    // over, whether we inject the in-place iframe or redirect due to CSP sandboxing.
+    // `document.documentElement` always exists at document_start.
     // Created in the XHTML namespace and selected via `:root` (not `html`) so it
     // also works in XML documents: there `createElement('style')` would yield an
     // inert null-namespace element, and the root isn't <html> (e.g. a direct .xml
@@ -46,6 +38,17 @@ export default defineContentScript({
     hideStyle.id = HIDE_STYLE_ID;
     hideStyle.textContent = ':root { visibility: hidden !important; overflow: hidden !important; }';
     document.documentElement.appendChild(hideStyle);
+
+    // A page served with CSP `sandbox` (e.g. raw.githubusercontent.com) sandboxes any iframe we
+    // inject, blocking the viewer's scripts — the document then has an opaque ("null") origin.
+    // The in-place iframe can't work here, so navigate the whole tab to the viewer instead.
+    // (The pending message rejects when the navigation tears down this content script — ignore it.)
+    if (window.origin === 'null') {
+      requestViewerRedirect(location.href).catch(() => {
+        document.getElementById(HIDE_STYLE_ID)?.remove();
+      });
+      return;
+    }
 
     let injected = false;
     try {
