@@ -1,4 +1,5 @@
 actionTitle: 'Ver el código fuente de la página'
+contextMenuViewSource: 'Ver código fuente con Source Viewer'
 extDescription: 'Visualiza y formatea código fuente con resaltado de sintaxis: HTML, CSS, JS, JSON y XML, más un visor de fuentes.'
 dialogClose: 'Cerrar'
 viewerWordWrap: 'Ajuste de línea'

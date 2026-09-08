@@ -1,4 +1,5 @@
 actionTitle: 'Seitenquelltext anzeigen'
+contextMenuViewSource: 'Quelltext mit Source Viewer anzeigen'
 extDescription: 'Quelltext anzeigen und formatieren mit Syntaxhervorhebung: HTML, CSS, JS, JSON, XML – plus ein Schriften-Viewer.'
 dialogClose: 'schließen'
 viewerWordWrap: 'Zeilenumbruch'

@@ -1,4 +1,5 @@
 actionTitle: 'Visualizza il codice sorgente della pagina'
+contextMenuViewSource: 'Visualizza sorgente con Source Viewer'
 extDescription: 'Visualizza e formatta il codice sorgente con evidenziazione: HTML, CSS, JS, JSON, XML, più un visualizzatore di font.'
 dialogClose: 'Chiudi'
 viewerWordWrap: 'A capo automatico'

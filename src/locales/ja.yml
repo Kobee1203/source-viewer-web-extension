@@ -1,4 +1,5 @@
 actionTitle: 'ページのソースコードを表示'
+contextMenuViewSource: 'Source Viewer でソースを表示'
 extDescription: 'ソースコードを構文ハイライトで表示・整形（HTML・CSS・JS・JSON・XML）。フォントビューアとグリフ一覧も搭載。'
 dialogClose: '閉じる'
 viewerWordWrap: '行の折り返し'

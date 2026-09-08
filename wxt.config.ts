@@ -18,7 +18,7 @@ export default defineConfig({
         : 'Source Code & Font Viewer — HTML, CSS, JS, JSON & XML Formatter',
     description: '__MSG_extDescription__',
     default_locale: 'en',
-    permissions: ['activeTab', 'tabs', 'storage', 'scripting'],
+    permissions: ['activeTab', 'tabs', 'storage', 'scripting', 'contextMenus'],
     host_permissions: ['<all_urls>'],
     // Lets the in-place viewer (inplace-viewer.content.ts) embed viewer.html in a
     // full-viewport iframe on any origin's page for direct CSS/JS/JSON/XML navigations.

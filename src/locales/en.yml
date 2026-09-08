@@ -1,4 +1,5 @@
 actionTitle: 'View page source code'
+contextMenuViewSource: 'View source with Source Viewer'
 extDescription: 'View & format source code with syntax highlighting — HTML, CSS, JS, JSON, XML — plus a font viewer with glyph grid.'
 dialogClose: 'Close'
 viewerWordWrap: 'Line wrap'

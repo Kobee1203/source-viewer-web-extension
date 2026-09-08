@@ -1,4 +1,5 @@
 actionTitle: 'Voir le code source de la page'
+contextMenuViewSource: 'Afficher le code source avec Source Viewer'
 extDescription: 'Affichez et mettez en forme le code source avec coloration syntaxique : HTML, CSS, JS, JSON, XML, plus une visionneuse de polices.'
 dialogClose: 'Fermer'
 viewerWordWrap: 'Retour à la ligne automatique'
