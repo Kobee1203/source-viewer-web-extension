@@ -6,24 +6,29 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/icon/16.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="/icon/48.png" />
     <title>Font Viewer</title>
+    <script>
+      try {
+        const themeType = localStorage.getItem('viewer-theme-type') || 'dark';
+        document.documentElement.setAttribute('data-theme-type', themeType);
+      } catch (e) {}
+    </script>
     <style>
       :root {
+        --app-bg: #1e1e1e;
+        --app-fg: #d4d4d4;
         color-scheme: dark light;
+      }
+      :root[data-theme-type='light'] {
+        --app-bg: #f5f2f0;
+        --app-fg: #000;
       }
       html,
       body {
         margin: 0;
         padding: 0;
         height: 100%;
-        background-color: #1e1e1e;
-        color: #d4d4d4;
-      }
-      @media (prefers-color-scheme: light) {
-        html,
-        body {
-          background-color: #ffffff;
-          color: #1f2328;
-        }
+        background-color: var(--app-bg);
+        color: var(--app-fg);
       }
     </style>
   </head>
