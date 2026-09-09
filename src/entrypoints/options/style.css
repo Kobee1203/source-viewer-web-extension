@@ -1,13 +1,4 @@
 :root {
-  --app-bg: #1e1e1e;
-  --app-fg: #d4d4d4;
-  --select-bg: #555;
-  --select-fg: #fff;
-  --select-border: #666;
-  --border-color: #444;
-}
-
-:root[data-theme-type='light'] {
   --app-bg: #fff;
   --app-fg: #1f2328;
   --select-bg: #f6f8fa;

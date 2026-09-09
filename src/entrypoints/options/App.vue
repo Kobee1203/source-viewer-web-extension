@@ -7,9 +7,6 @@ import { THEMES } from '@/utils/themes';
 
 const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
 
-const selectedTheme = computed(() => THEMES.find((theme) => theme.id === themeId.value));
-const currentThemeType = computed(() => selectedTheme.value?.type ?? 'dark');
-
 const fontSizes = computed(() => {
   const sizes: { value: number; label: string }[] = [];
   const predefined = [8, 9, 10, 11, 12, DEFAULT_FONT_SIZE, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
@@ -43,7 +40,7 @@ function onWordWrapChange(event: Event): void {
 </script>
 
 <template>
-  <main class="options-container" :data-theme-type="currentThemeType">
+  <main class="options-container">
     <header class="options-header">
       <h1>{{ t('settingsTitle') }}</h1>
     </header>
@@ -100,8 +97,11 @@ function onWordWrapChange(event: Event): void {
 
 <style scoped>
 .options-container {
-  max-width: 640px;
-  padding: 32px 24px;
+  box-sizing: border-box;
+  width: 90%;
+  min-width: 512px;
+  max-width: 1024px;
+  padding: 20px 24px;
   margin: 0 auto;
 }
 
@@ -140,17 +140,15 @@ function onWordWrapChange(event: Event): void {
 .setting-label {
   font-size: 14px;
   font-weight: 500;
-  color: var(--app-fg);
 }
 
 .setting-desc {
   font-size: 12px;
-  color: var(--app-fg);
   opacity: 0.75;
 }
 
 .setting-select {
-  min-width: 180px;
+  min-width: 210px;
   height: 32px;
   padding: 0 10px;
   font-family: inherit;
