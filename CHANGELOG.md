@@ -16,10 +16,20 @@ All notable changes to this project will be documented in this file.
 - **Viewer Tab Favicon**: Added favicon to the Source Code Viewer, Font Viewer, and in-place viewer tabs so they are easily identifiable among open browser tabs (#20).
 - **Improved Download Filenames**: Downloaded source files now derive meaningful names from the original page's `<title>` (formatted as `"{title} - {hostname}.html"`) when the URL path lacks a specific filename, replacing generic `download.html` names with sanitized, safe titles (#20).
 - **Toolbar Copy Split Button**: Added a split-button dropdown in the toolbar allowing one-click copying of the formatted source code (default action), raw unformatted source code, or the source URL, with visual "Copied!" feedback (#20).
+- **Dedicated "View Source" Context Menu**: Right-clicking any webpage, frame, link, or selection now offers a _"View source with Source Viewer"_ action in the browser context menu, opening the viewer directly without routing through the browser's native `view-source:` navigation and completely bypassing redirection flicker (#20).
+- **Configurable Opening Mode**: Added an "Open source viewer in" preference allowing users to choose whether to open the viewer in a **New tab** (default) or **Current tab (In-place)** (#20).
+  - Both the browser toolbar action icon and the new context menu entry respect this setting.
+  - Configurable directly from a new Settings button in the viewer toolbar (via a dedicated modal dialog) and from a standalone Options page opened in a dedicated browser tab.
+- **In-Place Viewer Dismissal**: Added a "Close" button to the toolbar when running in-place inside an iframe over an active webpage, allowing users to dismiss the viewer overlay and resume browsing the host page without reloading (#20).
 
 ### Fixed
 
 - **Keyboard Navigation in Code Viewer**: Arrow keys (`↑`, `↓`, `←`, `→`) and page keys (`PgUp`, `PgDn`) were not scrolling the code viewer on initial load or after clicking into the code due to a focus trap on the non-scrollable root element. Focus is now assigned directly to CodeMirror's scroller, and the browser focus ring is suppressed.
+- **Visual Flicker During Viewer Loading**: Eliminated white flashes and intermediate layout/styling transitions when opening source files (#20):
+  - Injected `:root { visibility: hidden !important; overflow: hidden !important; }` immediately on sandboxed CSP pages (e.g. `raw.githubusercontent.com`) prior to redirecting to the viewer, avoiding unformatted raw text flashes.
+  - Synchronously initialized user preferences from `window.localStorage` so Vue and the loading screen never temporarily render with light-mode defaults when a dark theme is selected.
+  - Injected a synchronous script and critical inline CSS in `viewer/index.html` to paint the canvas with the matching theme background (`--app-bg`) on the very first frame before JavaScript bundles execute, eliminating OS media query mismatches.
+  - Delayed mounting CodeMirror until the initial theme extension has finished loading asynchronously, avoiding intermediate renders of unstyled text or default syntax coloring.
 
 ## [1.9.0] - 2026-08-31
 
