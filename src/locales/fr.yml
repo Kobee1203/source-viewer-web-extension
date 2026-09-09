@@ -1,6 +1,13 @@
 actionTitle: 'Voir le code source de la page'
+contextMenuViewSource: 'Afficher le code source avec Source Viewer'
 extDescription: 'Affichez et mettez en forme le code source avec coloration syntaxique : HTML, CSS, JS, JSON, XML, plus une visionneuse de polices.'
 dialogClose: 'Fermer'
+settingsTitle: 'Paramètres'
+settingsOpenInLabel: 'Ouvrir la visionneuse dans :'
+settingsOpenInDescription: "Choisissez où la visionneuse s'ouvre lors d'un clic sur l'icône de la barre d'outils ou le menu contextuel."
+settingsOpenInNewTab: 'Nouvel onglet (par défaut)'
+settingsOpenInCurrentTab: 'Onglet actuel (In-place)'
+viewerClose: 'Fermer la visionneuse'
 viewerWordWrap: 'Retour à la ligne automatique'
 viewerTheme: 'Thème :'
 viewerFontSize: 'Taille de police :'

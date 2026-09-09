@@ -1,6 +1,13 @@
 actionTitle: 'Visualizza il codice sorgente della pagina'
+contextMenuViewSource: 'Visualizza sorgente con Source Viewer'
 extDescription: 'Visualizza e formatta il codice sorgente con evidenziazione: HTML, CSS, JS, JSON, XML, più un visualizzatore di font.'
 dialogClose: 'Chiudi'
+settingsTitle: 'Impostazioni'
+settingsOpenInLabel: 'Apri il visualizzatore in:'
+settingsOpenInDescription: "Scegli dove aprire il visualizzatore quando si clicca sull'icona della barra degli strumenti o sul menu contestuale."
+settingsOpenInNewTab: 'Nuova scheda (predefinito)'
+settingsOpenInCurrentTab: 'Scheda corrente (In-place)'
+viewerClose: 'Chiudi visualizzatore'
 viewerWordWrap: 'A capo automatico'
 viewerTheme: 'Tema:'
 viewerFontSize: 'Dimensione carattere:'

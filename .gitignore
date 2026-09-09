@@ -18,3 +18,4 @@ stats.html
 
 # Agent tooling / planning artifacts
 .agents/
+*.mov

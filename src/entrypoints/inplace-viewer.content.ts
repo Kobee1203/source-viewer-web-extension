@@ -49,15 +49,37 @@ export default defineContentScript({
       'visibility: visible',
     ].join(';');
 
+    // Ensure the host page's scrollbars are hidden while the iframe covers the viewport.
+    if (!document.getElementById(HIDE_STYLE_ID)) {
+      const hideStyle = document.createElementNS('http://www.w3.org/1999/xhtml', 'style');
+      hideStyle.id = HIDE_STYLE_ID;
+      hideStyle.textContent = ':root { overflow: hidden !important; }';
+      document.documentElement.appendChild(hideStyle);
+    }
+
     const restoreFavicon = setInplaceFavicon();
 
-    // Reveal the raw page (removing content.ts's hide-style) if the iframe can't load
-    // — e.g. the page's CSP forbids framing our extension origin.
-    iframe.addEventListener('error', () => {
+    const cleanup = () => {
+      window.removeEventListener('message', onMessage);
       iframe.remove();
       document.getElementById(HIDE_STYLE_ID)?.remove();
       restoreFavicon();
-    });
+    };
+
+    const onMessage = (event: MessageEvent) => {
+      if (
+        typeof event.data === 'object' &&
+        event.data !== null &&
+        (event.data as { type?: unknown }).type === 'CLOSE_INPLACE_VIEWER'
+      ) {
+        cleanup();
+      }
+    };
+
+    window.addEventListener('message', onMessage);
+
+    // Reveal the host page if the iframe fails to load (e.g. CSP forbids framing our extension origin).
+    iframe.addEventListener('error', cleanup);
 
     // Give the iframe keyboard focus once loaded so the viewer's Cmd/Ctrl-F search handler fires
     // without the user having to click into it first (the host page holds focus otherwise).

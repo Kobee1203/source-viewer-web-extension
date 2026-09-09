@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, shallowRef } from 'vue';
+import { computed, ref, shallowRef, watchEffect } from 'vue';
 import CodeMirror from 'vue-codemirror6';
 import { EditorView } from '@codemirror/view';
 import { useAsyncExtension } from '@/composables/useAsyncExtension';
@@ -20,8 +20,19 @@ const props = defineProps<{
 }>();
 
 // Language support and theme are each their own lazy chunk, loaded on demand (see useAsyncExtension).
-const langSupport = useAsyncExtension(() => props.language, loadLanguage);
-const themeExtension = useAsyncExtension(() => props.themeId ?? DEFAULT_THEME_ID, getThemeExtension);
+const { extension: langSupport } = useAsyncExtension(() => props.language, loadLanguage);
+const { extension: themeExtension, loaded: themeLoaded } = useAsyncExtension(
+  () => props.themeId ?? DEFAULT_THEME_ID,
+  getThemeExtension,
+);
+
+// Wait for initial theme to load before mounting CodeMirror, avoiding an unstyled text flash.
+const initialReady = ref(false);
+watchEffect(() => {
+  if (themeLoaded.value) {
+    initialReady.value = true;
+  }
+});
 
 const { searchExtensions, onReady, openSearch } = useCodeSearch(props.language);
 
@@ -57,7 +68,16 @@ defineExpose({ openSearch });
 
 <template>
   <div class="code-view" @click="onClick">
-    <CodeMirror :model-value="code" basic readonly disabled :wrap :extensions @ready="handleReady" />
+    <CodeMirror
+      v-if="initialReady"
+      :model-value="code"
+      basic
+      readonly
+      disabled
+      :wrap
+      :extensions
+      @ready="handleReady"
+    />
   </div>
 </template>
 

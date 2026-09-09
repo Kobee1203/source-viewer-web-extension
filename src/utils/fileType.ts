@@ -1,6 +1,6 @@
 export const DEFAULT_FILE_TYPE = 'html';
 
-/** The kind of source we highlight, mapped to a Prism language. */
+/** The kind of source we highlight, mapped to a CodeMirror language extension. */
 export type FileType = typeof DEFAULT_FILE_TYPE | 'javascript' | 'css' | 'xml' | 'json';
 
 /** Maps a URL's file extension to a FileType, or null when it isn't a handled source extension. */

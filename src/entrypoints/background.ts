@@ -1,5 +1,6 @@
 import { browser } from 'wxt/browser';
 import { defineBackground } from '#imports';
+import { t } from '@/utils/i18n';
 import {
   type FetchSourceRequest,
   type FetchSourceResponse,
@@ -15,11 +16,18 @@ import { viewerUrl } from '@/utils/viewerUrl';
 export default defineBackground(() => {
   const nativeViewer = createNativeViewerController();
 
-  // Toolbar icon: open our viewer for the current tab (or native view-source when restricted).
-  browser.action.onClicked.addListener((tab) => {
-    let url = tab.url;
-    if (!url) return;
+  const CONTEXT_MENU_ID = 'view-source-viewer';
 
+  browser.runtime.onInstalled.addListener(() => {
+    browser.contextMenus.create({
+      id: CONTEXT_MENU_ID,
+      title: t('contextMenuViewSource'),
+      contexts: ['page', 'frame', 'link', 'selection'],
+    });
+  });
+
+  async function openSourceViewer(rawUrl: string, tabId?: number, isLink = false): Promise<void> {
+    let url = rawUrl;
     if (url.startsWith('view-source:')) {
       url = url.replace(/^view-source:/, '');
     }
@@ -30,7 +38,34 @@ export default defineBackground(() => {
       void browser.tabs.create({ url: 'view-source:' + targetUrl.toString() });
       return;
     }
+
+    const result = await browser.storage.local.get('openIn');
+    const openIn = result.openIn === 'current-tab' ? 'current-tab' : 'new-tab';
+
+    if (openIn === 'current-tab' && tabId !== undefined && !isLink) {
+      const res = await injectViewer({ type: 'REQUEST_VIEWER_INJECTION', url: targetUrl.toString() }, tabId);
+      if (!res.inject) {
+        void browser.tabs.update(tabId, { url: viewerUrl(targetUrl.toString()) });
+      }
+      return;
+    }
+
     void browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
+  }
+
+  // Toolbar icon: open our viewer for the current tab (or native view-source when restricted).
+  browser.action.onClicked.addListener((tab) => {
+    if (!tab.url) return;
+    void openSourceViewer(tab.url, tab.id);
+  });
+
+  // Dedicated context menu entry: "View source with Source Viewer".
+  browser.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId !== CONTEXT_MENU_ID) return;
+    const isLink = Boolean(info.linkUrl);
+    const url = info.linkUrl || info.frameUrl || info.pageUrl || tab?.url;
+    if (!url) return;
+    void openSourceViewer(url, tab?.id, isLink);
   });
 
   // Intercept navigations to view-source: and redirect them to our viewer,
