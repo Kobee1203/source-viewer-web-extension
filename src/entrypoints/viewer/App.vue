@@ -9,7 +9,6 @@ import { usePreferences } from '@/composables/usePreferences';
 import { useReferenceSidebar } from '@/composables/useReferenceSidebar';
 import { useSourceFetch } from '@/composables/useSourceFetch';
 import { t } from '@/utils/i18n';
-import { getThemeType } from '@/utils/themes';
 
 const {
   loading,
@@ -31,7 +30,6 @@ const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
 const sidebar = useReferenceSidebar();
 
 const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
-const themeType = computed(() => getThemeType(themeId.value));
 
 const codeView = useTemplateRef('codeView');
 
@@ -75,7 +73,7 @@ void load();
 </script>
 
 <template>
-  <div id="app-viewer" :data-theme-type="themeType">
+  <div id="app-viewer">
     <Toolbar
       v-model:theme-id="themeId"
       v-model:word-wrap="wordWrap"
@@ -119,7 +117,6 @@ void load();
           :base-url
           :wrap="wordWrap"
           :theme-id
-          :theme-type
           :font-size="codeFontSize"
         />
       </div>
@@ -135,31 +132,6 @@ void load();
 </template>
 
 <style>
-#app-viewer[data-theme-type='light'] {
-  --app-bg: #f5f2f0;
-  --app-fg: #000;
-  --toolbar-bg: #ddd;
-  --toolbar-border: #ccc;
-  --sidebar-bg: #ddd;
-  --sidebar-border: #ccc;
-  --select-bg: #fff;
-  --select-fg: #000;
-  --select-border: #aaa;
-  --statusbar-bg: #ddd;
-  --statusbar-border: #ccc;
-  --btn-bg: #fff;
-  --btn-bg-hover: #eee;
-  --btn-border: #aaa;
-  --btn-active-bg: #cfe6ff;
-  --btn-active-border: #7fb6ff;
-  --btn-active-fg: #003a6b;
-  --dialog-bg: #fff;
-  --dialog-bg-alt: #f0f0f0;
-  --dialog-border: #ccc;
-  --dialog-link: #00e;
-  --dialog-backdrop: rgb(0 0 0 / 20%);
-}
-
 #app-viewer {
   display: flex;
   flex-direction: column;

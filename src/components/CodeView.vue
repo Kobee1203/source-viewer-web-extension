@@ -15,7 +15,6 @@ const props = defineProps<{
   baseUrl: string;
   wrap: boolean;
   themeId?: string;
-  themeType?: string;
   fontSize: number;
 }>();
 
@@ -60,8 +59,6 @@ const extensions = computed(() => [
   searchExtensions,
   fontSizeExtension.value,
 ]);
-
-const linkHoverColor = computed(() => (props.themeType === 'dark' ? 'black' : 'white'));
 
 defineExpose({ openSearch });
 </script>
@@ -182,11 +179,11 @@ defineExpose({ openSearch });
 }
 
 .source-link:hover {
-  color: color-mix(in srgb, currentcolor, v-bind(linkHoverColor) 30%);
-  text-decoration-color: color-mix(in srgb, currentcolor, v-bind(linkHoverColor) 30%);
+  color: color-mix(in srgb, currentcolor, var(--link-hover-mix) 30%);
+  text-decoration-color: color-mix(in srgb, currentcolor, var(--link-hover-mix) 30%);
 }
 
 .source-link:hover span {
-  color: color-mix(in srgb, currentcolor, v-bind(linkHoverColor) 0%);
+  color: color-mix(in srgb, currentcolor, var(--link-hover-mix) 0%);
 }
 </style>

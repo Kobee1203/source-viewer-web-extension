@@ -6,12 +6,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/icon/16.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="/icon/48.png" />
     <title>Source Code Viewer</title>
-    <script>
-      try {
-        const themeType = localStorage.getItem('viewer-theme-type') || 'light';
-        document.documentElement.setAttribute('data-theme-type', themeType);
-      } catch (e) {}
-    </script>
+    <script src="/theme-init.js"></script>
     <style>
       :root {
         --app-bg: #1e1e1e;

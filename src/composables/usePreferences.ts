@@ -63,9 +63,11 @@ export function usePreferences() {
     const savedTheme = result.theme;
     if (typeof savedTheme === 'string' && THEMES.some((theme) => theme.id === savedTheme)) {
       themeId.value = savedTheme;
+      const type = getThemeType(savedTheme);
       try {
         localStorage.setItem('viewer-theme', savedTheme);
-        localStorage.setItem('viewer-theme-type', getThemeType(savedTheme));
+        localStorage.setItem('viewer-theme-type', type);
+        document.documentElement.setAttribute('data-theme-type', type);
       } catch {}
     }
     if (typeof result.wordWrap === 'boolean') {
@@ -89,9 +91,11 @@ export function usePreferences() {
   });
 
   watch(themeId, (value) => {
+    const type = getThemeType(value);
     try {
       localStorage.setItem('viewer-theme', value);
-      localStorage.setItem('viewer-theme-type', getThemeType(value));
+      localStorage.setItem('viewer-theme-type', type);
+      document.documentElement.setAttribute('data-theme-type', type);
     } catch {}
     void browser.storage.local.set({ theme: value });
   });

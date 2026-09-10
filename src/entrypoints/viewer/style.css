@@ -1,6 +1,6 @@
 @import url('../../styles/toolbar.css');
 
-/* App chrome palettes. Default is dark; #app-viewer[data-theme-type='light'] switches to light. */
+/* App chrome palettes. Default is dark; :root[data-theme-type='light'] switches to light. */
 :root {
   --app-bg: #1e1e1e;
   --app-fg: #d4d4d4;
@@ -26,6 +26,33 @@
   --dialog-border: #444;
   --dialog-link: #3b82f6;
   --dialog-backdrop: rgb(0 0 0 / 50%);
+  --link-hover-mix: black;
+}
+
+:root[data-theme-type='light'] {
+  --app-bg: #f5f2f0;
+  --app-fg: #000;
+  --toolbar-bg: #ddd;
+  --toolbar-border: #ccc;
+  --sidebar-bg: #ddd;
+  --sidebar-border: #ccc;
+  --select-bg: #fff;
+  --select-fg: #000;
+  --select-border: #aaa;
+  --statusbar-bg: #ddd;
+  --statusbar-border: #ccc;
+  --btn-bg: #fff;
+  --btn-bg-hover: #eee;
+  --btn-border: #aaa;
+  --btn-active-bg: #cfe6ff;
+  --btn-active-border: #7fb6ff;
+  --btn-active-fg: #003a6b;
+  --dialog-bg: #fff;
+  --dialog-bg-alt: #f0f0f0;
+  --dialog-border: #ccc;
+  --dialog-link: #00e;
+  --dialog-backdrop: rgb(0 0 0 / 20%);
+  --link-hover-mix: white;
 }
 
 body {

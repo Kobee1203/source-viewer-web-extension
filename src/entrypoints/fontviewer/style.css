@@ -1,6 +1,6 @@
 @import url('../../styles/toolbar.css');
 
-/* Font viewer chrome palette. Dark by default; #app-fontviewer[data-theme-type='light'] switches to light.
+/* Font viewer chrome palette (dark).
    Shares the same CSS variable names as the code viewer (src/entrypoints/viewer/style.css). */
 :root {
   --app-bg: #1e1e1e;
