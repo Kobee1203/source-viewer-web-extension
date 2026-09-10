@@ -55,6 +55,7 @@
   --link-hover-mix: white;
 }
 
+html,
 body {
   height: 100vh;
   margin: 0;

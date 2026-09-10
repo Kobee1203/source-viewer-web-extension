@@ -23,6 +23,7 @@
   --dialog-backdrop: rgb(0 0 0 / 50%);
 }
 
+html,
 body {
   height: 100vh;
   margin: 0;
