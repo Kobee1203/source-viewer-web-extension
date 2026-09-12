@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "wxt prepare",
     "prepare": "husky",
-    "clean": "wxt clean && git clean -fXd -e \\!.idea -e \\!.idea/**/* -e \\!.vscode -e \\!.vscode/**/* -e \\!.claude -e \\!.claude/**/* -e \\!.agents -e \\!.agents/**/*",
+    "clean": "wxt clean && git clean -fXd -e \\!.idea -e \\!.idea/**/* -e \\!.vscode -e \\!.vscode/**/* -e \\!.claude -e \\!.claude/**/* -e \\!.agents -e \\!.agents/**/* -e \\!.env -e \\!.env.*",
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build && wxt build -b firefox",
@@ -21,7 +21,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "screenshots": "wxt build && tsx scripts/generate-screenshots.ts",
-    "screenshots:all": "wxt build && tsx scripts/generate-screenshots.ts --all"
+    "screenshots:all": "wxt build && tsx scripts/generate-screenshots.ts --all",
+    "metadata:check": "tsx scripts/check-store-metadata.ts",
+    "metadata:sync": "tsx scripts/sync-store-descriptions.ts"
   },
   "packageManager": "pnpm@11.4.0",
   "engines": {

@@ -1,1 +1,1 @@
-Quelltext anzeigen & formatieren mit Syntaxhervorhebung: HTML, CSS, JS, JSON, XML – plus Schriften-Viewer mit Glyphen-Tabelle.
+Quelltext anzeigen & formatieren mit Syntaxhervorhebung: HTML, CSS, JS, JSON, XML – plus Schriften-Viewer mit Glyphen-Raster.

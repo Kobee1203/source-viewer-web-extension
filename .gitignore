@@ -19,3 +19,8 @@ stats.html
 # Agent tooling / planning artifacts
 .agents/
 *.mov
+
+# Environment variables
+.env
+.env.*
+!.env.example

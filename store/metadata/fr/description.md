@@ -1,18 +1,18 @@
-Lassé de l'affichage fade et sans style du visualiseur de code source par défaut de votre navigateur ? Source Code & Font Viewer est là pour y remédier. Affichez — et mettez en forme — le code source de n'importe quelle page web avec une indentation soignée et une superbe coloration syntaxique, directement depuis le menu contextuel ou d'un simple clic sur l'icône de la barre d'outils. Fini les blocs de texte illisibles. Place à un code propre, coloré et structuré, comme il se doit.
+Marre de la visionneuse de code source fade et sans style de votre navigateur ? Source Code & Font Viewer est là pour y remédier. Affichez — et mettez en forme — le code source de n'importe quelle page web avec une mise en forme impeccable et une superbe coloration syntaxique, directement depuis le menu contextuel ou d'un seul clic sur l'icône de la barre d'outils. Fini les blocs de texte illisibles. Juste du code propre et coloré, comme il se doit.
 
-✨ Fonctionnalités principales :
+✨ Ce que vous obtenez :
 • Superbe coloration syntaxique pour HTML, CSS, JavaScript, JSON et XML
-• Formatage et indentation automatiques — mise en page claire du CSS, JS, JSON et HTML minifiés
-• Formatage automatique sur place (in-place) lors de l'ouverture directe d'un fichier brut CSS/JS/JSON/XML
-• Barre latérale interactive et arborescence des références — parcourez tous les scripts externes, feuilles de style, polices, images et ressources liées dans une arborescence de fichiers virtuelle, avec raccourcis rapides d'inspection
-• Bouton scindé de copie rapide — copiez le code formaté en un clic, ou utilisez le menu déroulant pour copier le code brut ou l'URL avec retour visuel instantané
-• Recherche textuelle complète (Cmd/Ctrl+F) sur l'intégralité du document — avec boutons suivant/précédent, respect de la casse, mot entier, expressions régulières et modes de recherche structurelle avancés (XPath, Sélecteurs CSS, JSONPath)
-• Téléchargement en un clic du code formaté avec nom de fichier intelligent — le HTML téléchargé s'affiche correctement en local, et les feuilles de style conservent leurs liens vers polices et images
-• Visionneuse de polices intégrée — prévisualisez n'importe quelle police web (woff2, woff, ttf, otf) avec votre propre texte, taille, graisse et style, ainsi qu'une grille complète de glyphes (cliquez sur un glyphe pour le copier)
-• Large choix de thèmes clairs et sombres
-• Retour à la ligne automatique, numérotation des lignes et pliage de code
-• Liens cliquables pour naviguer facilement d'une ressource à l'autre sans quitter la visionneuse
-• Bascule en un clic vers le visualiseur natif du navigateur
+• Formatez et embellissez automatiquement les fichiers CSS, JS, JSON et HTML minifiés
+• Formatez directement le code source d'un fichier CSS/JS/JSON/XML brut lorsque vous l'ouvrez
+• Une barre latérale et une arborescence interactives — parcourez tous les scripts externes, feuilles de style, polices, images et ressources liées dans une arborescence virtuelle organisée, avec des raccourcis rapides pour inspecter chaque élément
+• Bouton de copie rapide — copiez le code formaté en un clic, ou utilisez le menu déroulant pour copier le code source brut ou l'URL avec confirmation instantanée
+• Recherche textuelle intégrale (Cmd/Ctrl+F) dans tout le code source — et pas seulement la partie visible — avec suivant/précédent, respect de la casse, mot entier, expressions régulières et modes de recherche structurelle avancés (XPath, sélecteurs CSS, JSONPath)
+• Téléchargement en un clic du code source formaté avec nom de fichier intelligent — l'HTML téléchargé s'affiche toujours localement et les feuilles de style retrouvent leurs polices et images
+• Visionneuse de polices intégrée — prévisualisez n'importe quelle police web (woff2, woff, ttf, otf) avec votre propre texte d'exemple, taille, graisse et style, ainsi qu'une grille de glyphes des caractères couverts (cliquez sur un glyphe pour le copier)
+• Un large choix de thèmes clairs et sombres
+• Retour à la ligne automatique, numéros de ligne et réducteur de code
+• Liens cliquables pour naviguer entre les ressources sans quitter la visionneuse
+• Basculement en un clic vers l'affichage du code source natif du navigateur
 • Disponible en plusieurs langues
 
-Idéal pour les développeurs, designers web et toute personne ayant besoin d'inspecter ou formater du code source HTML, CSS, JavaScript, JSON ou XML — ou d'analyser une police web. Un visualiseur de code source épuré, visualiseur JSON/XML, inspecteur de polices et formateur de code réuni en une seule extension.
+Idéal pour les développeurs, les web designers et tous ceux qui ont besoin d'afficher ou de mettre en forme du code source HTML, CSS, JavaScript, JSON ou XML — ou d'inspecter une police web. Une visionneuse de code source, de JSON/XML, de polices et un outil de mise en forme tout-en-un clair et épuré.
