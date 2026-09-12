@@ -25,5 +25,6 @@ stats.html
 .env.*
 !.env.example
 
-# Store video recordings
-store/video/
+# Store video recordings (track final demo video, ignore raw captures and temp files)
+store/video/raw/
+store/video/temp/
