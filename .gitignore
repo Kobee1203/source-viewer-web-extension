@@ -24,3 +24,6 @@ stats.html
 .env
 .env.*
 !.env.example
+
+# Store video recordings
+store/video/

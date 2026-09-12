@@ -23,7 +23,8 @@
     "screenshots": "wxt build && tsx scripts/generate-screenshots.ts",
     "screenshots:all": "wxt build && tsx scripts/generate-screenshots.ts --all",
     "metadata:check": "tsx scripts/check-store-metadata.ts",
-    "metadata:sync": "tsx scripts/sync-store-descriptions.ts"
+    "metadata:sync": "tsx scripts/sync-store-descriptions.ts",
+    "demo:video": "wxt build && tsx scripts/generate-demo-video.ts"
   },
   "packageManager": "pnpm@11.4.0",
   "engines": {
