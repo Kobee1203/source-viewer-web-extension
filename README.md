@@ -2,6 +2,8 @@
 
 A browser extension that replaces the browser's plain "View Source" with a readable, syntax-highlighted view — with multiple themes, word wrap, and clickable links. It also renders a dedicated viewer for font files. Built with [WXT](https://wxt.dev/) + TypeScript + Vue 3, and [CodeMirror 6](https://codemirror.net/) for rendering.
 
+[Source Code Viewer Demo](https://github.com/user-attachments/assets/11d04e83-48b7-4497-953d-93706fd52d97)
+
 ## Features
 
 - **Syntax Highlighting**: Powered by CodeMirror 6, for HTML, CSS, JavaScript, JSON, and XML.
