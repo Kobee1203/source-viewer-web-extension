@@ -1,0 +1,1 @@
+Visualiza y formatea código fuente con resaltado de sintaxis: HTML, CSS, JS, JSON y XML, más un visor de fuentes con cuadrícula.
