@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "source-viewer",
+  "version": "1.10.0",
+  "description": "High-performance source code viewer and font inspector extension for Chromium and Firefox browsers, offering developer-grade syntax highlighting, formatting, structural search, and comprehensive typography diagnostics in a distraction-free environment.",
+  "homepage": "https://github.com/Kobee1203/source-viewer-web-extension",
+  "keywords": ["developer-tools", "syntax-highlighting", "font-viewer", "code-formatter"],
+  "license": "GPL-3.0-or-later",
+  "overview": "Source Viewer automatically detects minified or unformatted documents, formats them seamlessly with js-beautify, applies CodeMirror 6 syntax trees, and renders rich typography previews for web fonts.",
+  "features": {
+    "syntaxHighlighting": {
+      "supportedLanguages": ["HTML", "CSS", "JavaScript", "TypeScript", "JSON", "XML"],
+      "themesCount": 35,
+      "defaultTheme": "tokyo-night"
+    },
+    "fontInspector": {
+      "formats": ["woff2", "woff", "ttf", "otf"],
+      "features": ["glyph-grid", "interactive-preview", "metadata-extraction"]
+    },
+    "search": {
+      "modes": ["text", "regexp", "xpath", "jsonpath", "css-selector"],
+      "shortcuts": "Ctrl+F / Cmd+F"
+    }
+  },
+  "metrics": {
+    "activeUsers": 12500,
+    "rating": 4.9,
+    "reviewsCount": 84
+  }
+}

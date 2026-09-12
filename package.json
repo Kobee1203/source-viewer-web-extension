@@ -19,7 +19,9 @@
     "lint:css": "stylelint \"src/**/*.{css,vue}\"",
     "lint:css:fix": "stylelint \"src/**/*.{css,vue}\" --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "screenshots": "wxt build && tsx scripts/generate-screenshots.ts",
+    "screenshots:all": "wxt build && tsx scripts/generate-screenshots.ts --all"
   },
   "packageManager": "pnpm@11.4.0",
   "engines": {
@@ -94,12 +96,14 @@
     "eslint-plugin-vue": "^10.9.2",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
+    "playwright": "^1.63.0",
     "postcss-html": "^1.8.1",
     "prettier": "^3.9.5",
     "stylelint": "^17.14.0",
     "stylelint-config-recess-order": "^7.7.0",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-config-standard-vue": "^1.0.0",
+    "tsx": "^4.23.13",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.63.0",
     "vue-tsc": "^3.3.7",

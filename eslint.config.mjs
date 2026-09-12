@@ -13,6 +13,7 @@ export default withVueTs(
       '.output/**',
       '.wxt/**',
       'node_modules/**',
+      'scripts/fixtures/**',
       'src/public/**', // vendored themes + static assets
     ],
   },
