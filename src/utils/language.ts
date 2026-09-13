@@ -3,8 +3,8 @@ import { DEFAULT_FILE_TYPE, type FileType } from '@/utils/fileType';
 
 /**
  * Loads the CodeMirror language support for a file type on demand. Each `@codemirror/lang-*`
- * is imported dynamically so it builds to its own lazy chunk — loaded only when a file of that
- * type is viewed — instead of being inlined into the viewer bundle. `lang-html` also pulls in
+ * is imported dynamically so it builds to its own lazy chunk (loaded only when a file of that
+ * type is viewed, instead of being inlined) into the viewer bundle. `lang-html` also pulls in
  * CSS and JavaScript, since HTML embeds them.
  */
 export function loadLanguage(language: FileType): Promise<Extension> {

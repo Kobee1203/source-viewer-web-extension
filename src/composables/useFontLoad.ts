@@ -17,7 +17,7 @@ function formatFromUrl(target: URL): string {
  *
  * The font is fetched here in the extension page (covered by `<all_urls>` host permissions,
  * so cross-origin without CORS), decoded natively by the browser via the FontFace API
- * (woff2 included — no parsing/decompression on our side), and added to `document.fonts`.
+ * (woff2 included: no parsing/decompression on our side), and added to `document.fonts`.
  * The added FontFace is removed again when the owning component unmounts.
  */
 export function useFontLoad() {

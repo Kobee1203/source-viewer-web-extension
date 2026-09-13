@@ -11,7 +11,7 @@ import { t } from '@/utils/i18n';
  *
  * Returns the CodeMirror extensions to install, an `onReady` handler to capture the view, and an
  * `openSearch` command (used by the toolbar button). The editor is `disabled` (not focusable), so
- * CodeMirror's own Mod-f keymap never fires — we intercept Cmd/Ctrl-F on the window in the capture
+ * CodeMirror's own Mod-f keymap never fires: we intercept Cmd/Ctrl-F on the window in the capture
  * phase and open the panel ourselves. In the in-place viewer this listener lives in the iframe
  * document, so it only fires when the iframe has focus.
  */
@@ -23,7 +23,7 @@ export function useCodeSearch(fileType: FileType): {
   const view = shallowRef<EditorView>();
 
   // Localize the panel labels to the UI locale. Replace-related phrases are omitted: the panel
-  // hides them in read-only mode. Built once — the UI locale is fixed for the session.
+  // hides them in read-only mode. Built once: the UI locale is fixed for the session.
   const phrases = EditorState.phrases.of({
     Find: t('searchFind'),
     next: t('searchNext'),

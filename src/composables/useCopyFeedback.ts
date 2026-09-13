@@ -3,8 +3,8 @@ import { type Ref, onUnmounted, shallowRef } from 'vue';
 /**
  * Copies text to the clipboard and exposes a transient marker of what was just copied, so a
  * caller can flash a "copied" affordance. `copied` holds the marker for `duration` ms, then
- * resets to null. The marker (generic `T`) lets the caller tell which item was copied — e.g.
- * a code point, so only that grid cell highlights.
+ * resets to null. The marker (generic `T`) lets the caller tell which item was copied (e.g.
+ * a code point, so only that grid cell highlights).
  */
 export function useCopyFeedback<T>(duration = 1000): {
   copied: Ref<T | null>;

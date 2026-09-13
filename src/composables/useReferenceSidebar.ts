@@ -75,13 +75,13 @@ function filenameOf(urlStr: string): string {
 
 export function useReferenceSidebar() {
   const isOpen = ref(false);
-  /** The virtual file-system tree — mutated in place so Vue's Proxy tracks changes. */
+  /** The virtual file-system tree: mutated in place so Vue's Proxy tracks changes. */
   const vfsTree = ref<VfsNode[]>([]);
   /** URL of the file currently displayed in the viewer. */
   const activeUrl = ref('');
-  /** Hostname of the initial (root) file — used to classify internal vs external refs. */
+  /** Hostname of the initial (root) file: used to classify internal vs external refs. */
   const rootHostname = ref('');
-  /** URL of the initial (root) file — used for the "back to root" breadcrumb. */
+  /** URL of the initial (root) file: used for the "back to root" breadcrumb. */
   const rootUrl = ref('');
   /** Display name of the root file. */
   const rootFilename = ref('');
@@ -94,7 +94,7 @@ export function useReferenceSidebar() {
   // ── Private helpers ───────────────────────────────────────────────────────
 
   function setRootInfo(urlStr: string): void {
-    if (rootUrl.value) return; // already initialised — do not overwrite
+    if (rootUrl.value) return; // already initialized: do not overwrite
     rootUrl.value = urlStr;
     rootFilename.value = filenameOf(urlStr);
     rootHostname.value = hostnameOf(urlStr);
@@ -172,7 +172,7 @@ export function useReferenceSidebar() {
       if (!response.ok) return;
       const target = new URL(urlStr);
       const fileType = mimeToFileType(response.contentType) ?? getFileType(target);
-      // Extract refs from raw text — no need to beautify for reference scanning.
+      // Extract refs from raw text: no need to beautify for reference scanning.
       const { formatSource } = await import('@/utils/beautify');
       const formatted = formatSource(response.text, fileType);
       const refs = extractReferences(formatted, urlStr);

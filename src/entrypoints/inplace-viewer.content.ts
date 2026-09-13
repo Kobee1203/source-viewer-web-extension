@@ -9,7 +9,7 @@ const IFRAME_ID = 'source-viewer-frame';
  * Renders the formatted viewer in place on a direct CSS/JS/JSON/XML navigation,
  * keeping the address bar on the original URL (see `content.ts`).
  *
- * Never auto-injected — `registration: 'runtime'` excludes it from `manifest.json`'s
+ * Never auto-injected: `registration: 'runtime'` excludes it from `manifest.json`'s
  * content_scripts (its `matches` are only merged into `host_permissions`). It's loaded
  * into a specific tab via `browser.scripting.executeScript` from the background, in
  * response to `content.ts` detecting a source-file navigation.

@@ -13,7 +13,7 @@ interface ThemeDef extends Theme {
   /**
    * Loads the theme's CodeMirror extension on demand. Each loader targets an individual
    * `@uiw/codemirror-theme-*` package via dynamic `import()`, so every theme becomes its
-   * own lazily-loaded chunk instead of being inlined into the viewer bundle — only the
+   * own lazily-loaded chunk instead of being inlined into the viewer bundle: only the
    * selected theme is fetched (from the packaged extension, no network) and parsed.
    * Light/dark siblings share a package, hence the same chunk.
    */

@@ -29,7 +29,7 @@ export function mimeToFileType(mime: string | null | undefined): FileType | null
   if (CSS_MIMES.has(m)) return 'css';
   if (JS_MIMES.has(m)) return 'javascript';
   if (JSON_MIMES.has(m) || (m.startsWith('application/') && m.endsWith('+json'))) return 'json';
-  if (m === 'image/svg+xml') return null; // an image, not source — leave it to the browser
+  if (m === 'image/svg+xml') return null; // an image, not source: leave it to the browser
   if (XML_MIMES.has(m) || (m.startsWith('application/') && m.endsWith('+xml'))) return 'xml';
   return null;
 }
@@ -38,7 +38,7 @@ export function mimeToFileType(mime: string | null | undefined): FileType | null
  * Decides whether a direct navigation should open in the viewer, and as which
  * {@link FileType}. Uses the response MIME first; for generic MIME types
  * (`text/plain`, `application/octet-stream`) it falls back to the URL extension
- * — this catches e.g. GitHub raw, which serves `.json` as `text/plain`.
+ * (this catches e.g. GitHub raw), which serves `.json` as `text/plain`.
  */
 export function detectRedirectFileType(mime: string | null | undefined, url: URL): FileType | null {
   const byMime = mimeToFileType(mime);

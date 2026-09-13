@@ -13,7 +13,7 @@ import { requestViewerInjection, requestViewerRedirect } from '@/utils/messaging
  * pages and our own extension pages never match.
  *
  * Kept intentionally tiny (no Vue/CodeMirror/js-beautify) since it's always-on for every
- * http(s) page — the real work lives in `inplace-viewer.content.ts`, only loaded
+ * http(s) page: the real work lives in `inplace-viewer.content.ts`, only loaded
  * on demand via `browser.scripting.executeScript`.
  */
 export default defineContentScript({
@@ -22,7 +22,7 @@ export default defineContentScript({
   allFrames: false,
   async main() {
     const type = detectRedirectFileType(document.contentType, new URL(location.href));
-    if (!type) return; // not a handled source type — leave the page alone
+    if (!type) return; // not a handled source type: leave the page alone
 
     // Hide the raw content immediately to avoid a flash before the viewer takes
     // over, whether we inject the in-place iframe or redirect due to CSP sandboxing.
@@ -31,7 +31,7 @@ export default defineContentScript({
     // also works in XML documents: there `createElement('style')` would yield an
     // inert null-namespace element, and the root isn't <html> (e.g. a direct .xml
     // navigation renders an <rss> root).
-    // `overflow: hidden` suppresses the raw page's own scrollbar — its content is
+    // `overflow: hidden` suppresses the raw page's own scrollbar: its content is
     // only hidden (still laid out), so without this its scrollbar would render over
     // the full-viewport viewer iframe. The iframe scrolls its own content instead.
     const hideStyle = document.createElementNS('http://www.w3.org/1999/xhtml', 'style');
@@ -40,9 +40,9 @@ export default defineContentScript({
     document.documentElement.appendChild(hideStyle);
 
     // A page served with CSP `sandbox` (e.g. raw.githubusercontent.com) sandboxes any iframe we
-    // inject, blocking the viewer's scripts — the document then has an opaque ("null") origin.
+    // inject, blocking the viewer's scripts: the document then has an opaque ("null") origin.
     // The in-place iframe can't work here, so navigate the whole tab to the viewer instead.
-    // (The pending message rejects when the navigation tears down this content script — ignore it.)
+    // (The pending message rejects when the navigation tears down this content script: ignore it.)
     if (window.origin === 'null') {
       requestViewerRedirect(location.href).catch(() => {
         document.getElementById(HIDE_STYLE_ID)?.remove();

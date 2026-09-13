@@ -1,8 +1,8 @@
 /**
  * Writing systems selectable from the font preview's "writing system" dropdown (see
  * `useWritingSystems.ts`). For each script we keep a handful of representative letters
- * (`probe`) — enough for `coversAny` (see `glyphCoverage.ts`) to decide whether the loaded font
- * covers that script at all — and a fixed sample string used to fill the preview text when the
+ * (`probe`), enough for `coversAny` (see `glyphCoverage.ts`) to decide whether the loaded font
+ * covers that script at all, and a fixed sample string used to fill the preview text when the
  * script is selected.
  *
  * The sample text is written natively in the script and is NOT translated per UI locale (like
@@ -15,11 +15,11 @@
  * probe set, see Lot 2) deliberately excludes CJK: that file needs to sample a script broadly
  * enough for a grid, which isn't tractable for huge ideographic blocks without the real cmap.
  * This dropdown only needs a couple of probe code points plus one fixed sentence per script, so
- * the same objection doesn't apply — Japanese kana and Hangul are compact syllabaries anyway, and
+ * the same objection doesn't apply: Japanese kana and Hangul are compact syllabaries anyway, and
  * Chinese only needs a few common Han ideographs to probe (not the full block).
  */
 
-/** i18n keys for the dropdown option labels — kept as a literal union so `t(ws.labelKey)`
+/** i18n keys for the dropdown option labels: kept as a literal union so `t(ws.labelKey)`
  *  type-checks against the generated message keys (see `src/utils/i18n.ts`). */
 type ScriptLabelKey =
   | 'fontViewerScriptLatin'
@@ -142,7 +142,7 @@ export const WRITING_SYSTEMS: WritingSystem[] = [
  * text (before the user touches the dropdown, see `useFontPreferences.ts`) looks native to the
  * reader rather than always defaulting to a Latin pangram. The language's ISO 15924 script is
  * derived generically via `Intl.Locale` (e.g. `ru`→Cyrl, `el`→Grek, `ar`→Arab, `ja`→Jpan,
- * `zh-TW`→Hant, `ko`→Kore) and matched against each entry's `scriptCodes` — no per-language
+ * `zh-TW`→Hant, `ko`→Kore) and matched against each entry's `scriptCodes`: no per-language
  * special-casing. Note `browser.i18n.getUILanguage()` returns the *browser's* language, which
  * need not be one of the extension's own locales, so this can legitimately surface a script we
  * don't ship UI strings for. Falls back to Latin for anything unrecognized (or if `Intl.Locale`

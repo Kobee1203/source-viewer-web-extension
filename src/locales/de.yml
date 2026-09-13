@@ -1,6 +1,6 @@
 actionTitle: 'Seitenquelltext anzeigen'
 contextMenuViewSource: 'Quelltext mit Source Viewer anzeigen'
-extDescription: 'Quelltext anzeigen und formatieren mit Syntaxhervorhebung: HTML, CSS, JS, JSON, XML – plus ein Schriften-Viewer.'
+extDescription: 'Quelltext anzeigen und formatieren mit Syntaxhervorhebung: HTML, CSS, JS, JSON, XML - plus ein Schriften-Viewer.'
 dialogClose: 'schließen'
 settingsTitle: 'Einstellungen'
 settingsOpenInLabel: 'Source Viewer öffnen in:'

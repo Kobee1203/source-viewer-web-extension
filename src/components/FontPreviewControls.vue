@@ -21,7 +21,7 @@ const { available } = useWritingSystems(() => props.family);
 const selectedScript = ref('');
 
 // Keep the selection valid as `available` changes (e.g. once the font finishes loading), without
-// touching the preview text — only an explicit user pick (the @change handler below) does that.
+// touching the preview text: only an explicit user pick (the @change handler below) does that.
 watch(
   available,
   (list) => {
@@ -85,7 +85,7 @@ function onScriptChange(): void {
 
 <style scoped>
 /* Fills the toolbar space beside the view switch; internal spacer splits left/right groups
-   (.spacer/.sep are shared globals — see src/styles/toolbar.css). */
+   (.spacer/.sep are shared globals: see src/styles/toolbar.css). */
 .preview-controls {
   display: flex;
   flex: 1 1 auto;

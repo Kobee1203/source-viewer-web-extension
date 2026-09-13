@@ -14,7 +14,7 @@ export interface VfsFolderNode {
   key: string;
   /**
    * Non-null when the folder itself is a navigable URL:
-   *   - The root-domain folder (always navigable — points to the initial source)
+   *   - The root-domain folder (always navigable: points to the initial source)
    *   - Domain-root URLs for external sites (https://ga.com → no path after hostname)
    *   - Trailing-slash directory URLs (https://example.com/path/)
    */
@@ -122,7 +122,7 @@ export function insertIntoVfs(
       domainFolder.linkTarget = entry.linkTarget;
     }
 
-    // Domain-root URL: the folder IS the entry — nothing to nest further.
+    // Domain-root URL: the folder IS the entry: nothing to nest further.
     if (isRootPath) return;
 
     currentLevel = domainFolder.children;
@@ -184,7 +184,7 @@ export function insertIntoVfs(
     return;
   }
 
-  // Regular file node — deduplicate by URL.
+  // Regular file node: deduplicate by URL.
   const existingFile = currentLevel.find((n): n is VfsFileNode => n.kind === 'file' && n.url === entry.url);
   if (!existingFile) {
     const fileNode: VfsFileNode = {
@@ -260,7 +260,7 @@ function insertSorted(nodes: VfsNode[], node: VfsNode): void {
   for (let i = 0; i < nodes.length; i++) {
     const existing = nodes[i];
 
-    // Skip the root-domain folder — it must remain at position 0.
+    // Skip the root-domain folder: it must remain at position 0.
     if (existing.kind === 'folder' && existing.isRootDomain) continue;
 
     const isExistingFolder = existing.kind === 'folder';

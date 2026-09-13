@@ -10,8 +10,8 @@ const props = defineProps<{
   loading: boolean;
 }>();
 
-const formatLabel = computed(() => (props.format ? props.format.toUpperCase() : '—'));
-const sizeLabel = computed(() => (props.fileSize != null ? formatBytes(props.fileSize) : '—'));
+const formatLabel = computed(() => (props.format ? props.format.toUpperCase() : '-'));
+const sizeLabel = computed(() => (props.fileSize != null ? formatBytes(props.fileSize) : '-'));
 const statusLabel = computed(() => (props.loading ? t('fontViewerLoading') : 'OK'));
 </script>
 

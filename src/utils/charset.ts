@@ -2,7 +2,7 @@
  * Charset detection for fetched source (see `fetchSource` in `messaging.ts`).
  *
  * `res.text()` decodes using the charset from the HTTP `Content-Type` **header** and silently
- * defaults to UTF-8 when the header carries no parseable charset — it never consults the HTML
+ * defaults to UTF-8 when the header carries no parseable charset: it never consults the HTML
  * `<meta>`. Legacy-encoded pages (e.g. iso-8859-1) then get corrupted to U+FFFD (`�`) before the
  * viewer ever sees them, unrecoverably. We instead read the raw bytes and pick the charset
  * ourselves: HTTP header → HTML `<meta>` → UTF-8.

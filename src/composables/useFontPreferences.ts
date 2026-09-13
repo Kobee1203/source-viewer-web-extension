@@ -7,7 +7,7 @@ const DEFAULT_FONT_SIZE = 48;
 
 /**
  * Reactive font-preview settings (preview text, size, bold, italic, background).
- * Not persisted for now — kept in a composable to mirror {@link usePreferences} and to make
+ * Not persisted for now: kept in a composable to mirror {@link usePreferences} and to make
  * adding `browser.storage.local` backing later a localized change.
  */
 export function useFontPreferences() {

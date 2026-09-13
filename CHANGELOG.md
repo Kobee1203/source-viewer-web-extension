@@ -45,14 +45,14 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- **In-Place Viewer on CSP-Sandboxed Pages**: Navigating directly to a raw CSS/JS/JSON/XML file served with a `Content-Security-Policy: sandbox` header (e.g. `raw.githubusercontent.com`) left a blank page — the injected in-place iframe inherited the page's sandbox and couldn't run the viewer's scripts. Such pages are now detected (opaque document origin) and opened as a full-tab navigation to the viewer instead.
+- **In-Place Viewer on CSP-Sandboxed Pages**: Navigating directly to a raw CSS/JS/JSON/XML file served with a `Content-Security-Policy: sandbox` header (e.g. `raw.githubusercontent.com`) left a blank page: the injected in-place iframe inherited the page's sandbox and couldn't run the viewer's scripts. Such pages are now detected (opaque document origin) and opened as a full-tab navigation to the viewer instead.
 
 ## [1.8.0] - 2006-08-20
 
 ### Added
 
-- **Writing System Selector**: The font viewer's preview now offers a **writing system** dropdown listing only the scripts the loaded font actually covers (detected via the existing canvas coverage probe — no font parsing or extra network). Picking a script fills the preview with a native sample sentence for it. Covers Latin, Greek, Cyrillic, Armenian, Hebrew, Arabic, Devanagari, Thai, Ethiopic, Japanese, Chinese, and Korean. The dropdown is hidden when a single script is detected.
-- **Download Button**: A toolbar button downloads the formatted source you're viewing. The filename follows the server's `Content-Disposition`, the URL's own filename, or a `download.<ext>` default. A downloaded **HTML** page gets a `<base>` pointing at the original URL so it still renders (styles, images, scripts) when opened locally, and a downloaded **CSS** file has its relative `url(...)`/`@import` references rewritten to absolute so it keeps finding its fonts and images. (Cross-origin webfonts that the server doesn't expose via CORS won't render from a local file — a fully self-contained download is planned for later.)
+- **Writing System Selector**: The font viewer's preview now offers a **writing system** dropdown listing only the scripts the loaded font actually covers (detected via the existing canvas coverage probe: no font parsing or extra network). Picking a script fills the preview with a native sample sentence for it. Covers Latin, Greek, Cyrillic, Armenian, Hebrew, Arabic, Devanagari, Thai, Ethiopic, Japanese, Chinese, and Korean. The dropdown is hidden when a single script is detected.
+- **Download Button**: A toolbar button downloads the formatted source you're viewing. The filename follows the server's `Content-Disposition`, the URL's own filename, or a `download.<ext>` default. A downloaded **HTML** page gets a `<base>` pointing at the original URL so it still renders (styles, images, scripts) when opened locally, and a downloaded **CSS** file has its relative `url(...)`/`@import` references rewritten to absolute so it keeps finding its fonts and images. (Cross-origin webfonts that the server doesn't expose via CORS won't render from a local file: a fully self-contained download is planned for later.)
 - **Search in Source**: `Cmd`/`Ctrl`+`F` (or the toolbar search button) now searches the whole source, not just the part rendered in the viewport. Matches are highlighted and scrolled into view as you type, with next/previous, match-case, whole-word, and regular-expression options. The search bar is localized in all languages.
 
 ### Changed
@@ -68,7 +68,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **Font Viewer**: Navigating directly to a font URL (`woff2`/`woff`/`ttf`/`otf`) now opens a dedicated font viewer with a live preview — editable sample text, adjustable size, bold/italic toggles, and a light/dark background switch — alongside font details (source, format, file size, HTTP status).
+- **Font Viewer**: Navigating directly to a font URL (`woff2`/`woff`/`ttf`/`otf`) now opens a dedicated font viewer with a live preview (editable sample text, adjustable size, bold/italic toggles, and a light/dark background switch) alongside font details (source, format, file size, HTTP status).
 - **Glyph Grid**: A **Glyphs** view lists the characters the font actually renders. Hover a cell to see its `U+XXXX` code point, click to copy the character.
 - **HTTP Status in Status Bar**: The status bar now surfaces the response's HTTP status.
 
@@ -80,31 +80,31 @@ All notable changes to this project will be documented in this file.
 
 - **Error Response Bodies**: The response body is now shown on an HTTP error status when the server returns one.
 - **Authenticated Requests**: Credentials are now included in the fetch request, so pages behind a session cookie load correctly.
-- **Empty Glyph Grid on Firefox**: The glyph-coverage probe canvas is now attached to the document — Firefox only exposes a `FontFace`-loaded font to a canvas connected to the DOM, so the grid no longer renders empty.
+- **Empty Glyph Grid on Firefox**: The glyph-coverage probe canvas is now attached to the document: Firefox only exposes a `FontFace`-loaded font to a canvas connected to the DOM, so the grid no longer renders empty.
 - **Firefox Store Name**: Shortened the Firefox extension name to comply with AMO's 45-character limit.
 
 ## [1.6.1] - 2026-07-22
 
 ### Changed
 
-- **Store Listing**: Renamed the extension to "Source Code Viewer — HTML, CSS, JS, JSON & XML Formatter" and reworded the store summary across all locales to mention the supported languages (HTML, CSS, JavaScript, JSON, XML) and formatting, improving discoverability. No functional changes.
+- **Store Listing**: Renamed the extension to "Source Code Viewer - HTML, CSS, JS, JSON & XML Formatter" and reworded the store summary across all locales to mention the supported languages (HTML, CSS, JavaScript, JSON, XML) and formatting, improving discoverability. No functional changes.
 
 ## [1.6.0] - 2026-07-20
 
 ### Changed
 
 - **Syntax Highlighting Engine**: Migrated the viewer from PrismJS to **CodeMirror 6** for rendering and highlighting (read-only). Source is still formatted with `js-beautify`; CodeMirror now handles display, line numbers, word wrap, and code folding.
-- **Themes**: Replaced the 8 bundled Prism themes with the full CodeMirror theme set (`@uiw/codemirror-theme-*`) — **45 themes** — with `default` mapped to _Basic Light_.\
+- **Themes**: Replaced the 8 bundled Prism themes with the full CodeMirror theme set (`@uiw/codemirror-theme-*`) (**45 themes**), with `default` mapped to _Basic Light_.\
   ⚠️ **Theme ids changed, so a previously selected theme resets to the default and must be re-picked once.**
-- **On-Demand Loading**: Themes and language grammars are now code-split and loaded on demand — only the selected theme and the current file's language are fetched (from the packaged extension, no network) and parsed — keeping them out of the initial viewer bundle.
+- **On-Demand Loading**: Themes and language grammars are now code-split and loaded on demand (only the selected theme and the current file's language are fetched from the packaged extension, without network, and parsed), keeping them out of the initial viewer bundle.
 
 ## [1.5.0] - 2026-07-18
 
 ### Added
 
-- **In-Place Auto-Open**: Navigating directly to a raw `.css`/`.js`/`.json`/`.xml` URL now renders the formatted viewer in place — as a full-viewport iframe embedding the viewer page over the original page — instead of redirecting the tab. The address bar keeps the original URL and the browser back button works in a single hop. (Firefox's built-in JSON viewer, when enabled via `devtools.jsonview.enabled`, still intercepts direct `.json` navigations before the extension can run.)
-- **JSON Support**: Added JSON syntax highlighting and formatting (with a safe fallback for invalid JSON), plus content-type-aware file detection — the response's real MIME type now takes precedence over the URL extension (handles extensionless URLs such as `fonts.googleapis.com/css2?…`).
-- **Type-Aware Link Routing**: Links in the viewer are now routed by the target's type — image URLs (`.png`, `.svg`, …) open in the browser to render natively, while source files reopen in the code viewer. Clickable URLs now also cover CSS `url(…)` values and the HTML `content` attribute (e.g. `og:image`), the latter only when it holds an absolute URL.
+- **In-Place Auto-Open**: Navigating directly to a raw `.css`/`.js`/`.json`/`.xml` URL now renders the formatted viewer in place (as a full-viewport iframe embedding the viewer page over the original page) instead of redirecting the tab. The address bar keeps the original URL and the browser back button works in a single hop. (Firefox's built-in JSON viewer, when enabled via `devtools.jsonview.enabled`, still intercepts direct `.json` navigations before the extension can run.)
+- **JSON Support**: Added JSON syntax highlighting and formatting (with a safe fallback for invalid JSON), plus content-type-aware file detection: the response's real MIME type now takes precedence over the URL extension (handles extensionless URLs such as `fonts.googleapis.com/css2?…`).
+- **Type-Aware Link Routing**: Links in the viewer are now routed by the target's type: image URLs (`.png`, `.svg`, …) open in the browser to render natively, while source files reopen in the code viewer. Clickable URLs now also cover CSS `url(…)` values and the HTML `content` attribute (e.g. `og:image`), the latter only when it holds an absolute URL.
 
 ### Fixed
 
@@ -115,13 +115,13 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **Additional Languages**: Added Spanish, German, Italian, Japanese, Simplified Chinese, and Portuguese (Brazilian + European) on top of English and French — 9 locales total. The store description is now localized as well.
+- **Additional Languages**: Added Spanish, German, Italian, Japanese, Simplified Chinese, and Portuguese (Brazilian + European) on top of English and French (9 locales total). The store description is now localized as well.
 - **Native Source Viewer Action**: Added a toolbar button to open the current page in the browser's built-in `view-source:` viewer (left click opens in the same tab; middle click or Ctrl/Cmd+click opens in a new tab).
 
 ### Changed
 
 - **Build & Codebase Migration**: Migrated the extension to WXT + TypeScript + Vue 3, with behaviour parity. Source is now organized into components, composables, and typed utilities.
-- **Toolbar Redesign**: Reworked the toolbar into a coherent icon-button bar — word wrap became an icon toggle (highlighted when active), the theme selector gained a palette icon, and the native-viewer action is a dedicated icon button (using `@lucide/vue`).
+- **Toolbar Redesign**: Reworked the toolbar into a coherent icon-button bar: word wrap became an icon toggle (highlighted when active), the theme selector gained a palette icon, and the native-viewer action is a dedicated icon button (using `@lucide/vue`).
 - **Localization Overhaul**: Switched to YAML-based, type-safe messages via `@wxt-dev/i18n`; the `_locales/*/messages.json` files are now generated at build time.
 - **Developer Tooling**: Added type-aware ESLint, Prettier (`printWidth` 120), and Stylelint; husky + lint-staged pre-commit hooks; a GitHub Actions CI workflow (lint + typecheck + build); and pinned Node 24 and pnpm via `engines`/`packageManager`.
 

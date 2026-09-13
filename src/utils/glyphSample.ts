@@ -1,10 +1,10 @@
 /**
  * A curated set of Unicode code points probed for the glyph grid. Since we don't parse the
- * font's cmap (see glyphCoverage.ts), we can't enumerate a font's real glyph inventory — we
+ * font's cmap (see glyphCoverage.ts), we can't enumerate a font's real glyph inventory: we
  * instead render this fixed sample and keep only the code points the font actually covers.
  *
  * Ranges can be broad: uncovered code points (unassigned, or absent from the font) are filtered
- * out by the coverage test, so they add no noise — only probing cost. We cover the major
+ * out by the coverage test, so they add no noise, only probing cost. We cover the major
  * alphabetic scripts, not the huge ideographic blocks: fonts with very large coverage (e.g. CJK)
  * still only show this sample, not their full glyph set. Enumerating those would require the cmap.
  */
@@ -48,7 +48,7 @@ const SINGLES: number[] = [
 // Several blocks above (Greek, Thai, Ethiopic, Greek Extended...) have unassigned gaps.
 // Probing an unassigned code point renders a browser-drawn ".notdef" placeholder that can
 // differ from the plain-fallback placeholder purely due to font-selection quirks, registering
-// as a false "covered" — so drop anything Unicode hasn't actually assigned.
+// as a false "covered", so drop anything Unicode hasn't actually assigned.
 const ASSIGNED = /\p{Assigned}/u;
 
 function expand(): number[] {

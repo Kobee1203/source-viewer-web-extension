@@ -99,7 +99,7 @@ defineExpose({ openSearch });
   outline: none !important;
 }
 
-/* Search panel — styled to match the app toolbar. It renders inside CodeMirror's DOM, so these
+/* Search panel: styled to match the app toolbar. It renders inside CodeMirror's DOM, so these
    rules override CM's base/theme styles; the .cm-panels background/border use !important to stay
    consistent across all 45 editor themes (which each set their own panel colors). */
 .cm-editor .cm-panels {

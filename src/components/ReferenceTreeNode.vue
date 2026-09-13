@@ -53,7 +53,7 @@ function badgeColor(item: { linkTarget: 'source' | 'font' | null; fileType?: Fil
 
 /**
  * Show a chevron on a file node when:
- *   - It is a source file (fonts open in a new tab — no explore concept)
+ *   - It is a source file (fonts open in a new tab: no explore concept)
  *   - AND it has not yet been explored, is loading, or has known references.
  */
 function showFileChevron(node: VfsFileNode): boolean {

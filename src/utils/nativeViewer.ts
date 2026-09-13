@@ -28,7 +28,7 @@ export function openNativeViewer(target: URL, newTab: boolean): Promise<OpenNati
  *
  * Tracks the tabs the user explicitly sent to the native viewer (keyed by tab
  * id) so the background's `view-source:` interception lets those navigations
- * through — including across server redirects that would strip a URL-based
+ * through, including across server redirects that would strip a URL-based
  * marker (e.g. wikipedia.org 301s `/?x` back to `/`). State is encapsulated in
  * a private Set; create one instance in the background and share it across the
  * message and tab-update listeners.

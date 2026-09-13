@@ -32,7 +32,7 @@ _Avoid_: blocked domain, unsupported domain
 ### Source & Classification
 
 **Source**:
-The raw content of a URL (any scheme: http, https, file, blob). A Source cannot exist without a URL — the URL is always its anchor.
+The raw content of a URL (any scheme: http, https, file, blob). A Source cannot exist without a URL: the URL is always its anchor.
 _Avoid_: code, content, document, page source
 
 **Content Type**:
@@ -40,7 +40,7 @@ The MIME type of the HTTP response. The authoritative signal for triggering the 
 _Avoid_: MIME type, media type
 
 **FileType**:
-The domain-level classification of a Source file: one of `html`, `css`, `javascript`, `json`, or `xml`. Detected from Content Type (MIME authoritative, URL extension fallback). The concept the rest of the system branches on — Search modes, Link Routing, Download behaviour, and In-Place Renderer activation all depend on FileType.
+The domain-level classification of a Source file: one of `html`, `css`, `javascript`, `json`, or `xml`. Detected from Content Type (MIME authoritative, URL extension fallback). The concept the rest of the system branches on: Search modes, Link Routing, Download behaviour, and In-Place Renderer activation all depend on FileType.
 _Avoid_: language, format, file format, file extension
 
 **Language**:
@@ -57,7 +57,7 @@ Plain-text matching within a Source. Supports live highlighting, case sensitivit
 _Avoid_: find, find in page, basic search
 
 **Structural Search**:
-Document-node matching using a query language. Semantically distinct from Text Search — it matches document structure, not text spans. Applies to HTML/XML (XPath, CSS Selector) and JSON (JSONPath).
+Document-node matching using a query language. Semantically distinct from Text Search: it matches document structure, not text spans. Applies to HTML/XML (XPath, CSS Selector) and JSON (JSONPath).
 _Avoid_: advanced search, query search, node search
 
 **Search Mode**:
@@ -91,7 +91,7 @@ _Avoid_: save, export
 ### Font Viewer
 
 **Glyph**:
-An individual character rendition in a font. Distinct from a Unicode code point — a font may have multiple Glyphs per code point, or none.
+An individual character rendition in a font. Distinct from a Unicode code point: a font may have multiple Glyphs per code point, or none.
 _Avoid_: character, symbol, letter
 
 **Writing System**:

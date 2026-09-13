@@ -1,6 +1,6 @@
 /**
  * Detects which code points a loaded font actually renders, without parsing the font file
- * (no cmap access — we render on a canvas and compare, so woff2 works too).
+ * (no cmap access: we render on a canvas and compare, so woff2 works too).
  *
  * For a code point we render the character twice: once with the font followed by a generic
  * fallback (`"<family>", monospace`) and once with the fallback alone (`monospace`). If the
@@ -13,7 +13,7 @@
  *
  * Known limit: for a code point that NO installed font covers, the browser draws a last-resort
  * box whose metrics come from the primary font, so it differs from the fallback-alone box just
- * like a real glyph would — such characters can register as false positives. They are filtered
+ * like a real glyph would: such characters can register as false positives. They are filtered
  * out of the sample instead (see glyphSample.ts).
  *
  * The tester is dependency-free (usable outside Vue) so the language filter can reuse

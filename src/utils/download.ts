@@ -2,7 +2,7 @@ import sanitize from 'sanitize-filename';
 import type { FileType } from '@/utils/fileType';
 
 /**
- * Downloads the (formatted) source shown in the viewer — see the download button in `Toolbar.vue`.
+ * Downloads the (formatted) source shown in the viewer: see the download button in `Toolbar.vue`.
  *
  * The file is named after (in priority order) the server's `Content-Disposition` filename, the
  * URL's last path segment when it looks like a filename, the document's `<title>` (formatted as
@@ -15,11 +15,11 @@ import type { FileType } from '@/utils/fileType';
  * is string surgery (no DOM/CSS parsing), consistent with the rest of the codebase.
  *
  * Known limitation: a downloaded HTML page still pulls its assets from the origin over the network
- * (it is not offline), and cross-origin webfonts are subject to CORS — a page opened from `file://`
+ * (it is not offline), and cross-origin webfonts are subject to CORS: a page opened from `file://`
  * has a `null` origin, so an `@font-face` served without `Access-Control-Allow-Origin` is blocked
  * and its glyphs won't render (unlike `<link>` CSS and `<img>`, which aren't CORS-checked). Full
  * offline/complete rendering would require fetching and embedding the subresources ourselves via
- * the background — a separate, deferred feature.
+ * the background: a separate, deferred feature.
  */
 
 /** Canonical extension per file type, used for the default filename. */
@@ -40,7 +40,7 @@ const MIME: Record<FileType, string> = {
   xml: 'application/xml;charset=utf-8',
 };
 
-/** Default base name (fixed, not localized — a filename shouldn't vary with the UI language). */
+/** Default base name (fixed, not localized: a filename shouldn't vary with the UI language). */
 const DEFAULT_BASENAME = 'download';
 
 /** Reduces a candidate filename to a bare basename (drops any path, guards against `../`). */
@@ -66,7 +66,7 @@ export function filenameFromContentDisposition(header: string | null | undefined
   return plain ? basename(plain[1]) : null;
 }
 
-/** Whether a path segment already looks like a filename (ends with a `.ext` of 1–5 alphanumerics). */
+/** Whether a path segment already looks like a filename (ends with a `.ext` of 1-5 alphanumerics). */
 function looksLikeFilename(segment: string): boolean {
   return /\.[A-Za-z0-9]{1,5}$/.test(segment);
 }
@@ -191,7 +191,7 @@ export function injectBaseAndCharset(html: string, target: URL): string {
       // leave the original value if it can't be resolved
     }
     out = out.replace(existingBase[0], existingBase[0].replace(existingBase[1], resolved));
-    baseTag = ''; // don't add a second base — the page's own (now absolute) one stays authoritative
+    baseTag = ''; // don't add a second base: the page's own (now absolute) one stays authoritative
   }
 
   const injection = charsetTag + baseTag;
@@ -245,7 +245,7 @@ export function buildDownloadContent(code: string, type: FileType, target: URL):
 }
 
 /**
- * Triggers a download of the viewer's content via a transient `<a download>` + object URL — no
+ * Triggers a download of the viewer's content via a transient `<a download>` + object URL: no
  * `downloads` permission needed. The viewer document is on the extension origin (even in the
  * in-place iframe), so the suggested filename is honored on Chrome and Firefox.
  */

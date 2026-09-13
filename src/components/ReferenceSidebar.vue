@@ -194,7 +194,7 @@ function nodeKey(node: VfsNode): string {
   opacity: 0.6;
 }
 
-/* Resize handle — thin bar on the right edge */
+/* Resize handle: thin bar on the right edge */
 .resize-handle {
   position: absolute;
   top: 0;

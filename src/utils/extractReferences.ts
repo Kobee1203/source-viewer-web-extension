@@ -6,7 +6,7 @@ export interface ReferenceEntry {
   url: string;
   /** Basename of the file, for display in the sidebar. */
   filename: string;
-  /** Routing category — images are excluded; only 'source' and 'font' entries are returned. */
+  /** Routing category: images are excluded; only 'source' and 'font' entries are returned. */
   linkTarget: 'source' | 'font';
   /** FileType detected from the URL extension, or null for font files. */
   fileType: FileType | null;

@@ -46,7 +46,7 @@ export interface RequestViewerInjectionResponse {
 /**
  * Asks the background to inject the heavy in-place viewer content script into the
  * current tab. Resolves to `{ inject: false }` (never rejects on the happy path)
- * when the URL is restricted or the tab is gone — the caller must reveal the raw
+ * when the URL is restricted or the tab is gone: the caller must reveal the raw
  * page itself in that case.
  */
 export function requestViewerInjection(url: string): Promise<RequestViewerInjectionResponse> {

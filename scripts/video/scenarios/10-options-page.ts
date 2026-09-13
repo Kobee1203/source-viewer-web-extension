@@ -31,7 +31,7 @@ export const optionsPageScenario: VideoScenario = {
     await ctx.showOverlay({
       icon: '🚀',
       title: 'Source Viewer & Font Viewer',
-      description: 'The ultimate web developer companion — view, format, and inspect effortlessly!',
+      description: 'The ultimate web developer companion: view, format, and inspect effortlessly!',
     });
 
     await ctx.sleep(TIMINGS.scenePauseMs + 1000);

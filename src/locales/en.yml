@@ -1,6 +1,6 @@
 actionTitle: 'View page source code'
 contextMenuViewSource: 'View source with Source Viewer'
-extDescription: 'View & format source code with syntax highlighting — HTML, CSS, JS, JSON, XML — plus a font viewer with glyph grid.'
+extDescription: 'View & format source code with syntax highlighting: HTML, CSS, JS, JSON, XML - plus a font viewer with glyph grid.'
 dialogClose: 'Close'
 settingsTitle: 'Settings'
 settingsOpenInLabel: 'Open source viewer in:'
