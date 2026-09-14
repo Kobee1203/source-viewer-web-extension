@@ -1,0 +1,164 @@
+name: Release & Submit for Review
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        type: boolean
+        description: 'Skip upload and review submission (dry run)'
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    name: Validate
+    uses: ./.github/workflows/validate.yml
+
+  release:
+    name: Release & Submit
+    runs-on: ubuntu-latest
+    needs: [validate]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and package extensions
+        run: pnpm zip
+
+      - name: Extract version and release notes
+        id: notes
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            CURRENT_TAG="${{ github.ref_name }}"
+          else
+            PKG_VER=$(node -p "require('./package.json').version")
+            CURRENT_TAG="v${PKG_VER}"
+          fi
+          VERSION="${CURRENT_TAG#v}"
+          echo "tag=${CURRENT_TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+          PREV_TAG=$(git describe --tags --abbrev=0 "${CURRENT_TAG}^" 2>/dev/null || echo "")
+          echo "prevTag=${PREV_TAG}" >> "$GITHUB_OUTPUT"
+
+          cat << 'EOF' > extract_notes.py
+          import re, sys
+
+          version = sys.argv[1]
+          prev_tag = sys.argv[2]
+          repo = sys.argv[3]
+          current_tag = sys.argv[4]
+
+          with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
+              content = f.read()
+
+          pattern = rf'## \[?{re.escape(version)}\]?[^\n]*\n(.*?)(?=\n## |\Z)'
+          match = re.search(pattern, content, re.DOTALL)
+          notes = match.group(1).strip() if match else f"Release {current_tag}"
+
+          if prev_tag:
+              compare_url = f"https://github.com/{repo}/compare/{prev_tag}...{current_tag}"
+              notes += f"\n\n**Full Changelog**: [{prev_tag}...{current_tag}]({compare_url})"
+
+          with open('RELEASE_NOTES.md', 'w', encoding='utf-8') as out:
+              out.write(notes + "\n")
+          EOF
+
+          python3 extract_notes.py "$VERSION" "$PREV_TAG" "${{ github.repository }}" "$CURRENT_TAG"
+          cat RELEASE_NOTES.md
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.notes.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists. Uploading extension packages..."
+            gh release upload "$TAG" .output/*-chrome.zip .output/*-firefox.zip .output/*-edge.zip --clobber
+          else
+            echo "Creating new GitHub release for $TAG..."
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --notes-file RELEASE_NOTES.md \
+              .output/*-chrome.zip \
+              .output/*-firefox.zip \
+              .output/*-edge.zip
+          fi
+
+      - name: Submit to Web Stores
+        env:
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dryRun }}
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+          EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
+        run: |
+          HAS_CHROME=false
+          HAS_FIREFOX=false
+          HAS_EDGE=false
+
+          if [[ -n "$CHROME_EXTENSION_ID" && -n "$CHROME_CLIENT_ID" && -n "$CHROME_CLIENT_SECRET" && -n "$CHROME_REFRESH_TOKEN" ]]; then
+            HAS_CHROME=true
+          fi
+
+          if [[ -n "$FIREFOX_EXTENSION_ID" && -n "$FIREFOX_JWT_ISSUER" && -n "$FIREFOX_JWT_SECRET" ]]; then
+            HAS_FIREFOX=true
+          fi
+
+          if [[ -n "$EDGE_PRODUCT_ID" && -n "$EDGE_CLIENT_ID" && -n "$EDGE_API_KEY" ]]; then
+            HAS_EDGE=true
+          fi
+
+          SUBMIT_FLAGS=()
+          if [[ "$DRY_RUN" == "true" ]]; then
+            SUBMIT_FLAGS+=(--dry-run)
+            echo "ℹ️ Running wxt submit in DRY-RUN mode."
+          fi
+
+          if [[ "$HAS_CHROME" == "true" ]]; then
+            SUBMIT_FLAGS+=(--chrome-zip .output/*-chrome.zip)
+          else
+            echo "⚠️ Chrome Web Store credentials not set in GitHub Secrets. Skipping Chrome submission."
+          fi
+
+          if [[ "$HAS_FIREFOX" == "true" ]]; then
+            SUBMIT_FLAGS+=(--firefox-zip .output/*-firefox.zip --firefox-sources-zip .output/*-sources.zip)
+          else
+            echo "⚠️ Firefox AMO credentials not set in GitHub Secrets. Skipping Firefox submission."
+          fi
+
+          if [[ "$HAS_EDGE" == "true" ]]; then
+            SUBMIT_FLAGS+=(--edge-zip .output/*-edge.zip)
+          else
+            echo "⚠️ Microsoft Edge credentials not set in GitHub Secrets. Skipping Edge submission."
+          fi
+
+          if [[ "$HAS_CHROME" == "false" && "$HAS_FIREFOX" == "false" && "$HAS_EDGE" == "false" ]]; then
+            echo "ℹ️ No store credentials configured in GitHub Secrets yet. Skipping wxt submit."
+            echo "ℹ️ Run 'pnpm wxt submit init' locally to configure .env.submit and add secrets to GitHub."
+            exit 0
+          fi
+
+          pnpm wxt submit "${SUBMIT_FLAGS[@]}"
