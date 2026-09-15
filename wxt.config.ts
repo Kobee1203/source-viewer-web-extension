@@ -43,8 +43,4 @@ export default defineConfig({
       },
     }),
   }),
-  // No minification: keep the built code readable (simplifies store submission review).
-  vite: () => ({
-    build: { minify: false },
-  }),
 });

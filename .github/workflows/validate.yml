@@ -1,16 +1,17 @@
-name: CI
+name: Validate
 
 on:
+  workflow_call:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  check:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +23,8 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Lint (ESLint)
         run: pnpm lint
@@ -36,5 +38,8 @@ jobs:
       - name: Type check (vue-tsc)
         run: pnpm compile
 
-      - name: Build (Chrome + Firefox)
+      - name: Store metadata check
+        run: pnpm metadata:check
+
+      - name: Build (Chrome + Firefox + Edge)
         run: pnpm build
