@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Microsoft Edge Support**: Added Microsoft Edge target across development, build, and packaging scripts (`pnpm dev:edge`, `pnpm build`, `pnpm zip`).
+- **Store Listing Automation & Metadata**:
+  - **Multi-Language Store Metadata**: Added comprehensive, localized store listings across 9 languages (`.store/metadata.json`) covering titles, summaries, descriptions, keywords, and store categories.
+  - **Automated Store Screenshots**: Added Playwright automation (`pnpm screenshots`, `pnpm screenshots:all`) to capture high-DPI screenshots in both light and dark themes across feature views.
+  - **Automated Promotional Demo Video**: Added Playwright and ffmpeg automation (`pnpm demo:video`) to record high-definition showcase videos with virtual cursor movements, typing animations, and HUD feature callouts.
+  - **Metadata Validation & Sync Tooling**: Added scripts to validate store text length constraints (`pnpm metadata:check`) and synchronize descriptions (`pnpm metadata:sync`).
+- **Automated Release Pipeline (CI/CD)**:
+  - **Automated Release Workflow**: Added GitHub Actions workflow (`release.yml`) to automatically package extensions, extract changelog release notes with comparative GitHub diff links, publish GitHub Releases, and submit packages to Chrome Web Store, Firefox AMO (including automated source code archives), and Microsoft Edge Add-ons via `wxt submit`.
+  - **Dry-Run Mode**: Added manual dispatch input (`dryRun`) allowing verification of build packaging and submission logic without publishing releases or store submissions.
+  - **Enhanced CI Validation**: Updated `validate.yml` to validate store metadata and multi-browser compilation (Chrome, Firefox, Edge) on pull requests and commits.
+
+### Changed
+
+- **Codebase Minification**: Enabled default Vite/esbuild minification in extension production builds, reducing package archive sizes by over 30%.
+- **Typography & Punctuation Standardization**: Standardized punctuation across the entire repository (code, documentation, store metadata), replacing em-dashes and en-dashes with standard typography.
+
 ## [1.10.0] - 2026-09-10
 
 ### Added
