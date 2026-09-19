@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      '@@': resolve(__dirname, '.'),
       '#i18n': resolve(__dirname, './.wxt/i18n/index.ts'),
     },
   },

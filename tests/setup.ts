@@ -25,6 +25,13 @@ vi.mock('wxt/browser', () => ({
   browser: mockBrowser,
 }));
 
+vi.mock('#i18n', () => ({
+  i18n: {
+    t: (key: string, substitutions?: unknown[]) =>
+      substitutions && substitutions.length > 0 ? `${key}:${substitutions.join(',')}` : key,
+  },
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockBrowser.extension.isAllowedFileSchemeAccess.mockResolvedValue(true);
