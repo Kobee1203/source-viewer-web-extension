@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Local Files Support (`file://` Protocol & Drag-and-Drop)** (#29):
+  - **Local File Scheme Support**: Added support for inspecting local files (`file:///`) across all supported formats (HTML, CSS, JS, JSON, XML).
+  - **In-Place DOM Extraction for Chromium MV3**: Chromium Manifest V3 service workers cannot fetch `file://` resources. In-place viewing on local files extracts source code directly from the host DOM via a dedicated content script and transfers it securely to the viewer via `postMessage`.
+  - **Reference Sidebar VFS Tree for Local Projects**: Local file links and subresources are automatically resolved and grouped under a dedicated `local` domain folder in the Reference Sidebar, allowing full site tree exploration for local projects.
+  - **Drag-and-Drop & File Picker**: Added a dedicated drop zone in the viewer and window-wide drag-and-drop support, alongside a file browser button supporting the modern File System Access API (`showOpenFilePicker`) with live reload (`reloadLocalFile()`) and `<input type="file">` fallback.
+  - **Snapshot Persistence Across Reloads**: In-memory snapshots of dropped files are persisted in `sessionStorage` with a status bar badge (`In-memory snapshot`), preventing data loss upon page refresh (F5 / Cmd+R).
+  - **Permission Guidance**: Added an onboarding guidance card with step-by-step instructions and a fallback drop zone when file URL access is not yet enabled in Chromium extension settings.
 - **Microsoft Edge Support**: Added Microsoft Edge target across development, build, and packaging scripts (`pnpm dev:edge`, `pnpm build`, `pnpm zip`).
 - **Store Listing Automation & Metadata**:
   - **Multi-Language Store Metadata**: Added comprehensive, localized store listings across 9 languages (`.store/metadata.json`) covering titles, summaries, descriptions, keywords, and store categories.
