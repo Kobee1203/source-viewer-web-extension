@@ -26,6 +26,11 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- **Modular Source Fetching Architecture & Test Suite** (#32):
+  - **Strategy Pattern Modularization**: Refactored the monolithic `useSourceFetch` composable into an isolated strategy pattern under `src/composables/source/` (`remoteFetchStrategy`, `inplaceLocalStrategy`, `directLocalStrategy`, `sessionSnapshotStrategy`, `fileObjectStrategy`) coordinated by a functional resolver.
+  - **Navigation & URL Decoupling**: Extracted browser history synchronization and query parameter management (`url`, `root`, `fileAccess`) into a dedicated `useViewerNavigation` composable.
+  - **Automated Unit Testing with Vitest**: Introduced Vitest and Happy DOM with a dedicated test runner suite (24 unit tests) covering all strategies, resolution logic, and reactive states.
+  - **CI Pipeline Integration**: Integrated automated test execution (`pnpm test`) into GitHub Actions validation workflows.
 - **Codebase Minification**: Enabled default Vite/esbuild minification in extension production builds, reducing package archive sizes by over 30%.
 - **Typography & Punctuation Standardization**: Standardized punctuation across the entire repository (code, documentation, store metadata), replacing em-dashes and en-dashes with standard typography.
 

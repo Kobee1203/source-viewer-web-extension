@@ -6,10 +6,10 @@ import LocalDropZone from '@/components/LocalDropZone.vue';
 import ReferenceSidebar from '@/components/ReferenceSidebar.vue';
 import StatusBar from '@/components/StatusBar.vue';
 import Toolbar from '@/components/Toolbar.vue';
+import { useSourceFetch } from '@/composables/source/useSourceFetch';
 import { pickLocalFile } from '@/composables/useLocalFile';
 import { usePreferences } from '@/composables/usePreferences';
 import { useReferenceSidebar } from '@/composables/useReferenceSidebar';
-import { useSourceFetch } from '@/composables/useSourceFetch';
 import { t } from '@/utils/i18n';
 
 const {
