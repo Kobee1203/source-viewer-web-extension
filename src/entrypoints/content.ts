@@ -6,18 +6,18 @@ import { requestViewerInjection, requestViewerRedirect } from '@/utils/messaging
 /**
  * Auto-opens the in-place code viewer when navigating directly to raw CSS/JS/JSON/XML.
  *
- * Runs only on top-frame http(s) navigations (`allFrames: false`). It reads the
+ * Runs only on top-frame navigations (`allFrames: false`). It reads the
  * response MIME (`document.contentType`) at `document_start` and, when the content
  * is a source type we handle, hides the raw page and asks the background to inject
  * the heavy `inplace-viewer` content script into this tab. `text/html`, `view-source:`
- * pages and our own extension pages never match.
+ * pages, local `.html`/`.htm` files, and our own extension pages never match.
  *
  * Kept intentionally tiny (no Vue/CodeMirror/js-beautify) since it's always-on for every
- * http(s) page: the real work lives in `inplace-viewer.content.ts`, only loaded
+ * page: the real work lives in `inplace-viewer.content.ts`, only loaded
  * on demand via `browser.scripting.executeScript`.
  */
 export default defineContentScript({
-  matches: ['http://*/*', 'https://*/*'],
+  matches: ['http://*/*', 'https://*/*', 'file:///*'],
   runAt: 'document_start',
   allFrames: false,
   async main() {
