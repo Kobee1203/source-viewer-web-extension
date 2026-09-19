@@ -1,4 +1,5 @@
 import { defineContentScript } from '#imports';
+import { extractHostSource } from '@/utils/hostSource';
 import { HIDE_STYLE_ID } from '@/utils/inplace';
 import { setInplaceFavicon } from '@/utils/inplaceFavicon';
 import { viewerUrl } from '@/utils/viewerUrl';
@@ -22,7 +23,7 @@ const IFRAME_ID = 'source-viewer-frame';
  * context, byte-for-byte identical to opening the viewer page directly.
  */
 export default defineContentScript({
-  matches: ['http://*/*', 'https://*/*'],
+  matches: ['http://*/*', 'https://*/*', 'file:///*'],
   allFrames: false,
   registration: 'runtime',
   main() {
@@ -67,12 +68,13 @@ export default defineContentScript({
     };
 
     const onMessage = (event: MessageEvent) => {
-      if (
-        typeof event.data === 'object' &&
-        event.data !== null &&
-        (event.data as { type?: unknown }).type === 'CLOSE_INPLACE_VIEWER'
-      ) {
+      if (typeof event.data !== 'object' || event.data === null) return;
+      const type = (event.data as { type?: unknown }).type;
+      if (type === 'CLOSE_INPLACE_VIEWER') {
         cleanup();
+      } else if (type === 'REQUEST_INPLACE_LOCAL_SOURCE') {
+        const text = extractHostSource();
+        iframe.contentWindow?.postMessage({ type: 'INPLACE_LOCAL_SOURCE_DATA', text }, '*');
       }
     };
 

@@ -53,7 +53,9 @@ function findFileNode(url: string, nodes: VfsNode[]): VfsFileNode | null {
 
 function hostnameOf(urlStr: string): string {
   try {
-    return new URL(urlStr).hostname;
+    const u = new URL(urlStr);
+    if (u.protocol === 'file:') return 'local';
+    return u.hostname;
   } catch {
     return urlStr;
   }

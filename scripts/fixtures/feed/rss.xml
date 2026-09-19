@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Product News &amp; Changelog</title>
+    <link>https://developer.example.com/</link>
+    <description>Latest releases and updates for Source Viewer.</description>
+    <language>en-us</language>
+    <item>
+      <title>Source Viewer v1.11.0: Local Files Support</title>
+      <link>https://developer.example.com/blog/local-files-support.html</link>
+      <description>Inspect and format local HTML, CSS, JavaScript, JSON, XML, and font files directly.</description>
+      <pubDate>Sat, 19 Sep 2026 10:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Font Inspection &amp; Glyph Grid</title>
+      <link>https://developer.example.com/blog/font-inspection.html</link>
+      <description>Explore Unicode blocks, writing system coverage, and preview web fonts natively.</description>
+      <pubDate>Tue, 15 Sep 2026 12:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

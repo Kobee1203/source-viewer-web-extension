@@ -18,6 +18,9 @@ errorUnknown: 'Error desconocido'
 errorRestricted: "Por razones de seguridad, el navegador no permite que las extensiones accedan a este sitio. Utiliza la función nativa 'Ver código fuente de la página' del navegador."
 viewerOpenNative: 'Abrir en el visor nativo del navegador'
 errorRestrictedApi: 'El navegador prohíbe que las extensiones abran este tipo de página. Copia y pega la siguiente URL en la barra de direcciones:'
+fileSchemePermissionHelp: "Por razones de seguridad, los navegadores requieren permiso para que las extensiones abran URLs locales file:///. Activa 'Permitir acceso a las URLs de archivo' en la configuración de extensiones, o abre/arrastra tu archivo directamente a continuación."
+fileSchemeStep1: "1. Abre la página de extensiones del navegador y haz clic en 'Detalles' de Source Viewer."
+fileSchemeStep2: "2. Activa la opción 'Permitir acceso a las URLs de archivo'."
 viewerPageSize: 'Peso de la página: $1'
 viewerCopy: 'Copiar código fuente formateado'
 viewerCopyRaw: 'Copiar código fuente sin formato'
@@ -27,6 +30,12 @@ viewerCopyFailed: 'Error al copiar al portapapeles'
 viewerCopied: '¡Copiado!'
 viewerDownload: 'Descargar'
 viewerSearch: 'Buscar'
+viewerOpenLocalFile: 'Abrir archivo local'
+viewerReload: 'Recargar archivo'
+viewerDropFileHere: 'Arrastra un archivo aquí o haz clic para examinar'
+viewerDropHint: 'Archivos compatibles: HTML, CSS, JS, JSON y XML'
+viewerSnapshotBadge: 'Instantánea en memoria'
+viewerSnapshotRefreshHint: 'Este archivo es una instantánea en memoria. Para sincronizar los cambios del disco al recargar, abre su URL file:/// con el acceso a archivos activado.'
 searchFind: 'Buscar'
 searchNext: 'siguiente'
 searchPrevious: 'anterior'

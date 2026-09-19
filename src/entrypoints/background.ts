@@ -26,17 +26,28 @@ export default defineBackground(() => {
     });
   });
 
-  async function openSourceViewer(rawUrl: string, tabId?: number, isLink = false): Promise<void> {
-    let url = rawUrl;
+  async function openSourceViewer(rawUrl?: string, tabId?: number, isLink = false): Promise<void> {
+    let url = rawUrl ?? '';
     if (url.startsWith('view-source:')) {
       url = url.replace(/^view-source:/, '');
     }
-    if (!url.startsWith('http')) return;
+    if (!url.startsWith('http') && !url.startsWith('file:')) {
+      void browser.tabs.create({ url: browser.runtime.getURL('/viewer.html') });
+      return;
+    }
 
     const targetUrl = new URL(url);
     if (isRestricted(targetUrl)) {
       void browser.tabs.create({ url: 'view-source:' + targetUrl.toString() });
       return;
+    }
+
+    if (targetUrl.protocol === 'file:') {
+      const isAllowed = await browser.extension.isAllowedFileSchemeAccess();
+      if (!isAllowed) {
+        void browser.tabs.create({ url: `${viewerUrl(targetUrl.toString())}&fileAccess=0` });
+        return;
+      }
     }
 
     const result = await browser.storage.local.get('openIn');
@@ -53,9 +64,8 @@ export default defineBackground(() => {
     void browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
   }
 
-  // Toolbar icon: open our viewer for the current tab (or native view-source when restricted).
+  // Toolbar icon: open our viewer for the current tab (or empty viewer when on blank/restricted page).
   browser.action.onClicked.addListener((tab) => {
-    if (!tab.url) return;
     void openSourceViewer(tab.url, tab.id);
   });
 
@@ -64,13 +74,12 @@ export default defineBackground(() => {
     if (info.menuItemId !== CONTEXT_MENU_ID) return;
     const isLink = Boolean(info.linkUrl);
     const url = info.linkUrl || info.frameUrl || info.pageUrl || tab?.url;
-    if (!url) return;
     void openSourceViewer(url, tab?.id, isLink);
   });
 
   // Intercept navigations to view-source: and redirect them to our viewer,
   // unless the user explicitly asked for the native viewer in this tab.
-  browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete') {
       nativeViewer.forget(tabId); // one-shot allowance ends with the load
       return;
@@ -84,7 +93,10 @@ export default defineBackground(() => {
     const targetUrl = new URL(url.slice('view-source:'.length));
     if (isRestricted(targetUrl)) return;
 
-    void browser.tabs.update(tabId, { url: viewerUrl(targetUrl.toString()) });
+    const isFileDisallowed = targetUrl.protocol === 'file:' && !(await browser.extension.isAllowedFileSchemeAccess());
+    const dest = isFileDisallowed ? `${viewerUrl(targetUrl.toString())}&fileAccess=0` : viewerUrl(targetUrl.toString());
+
+    void browser.tabs.update(tabId, { url: dest });
   });
 
   // content.ts detected a direct CSS/JS/JSON/XML navigation: inject the heavy

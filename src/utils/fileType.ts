@@ -3,6 +3,11 @@ export const DEFAULT_FILE_TYPE = 'html';
 /** The kind of source we highlight, mapped to a CodeMirror language extension. */
 export type FileType = typeof DEFAULT_FILE_TYPE | 'javascript' | 'css' | 'xml' | 'json';
 
+export function isHtmlExtension(pathname: string): boolean {
+  const lower = pathname.toLowerCase();
+  return lower.endsWith('.html') || lower.endsWith('.htm');
+}
+
 /** Maps a URL's file extension to a FileType, or null when it isn't a handled source extension. */
 export function extensionToFileType(url: URL): FileType | null {
   const pathname = url.pathname.toLowerCase();

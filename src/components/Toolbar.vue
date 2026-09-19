@@ -6,9 +6,11 @@ import {
   Download,
   FileCode,
   FileText,
+  FolderOpen,
   Link,
   Palette,
   PanelLeft,
+  RefreshCw,
   Search,
   Settings,
   Type,
@@ -38,6 +40,8 @@ const props = defineProps<{
   language: FileType;
   contentDisposition: string | null;
   sidebarOpen: boolean;
+  hasFileHandle?: boolean;
+  fileName?: string | null;
 }>();
 const emit = defineEmits<{
   'update:themeId': [value: string];
@@ -46,6 +50,8 @@ const emit = defineEmits<{
   'update:openIn': [value: OpenInMode];
   search: [];
   'toggle-sidebar': [];
+  'open-local': [];
+  'reload-local': [];
 }>();
 
 const showSettings = ref(false);
@@ -73,23 +79,28 @@ async function onCopyUrl(): Promise<void> {
   await copy(props.targetUrl.toString(), true);
 }
 
-const copyMenuItems = computed<DropdownMenuItem[]>(() => [
-  {
-    label: t('viewerCopy'),
-    icon: FileCode,
-    onSelect: () => void onCopyFormatted(),
-  },
-  {
-    label: t('viewerCopyRaw'),
-    icon: FileText,
-    onSelect: () => void onCopyRaw(),
-  },
-  {
-    label: t('viewerCopyUrl'),
-    icon: Link,
-    onSelect: () => void onCopyUrl(),
-  },
-]);
+const copyMenuItems = computed<DropdownMenuItem[]>(() => {
+  const items: DropdownMenuItem[] = [
+    {
+      label: t('viewerCopy'),
+      icon: FileCode,
+      onSelect: () => void onCopyFormatted(),
+    },
+    {
+      label: t('viewerCopyRaw'),
+      icon: FileText,
+      onSelect: () => void onCopyRaw(),
+    },
+  ];
+  if (props.targetUrl) {
+    items.push({
+      label: t('viewerCopyUrl'),
+      icon: Link,
+      onSelect: () => void onCopyUrl(),
+    });
+  }
+  return items;
+});
 
 const fontSizes = computed(() => {
   const sizes: { value: number; label: string }[] = [];
@@ -122,8 +133,9 @@ function openNative(newTab: boolean): void {
 
 /** Downloads the formatted source shown in the viewer. */
 function onDownload(): void {
-  if (!props.targetUrl || !props.code) return;
-  downloadSource(props.code, props.language, props.targetUrl, props.contentDisposition);
+  const url = props.targetUrl ?? (props.fileName ? new URL('file:///' + props.fileName) : null);
+  if (!url || !props.code) return;
+  downloadSource(props.code, props.language, url, props.contentDisposition);
 }
 
 // No real `href`: `view-source:` cannot be navigated to via <a href>, so gestures
@@ -142,12 +154,25 @@ function onNativeAuxClick(event: MouseEvent): void {
 
 <template>
   <div class="toolbar">
-    <IconButton v-if="code" :active="sidebarOpen" :label="t('viewerToggleSidebar')" @click="emit('toggle-sidebar')">
+    <IconButton
+      v-if="code && targetUrl"
+      :active="sidebarOpen"
+      :label="t('viewerToggleSidebar')"
+      @click="emit('toggle-sidebar')"
+    >
       <PanelLeft :size="20" />
     </IconButton>
 
     <IconButton :active="wordWrap" :label="t('viewerWordWrap')" @click="toggleWrap">
       <WrapText :size="20" />
+    </IconButton>
+
+    <IconButton :label="t('viewerOpenLocalFile')" @click="emit('open-local')">
+      <FolderOpen :size="20" />
+    </IconButton>
+
+    <IconButton v-if="hasFileHandle" :label="t('viewerReload')" @click="emit('reload-local')">
+      <RefreshCw :size="20" />
     </IconButton>
 
     <span class="spacer"></span>
@@ -184,12 +209,12 @@ function onNativeAuxClick(event: MouseEvent): void {
       </select>
     </div>
 
-    <template v-if="targetUrl">
+    <template v-if="code">
       <span class="sep"></span>
-      <IconButton v-if="code" :label="t('viewerSearch')" @click="emit('search')">
+      <IconButton :label="t('viewerSearch')" @click="emit('search')">
         <Search :size="20" />
       </IconButton>
-      <DropdownButton v-if="code" :items="copyMenuItems" :label="t('viewerCopyOptions')">
+      <DropdownButton :items="copyMenuItems" :label="t('viewerCopyOptions')">
         <button
           type="button"
           class="copy-btn"
@@ -202,10 +227,10 @@ function onNativeAuxClick(event: MouseEvent): void {
           <Copy v-else :size="20" />
         </button>
       </DropdownButton>
-      <IconButton v-if="code" :label="t('viewerDownload')" @click="onDownload">
+      <IconButton :label="t('viewerDownload')" @click="onDownload">
         <Download :size="20" />
       </IconButton>
-      <IconButton :label="t('viewerOpenNative')" @click="onNativeClick" @auxclick="onNativeAuxClick">
+      <IconButton v-if="targetUrl" :label="t('viewerOpenNative')" @click="onNativeClick" @auxclick="onNativeAuxClick">
         <FileCode :size="20" />
       </IconButton>
     </template>
