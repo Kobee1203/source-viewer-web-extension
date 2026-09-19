@@ -38,6 +38,9 @@ jobs:
       - name: Type check (vue-tsc)
         run: pnpm compile
 
+      - name: Unit tests (Vitest)
+        run: pnpm test
+
       - name: Store metadata check
         run: pnpm metadata:check
 
