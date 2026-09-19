@@ -1,4 +1,4 @@
-import { type FileType, getFileType } from '@/utils/fileType';
+import { type FileType, extensionToFileType, isHtmlExtension } from '@/utils/fileType';
 import { classifyLinkTarget } from '@/utils/linkTarget';
 
 const SNAPSHOT_STORAGE_KEY = 'sv_snapshot_data';
@@ -87,17 +87,13 @@ export async function pickLocalFile(): Promise<PickedLocalFile | null> {
       const handles = await window.showOpenFilePicker({
         types: [
           {
-            description: 'Source and font files',
+            description: 'Source files',
             accept: {
               'text/html': ['.html', '.htm'],
               'text/javascript': ['.js', '.mjs', '.cjs'],
               'text/css': ['.css'],
               'application/json': ['.json'],
               'application/xml': ['.xml'],
-              'font/woff2': ['.woff2'],
-              'font/woff': ['.woff'],
-              'font/ttf': ['.ttf'],
-              'font/otf': ['.otf'],
             },
           },
         ],
@@ -119,7 +115,7 @@ export async function pickLocalFile(): Promise<PickedLocalFile | null> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.html,.htm,.js,.mjs,.cjs,.css,.json,.xml,.woff2,.woff,.ttf,.otf';
+    input.accept = '.html,.htm,.js,.mjs,.cjs,.css,.json,.xml';
     input.style.display = 'none';
 
     input.onchange = () => {
@@ -145,10 +141,17 @@ export async function pickLocalFile(): Promise<PickedLocalFile | null> {
 /**
  * Reads content and metadata from a local File object.
  */
-export async function readLocalFile(file: File): Promise<{ text: string; fileType: FileType; isFont: boolean }> {
+export async function readLocalFile(file: File): Promise<{ text: string; fileType: FileType }> {
   const dummyUrl = new URL('file:///' + file.name);
-  const isFont = classifyLinkTarget(dummyUrl) === 'font';
-  const fileType = getFileType(dummyUrl);
-  const text = isFont ? '' : await file.text();
-  return { text, fileType, isFont };
+  if (classifyLinkTarget(dummyUrl) === 'font') {
+    throw new Error('UnsupportedFileType: Fonts must be opened via Font Viewer');
+  }
+
+  const fileType = extensionToFileType(dummyUrl) ?? (isHtmlExtension(dummyUrl.pathname) ? 'html' : null);
+  if (!fileType) {
+    throw new Error(`UnsupportedFileType: ${file.name}`);
+  }
+
+  const text = await file.text();
+  return { text, fileType };
 }

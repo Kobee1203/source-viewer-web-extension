@@ -33,7 +33,7 @@ viewerSearch: 'Cerca'
 viewerOpenLocalFile: 'Apri file locale'
 viewerReload: 'Ricarica file'
 viewerDropFileHere: 'Trascina un file qui o fai clic per sfogliare'
-viewerDropHint: 'File supportati: HTML, CSS, JS, JSON, XML e font web'
+viewerDropHint: 'File supportati: HTML, CSS, JS, JSON e XML'
 viewerSnapshotBadge: 'Istantanea in memoria'
 viewerSnapshotRefreshHint: "Questo file è un'istantanea in memoria. Per sincronizzare le modifiche da disco al ricaricamento, apri il suo URL file:/// con l'accesso ai file abilitato."
 searchFind: 'Trova'
