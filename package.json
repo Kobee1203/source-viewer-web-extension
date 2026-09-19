@@ -15,6 +15,8 @@
     "build": "wxt build && wxt build -b firefox && wxt build -b edge",
     "zip": "wxt zip && wxt zip -b firefox && wxt zip -b edge",
     "compile": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:css": "stylelint \"src/**/*.{css,vue}\"",
@@ -98,6 +100,7 @@
     "eslint": "^10.7.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.9.2",
+    "happy-dom": "^20.14.5",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
     "playwright": "^1.63.0",
@@ -110,6 +113,7 @@
     "tsx": "^4.23.13",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.63.0",
+    "vitest": "^5.0.1",
     "vue-tsc": "^3.3.7",
     "wxt": "^0.20.27"
   }
