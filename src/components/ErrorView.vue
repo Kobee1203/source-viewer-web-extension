@@ -1,15 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import LocalDropZone from '@/components/LocalDropZone.vue';
 import { useCopyFeedback } from '@/composables/useCopyFeedback';
 import { t } from '@/utils/i18n';
 import { openNativeViewer } from '@/utils/nativeViewer';
 
-const props = defineProps<{ url: URL; message: string }>();
+const props = defineProps<{
+  url?: URL | null;
+  message: string;
+  fileAccessDenied?: boolean;
+}>();
+
+const emit = defineEmits<{
+  'file-selected': [file: File, handle?: FileSystemFileHandle];
+}>();
 
 const showFallback = ref(false);
 const { copied, copy } = useCopyFeedback<boolean>(2000);
 
 async function openNative(): Promise<void> {
+  if (!props.url) return;
   // Navigation can fail (e.g. Illegal URL on Firefox for about: pages).
   const res = await openNativeViewer(props.url, false);
   if (!res?.ok) showFallback.value = true;
@@ -18,13 +28,31 @@ async function openNative(): Promise<void> {
 
 <template>
   <div class="error-box">
-    <template v-if="!showFallback">
+    <!-- File scheme permission denied error -->
+    <template v-if="fileAccessDenied">
+      <div class="file-help-card">
+        <h2 class="file-help-title">{{ message }}</h2>
+        <p class="file-help-desc">{{ t('fileSchemePermissionHelp') }}</p>
+        <ol class="file-help-steps">
+          <li>{{ t('fileSchemeStep1') }}</li>
+          <li>{{ t('fileSchemeStep2') }}</li>
+        </ol>
+      </div>
+      <div class="drop-container">
+        <LocalDropZone @file-selected="(file, handle) => emit('file-selected', file, handle)" />
+      </div>
+    </template>
+
+    <!-- Generic error with native viewer button -->
+    <template v-else-if="!showFallback">
       <p class="error-message">{{ message }}</p>
-      <button class="native-btn" @click="openNative">
+      <button v-if="url" class="native-btn" @click="openNative">
         {{ t('viewerOpenNative') }}
       </button>
     </template>
-    <template v-else>
+
+    <!-- Fallback message for restricted URLs -->
+    <template v-else-if="url">
       <p class="fallback-message">{{ t('errorRestrictedApi') }}</p>
       <div class="url-box">view-source:{{ url.toString() }}</div>
       <button class="copy-btn" :class="{ copied }" @click="copy('view-source:' + url.toString(), true)">
@@ -36,8 +64,9 @@ async function openNative(): Promise<void> {
 
 <style scoped>
 .error-box {
-  padding: 20px;
-  margin-top: 20px;
+  max-width: 680px;
+  padding: 24px;
+  margin: 20px auto;
   text-align: center;
 }
 
@@ -45,6 +74,42 @@ async function openNative(): Promise<void> {
   margin-bottom: 15px;
   font-style: normal;
   line-height: 1.5;
+}
+
+.file-help-card {
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: left;
+  background: var(--app-control-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+}
+
+.file-help-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ff4d4d;
+}
+
+.file-help-desc {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--app-fg);
+}
+
+.file-help-steps {
+  padding-left: 20px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--app-fg);
+}
+
+.drop-container {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .native-btn {

@@ -7,6 +7,7 @@ const props = defineProps<{
   bytes: number;
   httpStatus?: number | null;
   httpStatusText?: string;
+  isLocalSnapshot?: boolean;
 }>();
 
 const httpStatus = computed(() =>
@@ -20,7 +21,14 @@ const httpStatusLabel = computed(() =>
 
 <template>
   <div class="status-bar">
-    <span class="http-status" :class="[httpStatus]">{{ httpStatusLabel }}</span>
+    <div class="status-left">
+      <span v-if="httpStatusText || httpStatus != null" class="http-status" :class="[httpStatus]">
+        {{ httpStatusLabel }}
+      </span>
+      <span v-if="isLocalSnapshot" class="snapshot-badge" :title="t('viewerSnapshotRefreshHint')">
+        {{ t('viewerSnapshotBadge') }}
+      </span>
+    </div>
     <span class="page-size">{{ t('viewerPageSize', [formatBytes(props.bytes)]) }}</span>
   </div>
 </template>
@@ -39,6 +47,12 @@ const httpStatusLabel = computed(() =>
   border-top: 1px solid var(--statusbar-border);
 }
 
+.status-left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .http-status {
   padding: 1px 8px;
   font-weight: 600;
@@ -53,5 +67,17 @@ const httpStatusLabel = computed(() =>
 .http-status.http-error {
   color: #fff;
   background: var(--statusbar-http-status-error-bg);
+}
+
+.snapshot-badge {
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--app-fg);
+  cursor: help;
+  background: var(--app-control-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  opacity: 0.9;
 }
 </style>

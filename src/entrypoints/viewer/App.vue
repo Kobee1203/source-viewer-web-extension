@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, useTemplateRef, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import CodeView from '@/components/CodeView.vue';
 import ErrorView from '@/components/ErrorView.vue';
+import LocalDropZone from '@/components/LocalDropZone.vue';
 import ReferenceSidebar from '@/components/ReferenceSidebar.vue';
 import StatusBar from '@/components/StatusBar.vue';
 import Toolbar from '@/components/Toolbar.vue';
+import { pickLocalFile } from '@/composables/useLocalFile';
 import { usePreferences } from '@/composables/usePreferences';
 import { useReferenceSidebar } from '@/composables/useReferenceSidebar';
 import { useSourceFetch } from '@/composables/useSourceFetch';
@@ -14,15 +16,21 @@ const {
   loading,
   errorMessage,
   errorWithNativeButton,
+  fileAccessDenied,
   code,
   rawCode,
   language,
   byteSize,
   targetUrl,
+  fileName,
+  isLocalSnapshot,
+  hasFileHandle,
   contentDisposition,
   httpStatus,
   httpStatusText,
   load,
+  loadFromLocalFile,
+  reloadLocalFile,
 } = useSourceFetch();
 
 const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
@@ -33,19 +41,67 @@ const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
 
 const codeView = useTemplateRef('codeView');
 
+const isGlobalDragging = ref(false);
+
 // Detect reload with a distinct ?root param (user had navigated away before reloading).
 const searchParams = new URLSearchParams(window.location.search);
 const rootParam = searchParams.get('root') ?? '';
 const urlParam = searchParams.get('url') ?? '';
 const hasDistinctRoot = !!rootParam && rootParam !== urlParam;
 
+async function onOpenLocal(): Promise<void> {
+  const result = await pickLocalFile();
+  if (result) {
+    await loadFromLocalFile(result.file, result.handle);
+  }
+}
+
+async function onReloadLocal(): Promise<void> {
+  await reloadLocalFile();
+}
+
+function onFileSelected(file: File, handle?: FileSystemFileHandle): void {
+  void loadFromLocalFile(file, handle);
+}
+
+// Global drag and drop support across the entire viewer window
+function onWindowDragOver(event: DragEvent): void {
+  event.preventDefault();
+  isGlobalDragging.value = true;
+}
+
+function onWindowDragLeave(event: DragEvent): void {
+  if (event.relatedTarget === null) {
+    isGlobalDragging.value = false;
+  }
+}
+
+function onWindowDrop(event: DragEvent): void {
+  event.preventDefault();
+  isGlobalDragging.value = false;
+  const file = event.dataTransfer?.files?.[0];
+  if (file) {
+    void loadFromLocalFile(file);
+  }
+}
+
 onMounted(() => {
+  window.addEventListener('dragover', onWindowDragOver);
+  window.addEventListener('dragleave', onWindowDragLeave);
+  window.addEventListener('drop', onWindowDrop);
+
   // Pre-seed the sidebar from the initial root source when the page was reloaded
   // while the viewer was showing a child file. This fires immediately so the VFS tree
   // is populated by the time the user opens the sidebar.
   if (hasDistinctRoot) {
     void sidebar.seedFromRootUrl(rootParam);
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('dragover', onWindowDragOver);
+  window.removeEventListener('dragleave', onWindowDragLeave);
+  window.removeEventListener('drop', onWindowDrop);
 });
 
 // When the source finishes loading and the sidebar is open: insert its refs into the VFS.
@@ -85,8 +141,12 @@ void load();
       :language="language"
       :content-disposition="contentDisposition"
       :sidebar-open="sidebar.isOpen.value"
+      :has-file-handle="hasFileHandle"
+      :file-name="fileName"
       @search="codeView?.openSearch()"
       @toggle-sidebar="sidebar.toggle()"
+      @open-local="onOpenLocal"
+      @reload-local="onReloadLocal"
     />
 
     <div id="main-area">
@@ -104,11 +164,20 @@ void load();
       <div id="content">
         <div v-if="loading" class="loader">{{ t('viewerLoading') }}</div>
         <ErrorView
+          v-else-if="fileAccessDenied"
+          :url="targetUrl"
+          :message="t('fileSchemePermissionHelp')"
+          :file-access-denied="true"
+          @file-selected="onFileSelected"
+        />
+        <ErrorView
           v-else-if="errorMessage && errorWithNativeButton && targetUrl"
           :url="targetUrl"
           :message="errorMessage"
+          @file-selected="onFileSelected"
         />
         <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
+        <LocalDropZone v-else-if="!code && !loading" @file-selected="onFileSelected" />
         <CodeView
           v-else
           ref="codeView"
@@ -127,6 +196,7 @@ void load();
       :bytes="byteSize"
       :http-status="httpStatus"
       :http-status-text="httpStatusText"
+      :is-local-snapshot="isLocalSnapshot"
     />
   </div>
 </template>
