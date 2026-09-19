@@ -1,4 +1,5 @@
 import { onUnmounted, ref } from 'vue';
+import { browser } from 'wxt/browser';
 import { t } from '@/utils/i18n';
 import { isRestricted } from '@/utils/restricted';
 
@@ -51,6 +52,15 @@ export function useFontLoad() {
       errorMessage.value = t('errorRestricted');
       loading.value = false;
       return;
+    }
+
+    if (target.protocol === 'file:') {
+      const isAllowed = await browser.extension.isAllowedFileSchemeAccess().catch(() => false);
+      if (!isAllowed) {
+        errorMessage.value = t('fileSchemePermissionHelp');
+        loading.value = false;
+        return;
+      }
     }
 
     try {

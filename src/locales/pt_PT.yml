@@ -18,6 +18,9 @@ errorUnknown: 'Erro desconhecido'
 errorRestricted: "Por motivos de segurança, o navegador não permite que as extensões acedam a este site. Utilize antes a funcionalidade nativa 'Ver código-fonte da página' do navegador."
 viewerOpenNative: 'Abrir no visualizador nativo do navegador'
 errorRestrictedApi: 'O navegador impede que as extensões abram este tipo de página. Copie e cole o seguinte URL na barra de endereços:'
+fileSchemePermissionHelp: "Por motivos de segurança, os navegadores exigem autorização para que as extensões abram URLs locais file:///. Ative 'Permitir acesso aos URLs do ficheiro' nas definições de extensões, ou abra/arraste o ficheiro diretamente abaixo."
+fileSchemeStep1: "1. Abra a página de gestão de extensões do navegador e clique em 'Detalhes' no Source Viewer."
+fileSchemeStep2: "2. Ative a opção 'Permitir acesso aos URLs do ficheiro'."
 viewerPageSize: 'Tamanho da página: $1'
 viewerCopy: 'Copiar código-fonte formatado'
 viewerCopyRaw: 'Copiar código-fonte não formatado'
@@ -27,6 +30,12 @@ viewerCopyFailed: 'Falha ao copiar para a área de transferência'
 viewerCopied: 'Copiado!'
 viewerDownload: 'Transferir'
 viewerSearch: 'Pesquisar'
+viewerOpenLocalFile: 'Abrir ficheiro local'
+viewerReload: 'Recarregar ficheiro'
+viewerDropFileHere: 'Arraste um ficheiro para aqui ou clique para procurar'
+viewerDropHint: 'Ficheiros suportados: HTML, CSS, JS, JSON, XML e tipos de letra web'
+viewerSnapshotBadge: 'Instantâneo na memória'
+viewerSnapshotRefreshHint: 'Este ficheiro é um instantâneo na memória. Para sincronizar alterações do disco ao recarregar, abra o seu URL file:/// com o acesso a ficheiros ativado.'
 searchFind: 'Localizar'
 searchNext: 'seguinte'
 searchPrevious: 'anterior'

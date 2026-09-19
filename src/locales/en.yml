@@ -18,6 +18,9 @@ errorUnknown: 'Unknown error'
 errorRestricted: "For security reasons, the browser does not allow extensions to access this site. Please use the browser's native 'View Page Source' instead."
 viewerOpenNative: "Open in browser's native viewer"
 errorRestrictedApi: 'The browser prohibits extensions from opening this type of page. Please copy and paste the following URL into your address bar:'
+fileSchemePermissionHelp: "For security reasons, browsers require you to grant permission before extensions can open local file:/// URLs. Please enable 'Allow access to file URLs' in the extension settings, or open/drop your file directly below."
+fileSchemeStep1: "1. Open your browser's extension management page and click 'Details' on Source Viewer."
+fileSchemeStep2: "2. Toggle on 'Allow access to file URLs'."
 viewerPageSize: 'Page weight: $1'
 viewerCopy: 'Copy formatted source'
 viewerCopyRaw: 'Copy raw source'
@@ -27,6 +30,12 @@ viewerCopyFailed: 'Failed to copy to clipboard'
 viewerCopied: 'Copied!'
 viewerDownload: 'Download'
 viewerSearch: 'Search'
+viewerOpenLocalFile: 'Open local file'
+viewerReload: 'Reload file'
+viewerDropFileHere: 'Drop a file here or click to browse'
+viewerDropHint: 'Supported files: HTML, CSS, JS, JSON, XML, and web fonts'
+viewerSnapshotBadge: 'In-memory snapshot'
+viewerSnapshotRefreshHint: 'This file is an in-memory snapshot. To sync live disk changes on reload, open its file:/// URL with file scheme access enabled.'
 searchFind: 'Find'
 searchNext: 'next'
 searchPrevious: 'previous'

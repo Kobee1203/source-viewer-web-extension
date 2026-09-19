@@ -18,6 +18,9 @@ errorUnknown: 'Errore sconosciuto'
 errorRestricted: "Per motivi di sicurezza, il browser non consente alle estensioni di accedere a questo sito. Utilizza invece la funzione nativa 'Visualizza sorgente pagina' del browser."
 viewerOpenNative: 'Apri nel visualizzatore nativo del browser'
 errorRestrictedApi: 'Il browser vieta alle estensioni di aprire questo tipo di pagina. Copia e incolla il seguente URL nella barra degli indirizzi:'
+fileSchemePermissionHelp: "Per motivi di sicurezza, i browser richiedono l'autorizzazione per aprire URL locali file:///. Abilita 'Consenti l'accesso agli URL dei file' nelle impostazioni delle estensioni, oppure apri/trascina il file direttamente qui sotto."
+fileSchemeStep1: "1. Apri la pagina di gestione estensioni del browser e fai clic su 'Dettagli' per Source Viewer."
+fileSchemeStep2: "2. Attiva l'opzione 'Consenti l'accesso agli URL dei file'."
 viewerPageSize: 'Peso della pagina: $1'
 viewerCopy: 'Copia codice sorgente formattato'
 viewerCopyRaw: 'Copia codice sorgente non formattato'
@@ -27,6 +30,12 @@ viewerCopyFailed: 'Copia negli appunti non riuscita'
 viewerCopied: 'Copiato!'
 viewerDownload: 'Scarica'
 viewerSearch: 'Cerca'
+viewerOpenLocalFile: 'Apri file locale'
+viewerReload: 'Ricarica file'
+viewerDropFileHere: 'Trascina un file qui o fai clic per sfogliare'
+viewerDropHint: 'File supportati: HTML, CSS, JS, JSON, XML e font web'
+viewerSnapshotBadge: 'Istantanea in memoria'
+viewerSnapshotRefreshHint: "Questo file è un'istantanea in memoria. Per sincronizzare le modifiche da disco al ricaricamento, apri il suo URL file:/// con l'accesso ai file abilitato."
 searchFind: 'Trova'
 searchNext: 'successivo'
 searchPrevious: 'precedente'

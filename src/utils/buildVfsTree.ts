@@ -91,7 +91,8 @@ export function insertIntoVfs(
     return;
   }
 
-  const isInternal = parsed.hostname === rootHostname;
+  const entryHostname = parsed.protocol === 'file:' ? 'local' : parsed.hostname;
+  const isInternal = entryHostname === rootHostname;
   let currentLevel: VfsNode[];
 
   if (isInternal) {
@@ -101,14 +102,14 @@ export function insertIntoVfs(
   } else {
     // ── External domain: find or create the hostname folder ───────────────
     currentLevel = tree;
-    const domainKey = parsed.hostname;
+    const domainKey = entryHostname;
     const isRootPath = parsed.pathname === '/' || parsed.pathname === '';
 
     let domainFolder = findFolder(currentLevel, domainKey);
     if (!domainFolder) {
       domainFolder = {
         kind: 'folder',
-        name: parsed.hostname,
+        name: entryHostname,
         key: domainKey,
         url: isRootPath ? entry.url : null,
         linkTarget: isRootPath ? entry.linkTarget : null,
