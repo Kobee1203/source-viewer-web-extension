@@ -43,7 +43,9 @@ export default defineContentScript({
     // inject, blocking the viewer's scripts: the document then has an opaque ("null") origin.
     // The in-place iframe can't work here, so navigate the whole tab to the viewer instead.
     // (The pending message rejects when the navigation tears down this content script: ignore it.)
-    if (window.origin === 'null') {
+    // Note: Firefox assigns an opaque ("null") origin to local `file:` URLs as part of its local file
+    // security model. These are NOT CSP-sandboxed and can host the in-place iframe normally.
+    if (window.origin === 'null' && location.protocol !== 'file:') {
       requestViewerRedirect(location.href).catch(() => {
         document.getElementById(HIDE_STYLE_ID)?.remove();
       });
