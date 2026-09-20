@@ -19,3 +19,7 @@ Strict rules for TypeScript typing (no `any`), import organization (aliases, typ
 ### Architecture & messaging
 
 System architecture, execution contexts (Service Worker, Content Scripts, In-Place Iframe, Extension Pages), communication channels, and messaging contracts. See `docs/agents/architecture.md`.
+
+### Release process
+
+GitHub Actions release pipeline, GitHub repository secrets configuration, web store submissions (Chrome, Firefox, Edge), and version bumping workflow. See `docs/agents/release-process.md`.
