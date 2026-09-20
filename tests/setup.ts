@@ -13,11 +13,23 @@ export const mockBrowser = {
       get: vi.fn().mockResolvedValue({}),
       set: vi.fn().mockResolvedValue(undefined),
     },
+    session: {
+      get: vi.fn().mockResolvedValue({}),
+      set: vi.fn().mockResolvedValue(undefined),
+      remove: vi.fn().mockResolvedValue(undefined),
+    },
+  },
+  scripting: {
+    executeScript: vi.fn().mockResolvedValue([]),
   },
   tabs: {
     query: vi.fn().mockResolvedValue([]),
     create: vi.fn().mockResolvedValue({ id: 1 }),
     update: vi.fn().mockResolvedValue({ id: 1 }),
+    get: vi.fn().mockResolvedValue({ id: 1 }),
+    onRemoved: {
+      addListener: vi.fn(),
+    },
   },
 };
 

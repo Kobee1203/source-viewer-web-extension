@@ -101,3 +101,45 @@ export async function fetchSource(message: FetchSourceRequest): Promise<FetchSou
     return { ok: false, error: (err as Error).message };
   }
 }
+
+/** In-memory payload stored in browser.storage.session for a viewer tab. */
+export interface SessionSourcePayload {
+  text: string;
+  byteSize: number;
+  isDomFallback: boolean;
+  contentType?: string;
+  characterSet?: string;
+  sourceTabId?: number;
+  timestamp: number;
+}
+
+/** Request sent from a viewer tab to retrieve its captured session source from the background. */
+export interface GetSessionSourceRequest {
+  type: 'GET_SESSION_SOURCE';
+}
+
+export interface GetSessionSourceResponse {
+  source: SessionSourcePayload | null;
+}
+
+export function requestSessionSource(): Promise<GetSessionSourceResponse> {
+  const message: GetSessionSourceRequest = { type: 'GET_SESSION_SOURCE' };
+  return browser.runtime.sendMessage(message);
+}
+
+/** Request sent from a viewer tab to refresh its source by re-capturing its source tab. */
+export interface RefreshTabSourceRequest {
+  type: 'REFRESH_TAB_SOURCE';
+}
+
+export interface RefreshTabSourceResponse {
+  ok: boolean;
+  source: SessionSourcePayload | null;
+  sourceTabClosed?: boolean;
+  error?: string;
+}
+
+export function requestRefreshTabSource(): Promise<RefreshTabSourceResponse> {
+  const message: RefreshTabSourceRequest = { type: 'REFRESH_TAB_SOURCE' };
+  return browser.runtime.sendMessage(message);
+}
