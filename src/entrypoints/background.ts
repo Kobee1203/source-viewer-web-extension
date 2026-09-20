@@ -3,14 +3,16 @@ import { defineBackground } from '#imports';
 import { t } from '@/utils/i18n';
 import {
   type FetchSourceRequest,
-  type FetchSourceResponse,
+  type GetSessionSourceResponse,
   type RequestViewerInjectionRequest,
   type RequestViewerInjectionResponse,
   type RequestViewerRedirectRequest,
   fetchSource,
 } from '@/utils/messaging';
-import { type OpenNativeRequest, type OpenNativeResponse, createNativeViewerController } from '@/utils/nativeViewer';
+import { type OpenNativeRequest, createNativeViewerController } from '@/utils/nativeViewer';
 import { isRestricted } from '@/utils/restricted';
+import { clearSessionSource, getSessionSource, refreshTabSource, saveSessionSource } from '@/utils/sessionSource';
+import { captureTabSource } from '@/utils/tabSourceCapture';
 import { viewerUrl } from '@/utils/viewerUrl';
 
 export default defineBackground(() => {
@@ -61,7 +63,15 @@ export default defineBackground(() => {
       return;
     }
 
-    void browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
+    let captured = null;
+    if (tabId !== undefined && !isLink) {
+      captured = await captureTabSource(tabId);
+    }
+
+    const newTab = await browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
+    if (captured && newTab.id !== undefined) {
+      await saveSessionSource(newTab.id, captured, tabId);
+    }
   }
 
   // Toolbar icon: open our viewer for the current tab (or empty viewer when on blank/restricted page).
@@ -72,9 +82,14 @@ export default defineBackground(() => {
   // Dedicated context menu entry: "View source with Source Viewer".
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId !== CONTEXT_MENU_ID) return;
-    const isLink = Boolean(info.linkUrl);
+    const isLink = Boolean(info.linkUrl || info.frameUrl);
     const url = info.linkUrl || info.frameUrl || info.pageUrl || tab?.url;
     void openSourceViewer(url, tab?.id, isLink);
+  });
+
+  // Clean up session source cache when a viewer tab is closed.
+  browser.tabs.onRemoved.addListener((tabId) => {
+    void clearSessionSource(tabId);
   });
 
   // Intercept navigations to view-source: and redirect them to our viewer,
@@ -131,32 +146,28 @@ export default defineBackground(() => {
 
   // Returning a Promise is how a message listener replies asynchronously.
   // (no-misused-promises' argument check is relaxed for this file in eslint.config.)
-  browser.runtime.onMessage.addListener(
-    (
-      message,
-      sender,
-    ):
-      | Promise<FetchSourceResponse>
-      | Promise<OpenNativeResponse>
-      | Promise<RequestViewerInjectionResponse>
-      | Promise<void>
-      | false => {
-      if (typeof message !== 'object' || message === null) return false;
-      const type = (message as { type?: unknown }).type;
+  browser.runtime.onMessage.addListener((message, sender): Promise<unknown> | false => {
+    if (typeof message !== 'object' || message === null) return false;
+    const type = (message as { type?: unknown }).type;
 
-      if (type === 'OPEN_NATIVE') {
-        return nativeViewer.open(message as OpenNativeRequest, sender.tab?.id);
-      }
-      if (type === 'FETCH_SOURCE') {
-        return fetchSource(message as FetchSourceRequest);
-      }
-      if (type === 'REQUEST_VIEWER_INJECTION') {
-        return injectViewer(message as RequestViewerInjectionRequest, sender.tab?.id);
-      }
-      if (type === 'REQUEST_VIEWER_REDIRECT') {
-        return redirectToViewer(message as RequestViewerRedirectRequest, sender.tab?.id);
-      }
-      return false;
-    },
-  );
+    if (type === 'OPEN_NATIVE') {
+      return nativeViewer.open(message as OpenNativeRequest, sender.tab?.id);
+    }
+    if (type === 'FETCH_SOURCE') {
+      return fetchSource(message as FetchSourceRequest);
+    }
+    if (type === 'GET_SESSION_SOURCE') {
+      return getSessionSource(sender.tab?.id).then((source): GetSessionSourceResponse => ({ source }));
+    }
+    if (type === 'REFRESH_TAB_SOURCE') {
+      return refreshTabSource(sender.tab?.id);
+    }
+    if (type === 'REQUEST_VIEWER_INJECTION') {
+      return injectViewer(message as RequestViewerInjectionRequest, sender.tab?.id);
+    }
+    if (type === 'REQUEST_VIEWER_REDIRECT') {
+      return redirectToViewer(message as RequestViewerRedirectRequest, sender.tab?.id);
+    }
+    return false;
+  });
 });

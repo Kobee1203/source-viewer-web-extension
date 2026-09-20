@@ -48,4 +48,5 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockBrowser.extension.isAllowedFileSchemeAccess.mockResolvedValue(true);
   mockBrowser.storage.local.get.mockResolvedValue({});
+  mockBrowser.storage.session.get.mockResolvedValue({});
 });
