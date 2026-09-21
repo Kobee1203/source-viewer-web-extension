@@ -42,25 +42,42 @@ describe('sessionSource', () => {
 
       await saveSessionSource(10, captured, 5);
 
-      const saved = await getSessionSource(10);
-      expect(saved).not.toBeNull();
-      expect(saved?.text).toBe('<h1>Test</h1>');
-      expect(saved?.sourceTabId).toBe(5);
-      expect(saved?.isDomFallback).toBe(false);
-      expect(saved?.timestamp).toBeTypeOf('number');
+      const res = await getSessionSource(10);
+      expect(res.source).not.toBeNull();
+      expect(res.source?.text).toBe('<h1>Test</h1>');
+      expect(res.source?.sourceTabId).toBe(5);
+      expect(res.source?.isDomFallback).toBe(false);
+      expect(res.source?.timestamp).toBeTypeOf('number');
+      expect(res.sourceTabClosed).toBe(false);
     });
 
-    it('returns null if tab ID is undefined or not in storage', async () => {
+    it('returns source: null if tab ID is undefined or not in storage', async () => {
       mockBrowser.storage.session.get.mockResolvedValue({});
-      expect(await getSessionSource(undefined)).toBeNull();
-      expect(await getSessionSource(99)).toBeNull();
+      expect((await getSessionSource(undefined)).source).toBeNull();
+      expect((await getSessionSource(99)).source).toBeNull();
     });
 
-    it('returns null if storage contains invalid data structure', async () => {
+    it('returns source: null if storage contains invalid data structure', async () => {
       mockBrowser.storage.session.get.mockResolvedValue({
         'viewer:tab:99': { invalid: true },
       });
-      expect(await getSessionSource(99)).toBeNull();
+      expect((await getSessionSource(99)).source).toBeNull();
+    });
+
+    it('flags sourceTabClosed: true when source tab does not exist', async () => {
+      const payload = {
+        text: 'hello',
+        byteSize: 5,
+        isDomFallback: false,
+        sourceTabId: 12,
+        timestamp: 12345,
+      };
+      mockBrowser.storage.session.get.mockResolvedValue({ 'viewer:tab:10': payload });
+      mockBrowser.tabs.get.mockRejectedValue(new Error('Tab closed'));
+
+      const res = await getSessionSource(10);
+      expect(res.source?.text).toBe('hello');
+      expect(res.sourceTabClosed).toBe(true);
     });
   });
 

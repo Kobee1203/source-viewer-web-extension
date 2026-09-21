@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import type { RefreshTabSourceResponse, SessionSourcePayload } from '@/utils/messaging';
+import type { GetSessionSourceResponse, RefreshTabSourceResponse, SessionSourcePayload } from '@/utils/messaging';
 import type { TabSourceCaptureResult } from '@/utils/tabSourceCapture';
 import { captureTabSource } from '@/utils/tabSourceCapture';
 
@@ -37,14 +37,35 @@ export async function saveSessionSource(
 }
 
 /**
- * Retrieves the captured session source for a given viewer tab.
+ * Internal helper to retrieve the raw session source payload from browser.storage.session.
  */
-export async function getSessionSource(viewerTabId?: number): Promise<SessionSourcePayload | null> {
+async function getStoredSessionSource(viewerTabId?: number): Promise<SessionSourcePayload | null> {
   if (viewerTabId === undefined) return null;
   const key = getSessionSourceKey(viewerTabId);
   const data = await browser.storage.session.get(key);
   const payload = data[key];
   return isSessionSourcePayload(payload) ? payload : null;
+}
+
+/**
+ * Retrieves the captured session source for a given viewer tab, checking whether
+ * the originating source tab is still open.
+ */
+export async function getSessionSource(viewerTabId?: number): Promise<GetSessionSourceResponse> {
+  if (viewerTabId === undefined) return { source: null };
+  const source = await getStoredSessionSource(viewerTabId);
+  if (!source) return { source: null };
+
+  let sourceTabClosed = false;
+  if (source.sourceTabId !== undefined) {
+    try {
+      const tab = await browser.tabs.get(source.sourceTabId);
+      sourceTabClosed = !tab;
+    } catch {
+      sourceTabClosed = true;
+    }
+  }
+  return { source, sourceTabClosed };
 }
 
 /**
@@ -63,7 +84,7 @@ export async function refreshTabSource(viewerTabId?: number): Promise<RefreshTab
     return { ok: false, source: null, error: 'Unknown viewer tab' };
   }
 
-  const existing = await getSessionSource(viewerTabId);
+  const existing = await getStoredSessionSource(viewerTabId);
   if (!existing) {
     return { ok: false, source: null, error: 'No session source recorded for tab' };
   }
@@ -90,6 +111,6 @@ export async function refreshTabSource(viewerTabId?: number): Promise<RefreshTab
   }
 
   await saveSessionSource(viewerTabId, freshCaptured, existing.sourceTabId);
-  const updated = await getSessionSource(viewerTabId);
+  const updated = await getStoredSessionSource(viewerTabId);
   return { ok: true, source: updated };
 }

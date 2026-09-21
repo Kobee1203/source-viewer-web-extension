@@ -44,4 +44,30 @@ describe('directLocalStrategy', () => {
       window.fetch = originalFetch;
     }
   });
+
+  it('prioritizes captured session source over window.fetch when available', async () => {
+    mockBrowser.runtime.sendMessage.mockResolvedValueOnce({
+      source: {
+        text: '<h1>Session Source</h1>',
+        byteSize: 23,
+        isDomFallback: false,
+        contentType: 'text/html',
+        timestamp: 123456789,
+      },
+      sourceTabClosed: false,
+    });
+
+    const targetUrl = new URL('file:///path/to/sample.html');
+    const result = await directLocalStrategy({
+      kind: 'url',
+      url: targetUrl,
+    });
+
+    expect(result.rawText).toBe('<h1>Session Source</h1>');
+    expect(result.byteSize).toBe(23);
+    expect(result.isDomFallback).toBe(false);
+    expect(result.isLocalSnapshot).toBe(true);
+    expect(result.snapshotTimestamp).toBe(123456789);
+    expect(result.targetUrl).toBe(targetUrl);
+  });
 });

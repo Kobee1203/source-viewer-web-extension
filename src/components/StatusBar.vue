@@ -8,6 +8,8 @@ const props = defineProps<{
   httpStatus?: number | null;
   httpStatusText?: string;
   isLocalSnapshot?: boolean;
+  isDomFallback?: boolean;
+  isSourceTabClosed?: boolean;
 }>();
 
 const httpStatus = computed(() =>
@@ -25,7 +27,13 @@ const httpStatusLabel = computed(() =>
       <span v-if="httpStatusText || httpStatus != null" class="http-status" :class="[httpStatus]">
         {{ httpStatusLabel }}
       </span>
-      <span v-if="isLocalSnapshot" class="snapshot-badge" :title="t('viewerSnapshotRefreshHint')">
+      <span v-if="isSourceTabClosed" class="snapshot-badge" :title="t('viewerBadgeTabClosedTooltip')">
+        {{ t('viewerBadgeTabClosed') }}
+      </span>
+      <span v-else-if="isDomFallback" class="snapshot-badge" :title="t('viewerBadgeDomTooltip')">
+        {{ t('viewerBadgeDomFallback') }}
+      </span>
+      <span v-else-if="isLocalSnapshot" class="snapshot-badge" :title="t('viewerSnapshotRefreshHint')">
         {{ t('viewerSnapshotBadge') }}
       </span>
     </div>

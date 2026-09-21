@@ -10,7 +10,15 @@ describe('inplaceLocalStrategy', () => {
         event.data !== null &&
         (event.data as { type?: unknown }).type === 'REQUEST_INPLACE_LOCAL_SOURCE'
       ) {
-        window.postMessage({ type: 'INPLACE_LOCAL_SOURCE_DATA', text: 'const inplace = true;' }, '*');
+        window.postMessage(
+          {
+            type: 'INPLACE_LOCAL_SOURCE_DATA',
+            text: 'const inplace = true;',
+            isDomFallback: true,
+            byteSize: 21,
+          },
+          '*',
+        );
       }
     };
 
@@ -25,6 +33,7 @@ describe('inplaceLocalStrategy', () => {
 
       expect(result.rawText).toBe('const inplace = true;');
       expect(result.byteSize).toBe(21);
+      expect(result.isDomFallback).toBe(true);
       expect(result.targetUrl).toBe(targetUrl);
     } finally {
       window.removeEventListener('message', onParentMessage);

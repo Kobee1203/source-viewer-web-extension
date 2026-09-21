@@ -1,7 +1,7 @@
 import { defineContentScript } from '#imports';
-import { extractHostSource } from '@/utils/hostSource';
 import { HIDE_STYLE_ID } from '@/utils/inplace';
 import { setInplaceFavicon } from '@/utils/inplaceFavicon';
+import { pageCaptureScript } from '@/utils/tabSourceCapture';
 import { viewerUrl } from '@/utils/viewerUrl';
 
 const IFRAME_ID = 'source-viewer-frame';
@@ -73,8 +73,17 @@ export default defineContentScript({
       if (type === 'CLOSE_INPLACE_VIEWER') {
         cleanup();
       } else if (type === 'REQUEST_INPLACE_LOCAL_SOURCE') {
-        const text = extractHostSource();
-        iframe.contentWindow?.postMessage({ type: 'INPLACE_LOCAL_SOURCE_DATA', text }, '*');
+        void pageCaptureScript().then((result) => {
+          iframe.contentWindow?.postMessage(
+            {
+              type: 'INPLACE_LOCAL_SOURCE_DATA',
+              text: result.text,
+              isDomFallback: result.isDomFallback,
+              byteSize: result.byteSize,
+            },
+            '*',
+          );
+        });
       }
     };
 

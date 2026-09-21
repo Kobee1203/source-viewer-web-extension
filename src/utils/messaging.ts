@@ -120,6 +120,7 @@ export interface GetSessionSourceRequest {
 
 export interface GetSessionSourceResponse {
   source: SessionSourcePayload | null;
+  sourceTabClosed?: boolean;
 }
 
 export function requestSessionSource(): Promise<GetSessionSourceResponse> {

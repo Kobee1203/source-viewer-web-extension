@@ -41,6 +41,8 @@ const props = defineProps<{
   contentDisposition: string | null;
   sidebarOpen: boolean;
   hasFileHandle?: boolean;
+  isLocalSnapshot?: boolean;
+  canReload?: boolean;
   fileName?: string | null;
 }>();
 const emit = defineEmits<{
@@ -51,8 +53,12 @@ const emit = defineEmits<{
   search: [];
   'toggle-sidebar': [];
   'open-local': [];
-  'reload-local': [];
+  reload: [];
 }>();
+
+const canReload = computed(
+  () => props.canReload ?? Boolean(props.hasFileHandle || props.targetUrl || props.isLocalSnapshot),
+);
 
 const showSettings = ref(false);
 const isInplace = typeof window !== 'undefined' && window.parent !== window;
@@ -171,7 +177,7 @@ function onNativeAuxClick(event: MouseEvent): void {
       <FolderOpen :size="20" />
     </IconButton>
 
-    <IconButton v-if="hasFileHandle" :label="t('viewerReload')" @click="emit('reload-local')">
+    <IconButton v-if="canReload" :label="t('viewerReload')" @click="emit('reload')">
       <RefreshCw :size="20" />
     </IconButton>
 

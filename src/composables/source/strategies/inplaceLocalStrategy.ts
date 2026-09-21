@@ -10,7 +10,11 @@ export const inplaceLocalStrategy: SourceFetchStrategy = async (target) => {
     throw new SourceFetchError('generic', t('errorGeneric', [t('errorUnknown')]));
   }
 
-  const rawText = await new Promise<string | null>((resolve) => {
+  const result = await new Promise<{
+    text: string;
+    isDomFallback?: boolean;
+    byteSize?: number;
+  } | null>((resolve) => {
     let resolved = false;
     const handler = (event: MessageEvent) => {
       if (
@@ -21,7 +25,13 @@ export const inplaceLocalStrategy: SourceFetchStrategy = async (target) => {
         window.removeEventListener('message', handler);
         resolved = true;
         const text = (event.data as { text?: unknown }).text;
-        resolve(typeof text === 'string' ? text : '');
+        const isDomFallback = (event.data as { isDomFallback?: unknown }).isDomFallback;
+        const byteSize = (event.data as { byteSize?: unknown }).byteSize;
+        resolve({
+          text: typeof text === 'string' ? text : '',
+          isDomFallback: typeof isDomFallback === 'boolean' ? isDomFallback : false,
+          byteSize: typeof byteSize === 'number' ? byteSize : undefined,
+        });
       }
     };
     window.addEventListener('message', handler);
@@ -35,13 +45,14 @@ export const inplaceLocalStrategy: SourceFetchStrategy = async (target) => {
     }, 500);
   });
 
-  if (rawText === null) {
+  if (result === null) {
     throw new SourceFetchError('generic', t('errorLoadSource', [t('errorUnknown')]));
   }
 
   return {
-    rawText,
-    byteSize: new Blob([rawText]).size,
+    rawText: result.text,
+    byteSize: result.byteSize ?? new Blob([result.text]).size,
     targetUrl: target.url,
+    isDomFallback: result.isDomFallback,
   };
 };

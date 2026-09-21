@@ -13,6 +13,7 @@ import { formatSource } from '@/utils/beautify';
 import { mimeToFileType } from '@/utils/contentType';
 import { DEFAULT_FILE_TYPE, type FileType, getFileType } from '@/utils/fileType';
 import { t } from '@/utils/i18n';
+import { requestRefreshTabSource } from '@/utils/messaging';
 
 interface FatalErrorState {
   kind: SourceErrorKind;
@@ -44,6 +45,8 @@ export function useSourceFetch() {
   const targetUrl = ref<URL | null>(null);
   const fileName = ref<string | null>(null);
   const isLocalSnapshot = ref(false);
+  const isDomFallback = ref(false);
+  const isSourceTabClosed = ref(false);
   const snapshotTimestamp = ref<number | null>(null);
   const activeFileHandle = ref<FileSystemFileHandle | null>(null);
   const contentDisposition = ref<string | null>(null);
@@ -68,6 +71,8 @@ export function useSourceFetch() {
     targetUrl.value = null;
     fileName.value = null;
     isLocalSnapshot.value = false;
+    isDomFallback.value = false;
+    isSourceTabClosed.value = false;
     snapshotTimestamp.value = null;
   }
 
@@ -99,6 +104,8 @@ export function useSourceFetch() {
       targetUrl.value = payload.targetUrl ?? null;
       fileName.value = payload.fileName ?? null;
       isLocalSnapshot.value = payload.isLocalSnapshot ?? false;
+      isDomFallback.value = payload.isDomFallback ?? false;
+      isSourceTabClosed.value = payload.isSourceTabClosed ?? false;
       snapshotTimestamp.value = payload.snapshotTimestamp ?? null;
       activeFileHandle.value = payload.fileHandle ?? null;
       contentDisposition.value = payload.contentDisposition ?? null;
@@ -189,6 +196,46 @@ export function useSourceFetch() {
     }
   }
 
+  async function refreshSource(): Promise<void> {
+    if (activeFileHandle.value) {
+      await reloadLocalFile();
+      return;
+    }
+
+    status.value = 'loading';
+    try {
+      const refreshRes = await requestRefreshTabSource();
+      if (refreshRes.ok && refreshRes.source) {
+        rawCode.value = refreshRes.source.text;
+        code.value = formatSource(refreshRes.source.text, language.value);
+        byteSize.value = refreshRes.source.byteSize;
+        isDomFallback.value = refreshRes.source.isDomFallback;
+        isSourceTabClosed.value = false;
+        snapshotTimestamp.value = refreshRes.source.timestamp;
+        status.value = 'success';
+        return;
+      }
+
+      if (refreshRes.sourceTabClosed) {
+        isSourceTabClosed.value = true;
+        status.value = 'success';
+        return;
+      }
+
+      if (targetUrl.value) {
+        await load(targetUrl.value.toString());
+      } else {
+        status.value = 'success';
+      }
+    } catch {
+      if (targetUrl.value) {
+        await load(targetUrl.value.toString());
+      } else {
+        status.value = 'idle';
+      }
+    }
+  }
+
   return {
     loading,
     errorMessage,
@@ -201,6 +248,8 @@ export function useSourceFetch() {
     targetUrl,
     fileName,
     isLocalSnapshot,
+    isDomFallback,
+    isSourceTabClosed,
     snapshotTimestamp,
     hasFileHandle,
     contentDisposition,
@@ -209,5 +258,6 @@ export function useSourceFetch() {
     load,
     loadFromLocalFile,
     reloadLocalFile,
+    refreshSource,
   };
 }

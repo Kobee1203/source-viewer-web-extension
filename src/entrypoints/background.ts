@@ -3,7 +3,6 @@ import { defineBackground } from '#imports';
 import { t } from '@/utils/i18n';
 import {
   type FetchSourceRequest,
-  type GetSessionSourceResponse,
   type RequestViewerInjectionRequest,
   type RequestViewerInjectionResponse,
   type RequestViewerRedirectRequest,
@@ -157,7 +156,7 @@ export default defineBackground(() => {
       return fetchSource(message as FetchSourceRequest);
     }
     if (type === 'GET_SESSION_SOURCE') {
-      return getSessionSource(sender.tab?.id).then((source): GetSessionSourceResponse => ({ source }));
+      return getSessionSource(sender.tab?.id);
     }
     if (type === 'REFRESH_TAB_SOURCE') {
       return refreshTabSource(sender.tab?.id);

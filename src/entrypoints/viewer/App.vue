@@ -24,13 +24,15 @@ const {
   targetUrl,
   fileName,
   isLocalSnapshot,
+  isDomFallback,
+  isSourceTabClosed,
   hasFileHandle,
   contentDisposition,
   httpStatus,
   httpStatusText,
   load,
   loadFromLocalFile,
-  reloadLocalFile,
+  refreshSource,
 } = useSourceFetch();
 
 const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
@@ -54,10 +56,6 @@ async function onOpenLocal(): Promise<void> {
   if (result) {
     await loadFromLocalFile(result.file, result.handle);
   }
-}
-
-async function onReloadLocal(): Promise<void> {
-  await reloadLocalFile();
 }
 
 function onFileSelected(file: File, handle?: FileSystemFileHandle): void {
@@ -142,11 +140,12 @@ void load();
       :content-disposition="contentDisposition"
       :sidebar-open="sidebar.isOpen.value"
       :has-file-handle="hasFileHandle"
+      :is-local-snapshot="isLocalSnapshot"
       :file-name="fileName"
       @search="codeView?.openSearch()"
       @toggle-sidebar="sidebar.toggle()"
       @open-local="onOpenLocal"
-      @reload-local="onReloadLocal"
+      @reload="refreshSource"
     />
 
     <div id="main-area">
@@ -197,6 +196,8 @@ void load();
       :http-status="httpStatus"
       :http-status-text="httpStatusText"
       :is-local-snapshot="isLocalSnapshot"
+      :is-dom-fallback="isDomFallback"
+      :is-source-tab-closed="isSourceTabClosed"
     />
   </div>
 </template>

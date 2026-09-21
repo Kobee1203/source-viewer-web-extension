@@ -43,6 +43,8 @@ export interface RawSourcePayload {
   snapshotTimestamp?: number | null;
   fileHandle?: FileSystemFileHandle | null;
   detectedFileType?: FileType;
+  isDomFallback?: boolean;
+  isSourceTabClosed?: boolean;
 }
 
 /**
