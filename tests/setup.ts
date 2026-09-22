@@ -4,6 +4,10 @@ export const mockBrowser = {
   runtime: {
     sendMessage: vi.fn(),
     getURL: vi.fn((path: string) => `chrome-extension://dummy-id${path}`),
+    onMessage: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
   },
   extension: {
     isAllowedFileSchemeAccess: vi.fn().mockResolvedValue(true),

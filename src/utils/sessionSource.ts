@@ -24,11 +24,23 @@ function isSessionSourcePayload(val: unknown): val is SessionSourcePayload {
 export async function saveSessionSource(
   viewerTabId: number,
   captured: TabSourceCaptureResult,
+  urlOrTabId?: string | number,
   sourceTabId?: number,
 ): Promise<void> {
+  let url: string | undefined;
+  let tabId: number | undefined;
+
+  if (typeof urlOrTabId === 'number') {
+    tabId = urlOrTabId;
+  } else {
+    url = urlOrTabId;
+    tabId = sourceTabId;
+  }
+
   const payload: SessionSourcePayload = {
     ...captured,
-    sourceTabId,
+    url,
+    sourceTabId: tabId,
     timestamp: Date.now(),
   };
   await browser.storage.session.set({
@@ -110,7 +122,7 @@ export async function refreshTabSource(viewerTabId?: number): Promise<RefreshTab
     return { ok: false, source: existing, error: 'Failed to re-capture source tab' };
   }
 
-  await saveSessionSource(viewerTabId, freshCaptured, existing.sourceTabId);
+  await saveSessionSource(viewerTabId, freshCaptured, existing.url, existing.sourceTabId);
   const updated = await getStoredSessionSource(viewerTabId);
   return { ok: true, source: updated };
 }

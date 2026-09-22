@@ -12,7 +12,7 @@ function isAbsoluteUrl(value: string): boolean {
   return /^https?:\/\//i.test(trimmed) || trimmed.startsWith('//');
 }
 
-function resolveUrl(attr: string, rawUrl: string, baseUrl: string): string | null {
+export function resolveUrl(attr: string, rawUrl: string, baseUrl: string): string | null {
   const trimmed = rawUrl.trim();
   if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('javascript:') || trimmed.startsWith('data:')) {
     return null;

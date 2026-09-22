@@ -26,13 +26,13 @@ export function resolveFetchStrategy(target: SourceTarget): SourceFetchStrategy 
       throw new SourceFetchError('restricted', t('errorRestricted'), true);
     }
 
+    if (typeof window !== 'undefined' && window.self !== window.top) {
+      return inplaceLocalStrategy;
+    }
+
     if (target.url.protocol === 'file:') {
       if (target.fileAccessDisallowed) {
         throw new SourceFetchError('file-access-denied', t('fileSchemePermissionHelp'));
-      }
-
-      if (typeof window !== 'undefined' && window.self !== window.top) {
-        return inplaceLocalStrategy;
       }
 
       return directLocalStrategy;

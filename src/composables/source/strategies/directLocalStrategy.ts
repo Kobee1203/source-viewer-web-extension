@@ -15,7 +15,7 @@ export const directLocalStrategy: SourceFetchStrategy = async (target) => {
 
   try {
     const sessionRes = await requestSessionSource();
-    if (sessionRes.source) {
+    if (sessionRes.source && (!sessionRes.source.url || sessionRes.source.url === target.url.toString())) {
       return {
         rawText: sessionRes.source.text,
         byteSize: sessionRes.source.byteSize,
@@ -43,11 +43,13 @@ export const directLocalStrategy: SourceFetchStrategy = async (target) => {
       byteSize: new Blob([rawText]).size,
       targetUrl: target.url,
     };
-  } catch (err) {
+  } catch {
     const isAllowed = await browser.extension.isAllowedFileSchemeAccess().catch(() => false);
     if (!isAllowed) {
       throw new SourceFetchError('file-access-denied', t('fileSchemePermissionHelp'));
     }
-    throw new SourceFetchError('generic', (err as Error).message);
+    // On Firefox, fetch("file://...") is blocked by the engine even if fileSchemeAccess is enabled.
+    // Presenting file-access-denied lets the user load the file via the dropzone/file picker.
+    throw new SourceFetchError('file-access-denied', t('fileSchemePermissionHelp'));
   }
 };

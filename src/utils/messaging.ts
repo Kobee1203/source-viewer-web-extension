@@ -75,11 +75,20 @@ export function requestViewerRedirect(url: string): Promise<void> {
  * there to avoid the page's own CORS/CSP constraints.
  */
 export async function fetchSource(message: FetchSourceRequest): Promise<FetchSourceResponse> {
-  try {
-    const res = await fetch(message.url, {
+  const tryFetch = (credentials: RequestCredentials) =>
+    fetch(message.url, {
       headers: { Accept: 'text/html,text/plain,*/*' },
-      credentials: 'include',
+      credentials,
     });
+
+  try {
+    let res: Response;
+    try {
+      res = await tryFetch('include');
+    } catch {
+      // If include failed (e.g. CORS wildcard origin mismatch on public CDNs), retry without credentials
+      res = await tryFetch('same-origin');
+    }
     const contentType = res.headers.get('content-type');
     // Read raw bytes and decode ourselves: res.text() would default to UTF-8 whenever the header
     // carries no parseable charset, corrupting legacy-encoded pages (see charset.ts).
@@ -104,6 +113,7 @@ export async function fetchSource(message: FetchSourceRequest): Promise<FetchSou
 
 /** In-memory payload stored in browser.storage.session for a viewer tab. */
 export interface SessionSourcePayload {
+  url?: string;
   text: string;
   byteSize: number;
   isDomFallback: boolean;

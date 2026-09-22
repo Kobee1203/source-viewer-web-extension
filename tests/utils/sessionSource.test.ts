@@ -40,10 +40,11 @@ describe('sessionSource', () => {
         contentType: 'text/html',
       };
 
-      await saveSessionSource(10, captured, 5);
+      await saveSessionSource(10, captured, 'file:///path/to/sample.html', 5);
 
       const res = await getSessionSource(10);
       expect(res.source).not.toBeNull();
+      expect(res.source?.url).toBe('file:///path/to/sample.html');
       expect(res.source?.text).toBe('<h1>Test</h1>');
       expect(res.source?.sourceTabId).toBe(5);
       expect(res.source?.isDomFallback).toBe(false);

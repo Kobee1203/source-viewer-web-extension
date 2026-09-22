@@ -1,23 +1,34 @@
 import { mockBrowser } from '@@/tests/setup';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { captureTabSource, pageCaptureScript } from '@/utils/tabSourceCapture';
+import { describe, expect, it, vi } from 'vitest';
+import { captureTabSource } from '@/utils/tabSourceCapture';
 
 describe('tabSourceCapture', () => {
   describe('captureTabSource', () => {
-    it('executes script on target tab and returns the result', async () => {
+    it('executes tab-capture.js on target tab and resolves when message is received', async () => {
       const mockResult = {
         text: 'console.log("hello");',
         byteSize: 21,
         isDomFallback: false,
         contentType: 'application/javascript',
       };
-      mockBrowser.scripting.executeScript.mockResolvedValue([{ result: mockResult }]);
+
+      let listenerCallback: ((msg: unknown, sender: unknown) => void) | null = null;
+      mockBrowser.runtime.onMessage.addListener.mockImplementation((cb: (msg: unknown, sender: unknown) => void) => {
+        listenerCallback = cb;
+      });
+
+      mockBrowser.scripting.executeScript.mockImplementation(() => {
+        if (listenerCallback) {
+          listenerCallback({ type: 'TAB_SOURCE_CAPTURED', result: mockResult }, { tab: { id: 42 } });
+        }
+        return Promise.resolve([]);
+      });
 
       const res = await captureTabSource(42);
 
       expect(mockBrowser.scripting.executeScript).toHaveBeenCalledWith({
         target: { tabId: 42 },
-        func: pageCaptureScript,
+        files: ['/content-scripts/tab-capture.js'],
       });
       expect(res).toEqual(mockResult);
     });
@@ -29,55 +40,20 @@ describe('tabSourceCapture', () => {
 
       expect(res).toBeNull();
     });
-  });
 
-  describe('pageCaptureScript', () => {
-    const originalFetch = globalThis.fetch;
+    it('returns null when capture times out', async () => {
+      vi.useFakeTimers();
+      try {
+        mockBrowser.scripting.executeScript.mockResolvedValue([]);
 
-    beforeEach(() => {
-      document.documentElement.innerHTML = '<html><head><title>Test</title></head><body><h1>Hello</h1></body></html>';
-    });
+        const capturePromise = captureTabSource(100);
+        vi.advanceTimersByTime(2000);
 
-    afterEach(() => {
-      globalThis.fetch = originalFetch;
-    });
-
-    it('returns raw text from force-cache fetch when successful', async () => {
-      const mockHtml = '<!DOCTYPE html><html><head></head><body>Raw source</body></html>';
-      globalThis.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        headers: new Headers({ 'content-type': 'text/html; charset=utf-8' }),
-        arrayBuffer: () => Promise.resolve(new TextEncoder().encode(mockHtml).buffer),
-        text: () => Promise.resolve(mockHtml),
-      });
-
-      const res = await pageCaptureScript();
-
-      expect(res.isDomFallback).toBe(false);
-      expect(res.text).toBe(mockHtml);
-      expect(res.byteSize).toBe(new Blob([mockHtml]).size);
-    });
-
-    it('falls back to DOM extraction when fetch fails on HTML document', async () => {
-      globalThis.fetch = vi.fn().mockRejectedValue(new Error('NetworkError'));
-
-      const res = await pageCaptureScript();
-
-      expect(res.isDomFallback).toBe(true);
-      expect(res.text).toContain('<h1>Hello</h1>');
-      expect(res.contentType).toBe('text/html');
-    });
-
-    it('falls back to <pre> content for non-HTML raw source document', async () => {
-      globalThis.fetch = vi.fn().mockRejectedValue(new Error('NetworkError'));
-      document.documentElement.innerHTML = '<body><pre>const x = 10;</pre></body>';
-      Object.defineProperty(document, 'contentType', { value: 'application/javascript', configurable: true });
-
-      const res = await pageCaptureScript();
-
-      expect(res.isDomFallback).toBe(true);
-      expect(res.text).toBe('const x = 10;');
+        const res = await capturePromise;
+        expect(res).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });

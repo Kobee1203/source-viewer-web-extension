@@ -43,7 +43,13 @@ export default defineBackground(() => {
       return;
     }
 
-    if (targetUrl.protocol === 'file:') {
+    // Try tab source capture first when invoked from an active page (toolbar icon or page context menu)
+    let captured = null;
+    if (tabId !== undefined && !isLink) {
+      captured = await captureTabSource(tabId);
+    }
+
+    if (targetUrl.protocol === 'file:' && !captured) {
       const isAllowed = await browser.extension.isAllowedFileSchemeAccess();
       if (!isAllowed) {
         void browser.tabs.create({ url: `${viewerUrl(targetUrl.toString())}&fileAccess=0` });
@@ -57,19 +63,17 @@ export default defineBackground(() => {
     if (openIn === 'current-tab' && tabId !== undefined && !isLink) {
       const res = await injectViewer({ type: 'REQUEST_VIEWER_INJECTION', url: targetUrl.toString() }, tabId);
       if (!res.inject) {
+        if (captured) {
+          await saveSessionSource(tabId, captured, targetUrl.toString(), tabId);
+        }
         void browser.tabs.update(tabId, { url: viewerUrl(targetUrl.toString()) });
       }
       return;
     }
 
-    let captured = null;
-    if (tabId !== undefined && !isLink) {
-      captured = await captureTabSource(tabId);
-    }
-
     const newTab = await browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
     if (captured && newTab.id !== undefined) {
-      await saveSessionSource(newTab.id, captured, tabId);
+      await saveSessionSource(newTab.id, captured, targetUrl.toString(), tabId);
     }
   }
 
@@ -106,6 +110,7 @@ export default defineBackground(() => {
 
     const targetUrl = new URL(url.slice('view-source:'.length));
     if (isRestricted(targetUrl)) return;
+    if (targetUrl.protocol === 'file:') return;
 
     const isFileDisallowed = targetUrl.protocol === 'file:' && !(await browser.extension.isAllowedFileSchemeAccess());
     const dest = isFileDisallowed ? `${viewerUrl(targetUrl.toString())}&fileAccess=0` : viewerUrl(targetUrl.toString());
