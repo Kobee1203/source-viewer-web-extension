@@ -6,7 +6,9 @@ import {
   Download,
   FileCode,
   FileText,
+  FileUp,
   FolderOpen,
+  FolderX,
   Link,
   Palette,
   PanelLeft,
@@ -42,6 +44,8 @@ const props = defineProps<{
   sidebarOpen: boolean;
   hasFileHandle?: boolean;
   isLocalSnapshot?: boolean;
+  isDirectoryFile?: boolean;
+  isDirectoryLoaded?: boolean;
   canReload?: boolean;
   fileName?: string | null;
 }>();
@@ -53,11 +57,15 @@ const emit = defineEmits<{
   search: [];
   'toggle-sidebar': [];
   'open-local': [];
+  'open-directory': [];
+  'close-directory': [];
   reload: [];
 }>();
 
 const canReload = computed(
-  () => props.canReload ?? Boolean(props.hasFileHandle || props.targetUrl || props.isLocalSnapshot),
+  () =>
+    props.canReload ??
+    Boolean(props.hasFileHandle || props.targetUrl || props.isLocalSnapshot || props.isDirectoryFile),
 );
 
 const showSettings = ref(false);
@@ -161,7 +169,7 @@ function onNativeAuxClick(event: MouseEvent): void {
 <template>
   <div class="toolbar">
     <IconButton
-      v-if="code && targetUrl"
+      v-if="code && (targetUrl || isDirectoryLoaded)"
       :active="sidebarOpen"
       :label="t('viewerToggleSidebar')"
       @click="emit('toggle-sidebar')"
@@ -174,7 +182,15 @@ function onNativeAuxClick(event: MouseEvent): void {
     </IconButton>
 
     <IconButton :label="t('viewerOpenLocalFile')" @click="emit('open-local')">
+      <FileUp :size="20" />
+    </IconButton>
+
+    <IconButton :label="t('viewerOpenLocalDirectory')" @click="emit('open-directory')">
       <FolderOpen :size="20" />
+    </IconButton>
+
+    <IconButton v-if="isDirectoryLoaded" :label="t('viewerCloseDirectory')" @click="emit('close-directory')">
+      <FolderX :size="20" />
     </IconButton>
 
     <IconButton v-if="canReload" :label="t('viewerReload')" @click="emit('reload')">

@@ -70,6 +70,8 @@ function buildDecorations(view: EditorView, baseUrl: string): DecorationSet {
             class: 'source-link',
             attributes: {
               href: targetUrl,
+              'data-raw-url': rawUrl,
+              'data-target-url': targetUrl,
               target: '_blank',
               rel: 'noopener noreferrer',
             },

@@ -7,9 +7,10 @@ import ReferenceSidebar from '@/components/ReferenceSidebar.vue';
 import StatusBar from '@/components/StatusBar.vue';
 import Toolbar from '@/components/Toolbar.vue';
 import { useSourceFetch } from '@/composables/source/useSourceFetch';
+import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import { pickLocalFile } from '@/composables/useLocalFile';
 import { usePreferences } from '@/composables/usePreferences';
-import { useReferenceSidebar } from '@/composables/useReferenceSidebar';
+import { type ReferenceEntry, type VfsNode, useReferenceSidebar } from '@/composables/useReferenceSidebar';
 import { t } from '@/utils/i18n';
 
 const {
@@ -26,23 +27,24 @@ const {
   isLocalSnapshot,
   isDomFallback,
   isSourceTabClosed,
+  isDirectoryFile,
   hasFileHandle,
   contentDisposition,
   httpStatus,
   httpStatusText,
   load,
   loadFromLocalFile,
+  loadFromDirectoryFile,
   refreshSource,
+  clearUrl,
 } = useSourceFetch();
 
+const localDirectory = useLocalDirectory();
 const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
-
 const sidebar = useReferenceSidebar();
 
 const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
-
 const codeView = useTemplateRef('codeView');
-
 const isGlobalDragging = ref(false);
 
 // Detect reload with a distinct ?root param (user had navigated away before reloading).
@@ -54,12 +56,101 @@ const hasDistinctRoot = !!rootParam && rootParam !== urlParam;
 async function onOpenLocal(): Promise<void> {
   const result = await pickLocalFile();
   if (result) {
+    if (localDirectory.isLoaded.value) {
+      await localDirectory.closeDirectory();
+      sidebar.reset();
+    }
+    clearUrl();
     await loadFromLocalFile(result.file, result.handle);
   }
 }
 
 function onFileSelected(file: File, handle?: FileSystemFileHandle): void {
+  if (localDirectory.isLoaded.value) {
+    void localDirectory.closeDirectory();
+    sidebar.reset();
+  }
+  clearUrl();
   void loadFromLocalFile(file, handle);
+}
+
+async function onOpenDirectory(): Promise<void> {
+  const ok = await localDirectory.pickDirectory();
+  if (ok) {
+    onDirectoryLoaded();
+  }
+}
+
+function onDirectoryLoaded(): void {
+  clearUrl();
+  const activeFileUrl = `file:///${localDirectory.rootName.value}/${localDirectory.activePath.value}`;
+  sidebar.setDirectoryTree(localDirectory.directoryVfsTree.value, activeFileUrl, true);
+  void loadFromDirectoryFile(localDirectory.activePath.value);
+}
+
+async function onCloseDirectory(): Promise<void> {
+  await localDirectory.closeDirectory();
+  sidebar.reset();
+  sidebar.isOpen.value = false;
+  clearUrl();
+  void load();
+}
+
+function onSidebarNavigate(node: VfsNode): void {
+  if (localDirectory.isLoaded.value && node.url) {
+    const dirFile = localDirectory.getFile(node.url);
+    if (dirFile) {
+      sidebar.activeUrl.value = node.url;
+      void loadFromDirectoryFile(dirFile.path);
+      return;
+    }
+  }
+  sidebar.navigateTo(node, load);
+}
+
+function onSidebarNavigateShortcut(refEntry: ReferenceEntry): void {
+  if (localDirectory.isLoaded.value && refEntry.url) {
+    const dirFile = localDirectory.getFile(refEntry.url);
+    if (dirFile) {
+      const activeFileUrl = `file:///${localDirectory.rootName.value}/${dirFile.path}`;
+      sidebar.activeUrl.value = activeFileUrl;
+      sidebar.revealNode(activeFileUrl);
+      void loadFromDirectoryFile(dirFile.path);
+      return;
+    }
+  }
+  sidebar.navigateToShortcut(refEntry, load);
+}
+
+function onLinkClick({
+  rawUrl,
+  targetUrl: clickedTargetUrl,
+  event,
+}: {
+  rawUrl: string;
+  targetUrl: string;
+  event: MouseEvent;
+}): void {
+  if (localDirectory.isLoaded.value) {
+    let resolvedTarget = clickedTargetUrl;
+    try {
+      const parsed = new URL(clickedTargetUrl);
+      if (parsed.searchParams.has('url')) {
+        resolvedTarget = parsed.searchParams.get('url') ?? clickedTargetUrl;
+      }
+    } catch {
+      // not a valid URL
+    }
+
+    const matchedFile = localDirectory.getFile(resolvedTarget) ?? localDirectory.getFile(rawUrl);
+    if (matchedFile) {
+      event.preventDefault();
+      const activeFileUrl = `file:///${localDirectory.rootName.value}/${matchedFile.path}`;
+      sidebar.activeUrl.value = activeFileUrl;
+      sidebar.revealNode(activeFileUrl);
+      void loadFromDirectoryFile(matchedFile.path);
+    }
+  }
 }
 
 // Global drag and drop support across the entire viewer window
@@ -74,23 +165,48 @@ function onWindowDragLeave(event: DragEvent): void {
   }
 }
 
-function onWindowDrop(event: DragEvent): void {
+async function onWindowDrop(event: DragEvent): Promise<void> {
   event.preventDefault();
   isGlobalDragging.value = false;
-  const file = event.dataTransfer?.files?.[0];
+  if (!event.dataTransfer) return;
+
+  const loadedDir = await localDirectory.loadFromDataTransfer(event.dataTransfer);
+  if (loadedDir) {
+    onDirectoryLoaded();
+    return;
+  }
+
+  const file = event.dataTransfer.files?.[0];
   if (file) {
+    if (localDirectory.isLoaded.value) {
+      await localDirectory.closeDirectory();
+      sidebar.reset();
+    }
+    clearUrl();
     void loadFromLocalFile(file);
   }
+}
+
+function handleWindowDrop(event: DragEvent): void {
+  void onWindowDrop(event);
 }
 
 onMounted(() => {
   window.addEventListener('dragover', onWindowDragOver);
   window.addEventListener('dragleave', onWindowDragLeave);
-  window.addEventListener('drop', onWindowDrop);
+  window.addEventListener('drop', handleWindowDrop);
 
-  // Pre-seed the sidebar from the initial root source when the page was reloaded
-  // while the viewer was showing a child file. This fires immediately so the VFS tree
-  // is populated by the time the user opens the sidebar.
+  // If page was loaded without a url param, check if there's a stored directory project
+  if (!urlParam) {
+    void (async () => {
+      const restored = await localDirectory.restoreFromStorage();
+      if (restored) {
+        const activeFileUrl = `file:///${localDirectory.rootName.value}/${localDirectory.activePath.value}`;
+        sidebar.setDirectoryTree(localDirectory.directoryVfsTree.value, activeFileUrl, true);
+      }
+    })();
+  }
+
   if (hasDistinctRoot) {
     void sidebar.seedFromRootUrl(rootParam);
   }
@@ -99,18 +215,24 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('dragover', onWindowDragOver);
   window.removeEventListener('dragleave', onWindowDragLeave);
-  window.removeEventListener('drop', onWindowDrop);
+  window.removeEventListener('drop', handleWindowDrop);
 });
 
 // When the source finishes loading and the sidebar is open: insert its refs into the VFS.
 watch([code, baseUrl], ([newCode, newBase]) => {
   if (!sidebar.isOpen.value || !newCode || !newBase) return;
+  if (localDirectory.isLoaded.value) {
+    sidebar.activeUrl.value = newBase;
+    sidebar.initFromSource(newCode, newBase, false);
+    return;
+  }
   sidebar.initFromSource(newCode, newBase, hasDistinctRoot);
 });
 
 // When the sidebar is opened and has not yet been populated from the current source: do it now.
 watch(sidebar.isOpen, (open) => {
   if (!open || !code.value || !baseUrl.value) return;
+  if (localDirectory.isLoaded.value) return;
   if (!sidebar.rootUrl.value) {
     sidebar.initFromSource(code.value, baseUrl.value, hasDistinctRoot);
   }
@@ -141,10 +263,14 @@ void load();
       :sidebar-open="sidebar.isOpen.value"
       :has-file-handle="hasFileHandle"
       :is-local-snapshot="isLocalSnapshot"
+      :is-directory-file="isDirectoryFile"
+      :is-directory-loaded="localDirectory.isLoaded.value"
       :file-name="fileName"
       @search="codeView?.openSearch()"
       @toggle-sidebar="sidebar.toggle()"
       @open-local="onOpenLocal"
+      @open-directory="onOpenDirectory"
+      @close-directory="onCloseDirectory"
       @reload="refreshSource"
     />
 
@@ -153,11 +279,13 @@ void load();
         v-if="sidebar.isOpen.value"
         :vfs-tree="sidebar.vfsTree.value"
         :active-url="sidebar.activeUrl.value"
-        @navigate="(node) => sidebar.navigateTo(node, load)"
-        @navigate-shortcut="(ref) => sidebar.navigateToShortcut(ref, load)"
+        :directory-name="localDirectory.isLoaded.value ? localDirectory.rootName.value : null"
+        @navigate="onSidebarNavigate"
+        @navigate-shortcut="onSidebarNavigateShortcut"
         @toggle-folder="sidebar.toggleFolder"
         @toggle-file="sidebar.toggleFile"
         @close="sidebar.toggle()"
+        @close-directory="onCloseDirectory"
       />
 
       <div id="content">
@@ -168,15 +296,21 @@ void load();
           :message="t('fileSchemePermissionHelp')"
           :file-access-denied="true"
           @file-selected="onFileSelected"
+          @directory-loaded="onDirectoryLoaded"
         />
         <ErrorView
           v-else-if="errorMessage && errorWithNativeButton && targetUrl"
           :url="targetUrl"
           :message="errorMessage"
           @file-selected="onFileSelected"
+          @directory-loaded="onDirectoryLoaded"
         />
         <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
-        <LocalDropZone v-else-if="!code && !loading" @file-selected="onFileSelected" />
+        <LocalDropZone
+          v-else-if="!code && !loading"
+          @file-selected="onFileSelected"
+          @directory-loaded="onDirectoryLoaded"
+        />
         <CodeView
           v-else
           ref="codeView"
@@ -186,6 +320,7 @@ void load();
           :wrap="wordWrap"
           :theme-id
           :font-size="codeFontSize"
+          @link-click="onLinkClick"
         />
       </div>
     </div>
@@ -198,6 +333,7 @@ void load();
       :is-local-snapshot="isLocalSnapshot"
       :is-dom-fallback="isDomFallback"
       :is-source-tab-closed="isSourceTabClosed"
+      :directory-name="localDirectory.isLoaded.value ? localDirectory.rootName.value : null"
     />
   </div>
 </template>

@@ -24,7 +24,8 @@ export class SourceFetchError extends Error {
 export type SourceTarget =
   | { kind: 'url'; url: URL; fileAccessDisallowed?: boolean }
   | { kind: 'file'; file: File; handle?: FileSystemFileHandle; isFromSession?: boolean }
-  | { kind: 'snapshot' };
+  | { kind: 'snapshot' }
+  | { kind: 'directory-file'; path: string; url?: URL };
 
 /**
  * Standardized raw source payload returned by all acquisition strategies
@@ -45,6 +46,7 @@ export interface RawSourcePayload {
   detectedFileType?: FileType;
   isDomFallback?: boolean;
   isSourceTabClosed?: boolean;
+  isDirectoryFile?: boolean;
 }
 
 /**

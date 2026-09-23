@@ -135,4 +135,24 @@ describe('useSourceFetch', () => {
 
     expect(isSourceTabClosed.value).toBe(true);
   });
+
+  it('clears URL query parameters and loads file from active directory without fetch', async () => {
+    history.replaceState(null, '', '/viewer.html?url=file%3A%2F%2F%2Ffixtures%2Fsample.html');
+    const { useLocalDirectory } = await import('@/composables/useLocalDirectory');
+    const dir = useLocalDirectory();
+    await dir.initDirectory('fixtures', [
+      { path: 'sample.html', name: 'sample.html', type: 'html', size: 50, text: '<h1>Directory File</h1>' },
+    ]);
+
+    const { loading, code, isDirectoryFile, load } = useSourceFetch();
+
+    await load('file:///fixtures/sample.html');
+
+    expect(loading.value).toBe(false);
+    expect(isDirectoryFile.value).toBe(true);
+    expect(code.value).toContain('<h1>Directory File</h1>');
+    expect(window.location.search).toBe('');
+
+    await dir.closeDirectory();
+  });
 });

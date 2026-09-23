@@ -29,6 +29,16 @@ export function useViewerNavigation() {
     syncFromLocation();
   }
 
+  function clearUrl(): void {
+    if (typeof window === 'undefined') return;
+    if (window.location.search) {
+      history.replaceState(null, '', window.location.pathname);
+    }
+    currentUrl.value = null;
+    rootUrl.value = null;
+    fileAccessDisallowed.value = false;
+  }
+
   syncFromLocation();
 
   return {
@@ -37,5 +47,6 @@ export function useViewerNavigation() {
     fileAccessDisallowed,
     syncFromLocation,
     navigateTo,
+    clearUrl,
   };
 }

@@ -28,4 +28,17 @@ describe('useViewerNavigation', () => {
     expect(window.location.search).toContain('root=https%3A%2F%2Fexample.com%2Fstyle.css');
     expect(window.location.search).toContain('url=https%3A%2F%2Fexample.com%2Freset.css');
   });
+
+  it('resets query parameters and reactive state on clearUrl', () => {
+    const nav = useViewerNavigation();
+    expect(nav.currentUrl.value).toBe('https://example.com/style.css');
+    expect(window.location.search).toContain('url=https://example.com/style.css');
+
+    nav.clearUrl();
+
+    expect(nav.currentUrl.value).toBeNull();
+    expect(nav.rootUrl.value).toBeNull();
+    expect(nav.fileAccessDisallowed.value).toBe(false);
+    expect(window.location.search).toBe('');
+  });
 });

@@ -13,6 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'file-selected': [file: File, handle?: FileSystemFileHandle];
+  'directory-loaded': [];
 }>();
 
 const showFallback = ref(false);
@@ -39,7 +40,10 @@ async function openNative(): Promise<void> {
         </ol>
       </div>
       <div class="drop-container">
-        <LocalDropZone @file-selected="(file, handle) => emit('file-selected', file, handle)" />
+        <LocalDropZone
+          @file-selected="(file, handle) => emit('file-selected', file, handle)"
+          @directory-loaded="emit('directory-loaded')"
+        />
       </div>
     </template>
 

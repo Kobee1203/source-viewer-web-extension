@@ -10,6 +10,7 @@ const props = defineProps<{
   isLocalSnapshot?: boolean;
   isDomFallback?: boolean;
   isSourceTabClosed?: boolean;
+  directoryName?: string | null;
 }>();
 
 const httpStatusClass = computed(() =>
@@ -26,6 +27,9 @@ const httpStatusLabel = computed(() =>
     <div class="status-left">
       <span v-if="httpStatusText || props.httpStatus != null" class="http-status" :class="[httpStatusClass]">
         {{ httpStatusLabel }}
+      </span>
+      <span v-if="directoryName" class="directory-badge" :title="t('viewerDirectoryBadge')">
+        📁 {{ directoryName }}
       </span>
       <span v-if="isSourceTabClosed" class="snapshot-badge" :title="t('viewerBadgeTabClosedTooltip')">
         {{ t('viewerBadgeTabClosed') }}
@@ -87,5 +91,15 @@ const httpStatusLabel = computed(() =>
   border: 1px solid var(--app-border);
   border-radius: 8px;
   opacity: 0.9;
+}
+
+.directory-badge {
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--app-fg);
+  background: var(--app-control-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
 }
 </style>

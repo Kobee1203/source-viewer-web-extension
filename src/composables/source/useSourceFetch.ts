@@ -8,6 +8,7 @@ import {
   type SourceTarget,
 } from '@/composables/source/types';
 import { useViewerNavigation } from '@/composables/source/useViewerNavigation';
+import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import { getStoredSnapshot } from '@/composables/useLocalFile';
 import { formatSource } from '@/utils/beautify';
 import { mimeToFileType } from '@/utils/contentType';
@@ -47,6 +48,7 @@ export function useSourceFetch() {
   const isLocalSnapshot = ref(false);
   const isDomFallback = ref(false);
   const isSourceTabClosed = ref(false);
+  const isDirectoryFile = ref(false);
   const snapshotTimestamp = ref<number | null>(null);
   const activeFileHandle = ref<FileSystemFileHandle | null>(null);
   const contentDisposition = ref<string | null>(null);
@@ -73,6 +75,7 @@ export function useSourceFetch() {
     isLocalSnapshot.value = false;
     isDomFallback.value = false;
     isSourceTabClosed.value = false;
+    isDirectoryFile.value = false;
     snapshotTimestamp.value = null;
   }
 
@@ -106,6 +109,7 @@ export function useSourceFetch() {
       isLocalSnapshot.value = payload.isLocalSnapshot ?? false;
       isDomFallback.value = payload.isDomFallback ?? false;
       isSourceTabClosed.value = payload.isSourceTabClosed ?? false;
+      isDirectoryFile.value = payload.isDirectoryFile ?? false;
       snapshotTimestamp.value = payload.snapshotTimestamp ?? null;
       activeFileHandle.value = payload.fileHandle ?? null;
       contentDisposition.value = payload.contentDisposition ?? null;
@@ -132,7 +136,17 @@ export function useSourceFetch() {
   }
 
   async function load(explicitUrl?: string): Promise<void> {
+    status.value = 'loading';
+
+    const { isLoaded: dirLoaded, activePath: dirActivePath, getFile, restoreFromStorage } = useLocalDirectory();
+
     if (explicitUrl) {
+      if (dirLoaded.value && getFile(explicitUrl)) {
+        navigation.clearUrl();
+        const dirFile = getFile(explicitUrl)!;
+        await executePipeline({ kind: 'directory-file', path: dirFile.path });
+        return;
+      }
       navigation.navigateTo(explicitUrl);
     } else {
       navigation.syncFromLocation();
@@ -141,6 +155,14 @@ export function useSourceFetch() {
     const urlParam = explicitUrl ?? navigation.currentUrl.value;
 
     if (!urlParam) {
+      if (!dirLoaded.value) {
+        await restoreFromStorage();
+      }
+      if (dirLoaded.value && dirActivePath.value) {
+        await executePipeline({ kind: 'directory-file', path: dirActivePath.value });
+        return;
+      }
+
       const stored = getStoredSnapshot();
       if (stored) {
         await executePipeline({ kind: 'snapshot' });
@@ -149,6 +171,15 @@ export function useSourceFetch() {
       resetState();
       status.value = 'idle';
       return;
+    }
+
+    if (dirLoaded.value) {
+      const matchingDirFile = getFile(urlParam);
+      if (matchingDirFile) {
+        navigation.clearUrl();
+        await executePipeline({ kind: 'directory-file', path: matchingDirFile.path });
+        return;
+      }
     }
 
     let parsedUrl: URL;
@@ -173,11 +204,20 @@ export function useSourceFetch() {
   }
 
   async function loadFromLocalFile(file: File, handle?: FileSystemFileHandle, isFromSession = false): Promise<void> {
+    navigation.clearUrl();
     await executePipeline({
       kind: 'file',
       file,
       handle,
       isFromSession,
+    });
+  }
+
+  async function loadFromDirectoryFile(path: string): Promise<void> {
+    navigation.clearUrl();
+    await executePipeline({
+      kind: 'directory-file',
+      path,
     });
   }
 
@@ -197,6 +237,14 @@ export function useSourceFetch() {
   }
 
   async function refreshSource(): Promise<void> {
+    if (isDirectoryFile.value) {
+      const { activePath: dirActivePath } = useLocalDirectory();
+      if (dirActivePath.value) {
+        await loadFromDirectoryFile(dirActivePath.value);
+        return;
+      }
+    }
+
     if (activeFileHandle.value) {
       await reloadLocalFile();
       return;
@@ -250,6 +298,7 @@ export function useSourceFetch() {
     isLocalSnapshot,
     isDomFallback,
     isSourceTabClosed,
+    isDirectoryFile,
     snapshotTimestamp,
     hasFileHandle,
     contentDisposition,
@@ -257,7 +306,9 @@ export function useSourceFetch() {
     httpStatusText,
     load,
     loadFromLocalFile,
+    loadFromDirectoryFile,
     reloadLocalFile,
     refreshSource,
+    clearUrl: navigation.clearUrl,
   };
 }
