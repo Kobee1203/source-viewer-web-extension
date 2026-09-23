@@ -43,9 +43,14 @@ export default defineBackground(() => {
       return;
     }
 
-    // Try tab source capture first when invoked from an active page (toolbar icon or page context menu)
+    const isFirefox = navigator.userAgent.includes('Firefox');
+    // On Chromium, extension pages with file scheme access can read file:/// URLs directly from disk,
+    // avoiding CORS restrictions and retrieving the authentic source before JS execution.
+    // On Firefox, moz-extension:// is blocked from reading file:///, requiring in-tab source capture.
+    const shouldCaptureTab = tabId !== undefined && !isLink && (targetUrl.protocol !== 'file:' || isFirefox);
+
     let captured = null;
-    if (tabId !== undefined && !isLink) {
+    if (shouldCaptureTab && tabId !== undefined) {
       captured = await captureTabSource(tabId);
     }
 
@@ -85,8 +90,8 @@ export default defineBackground(() => {
   // Dedicated context menu entry: "View source with Source Viewer".
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId !== CONTEXT_MENU_ID) return;
-    const isLink = Boolean(info.linkUrl || info.frameUrl);
-    const url = info.linkUrl || info.frameUrl || info.pageUrl || tab?.url;
+    const isLink = Boolean(info.linkUrl);
+    const url = info.linkUrl || info.pageUrl || info.frameUrl || tab?.url;
     void openSourceViewer(url, tab?.id, isLink);
   });
 

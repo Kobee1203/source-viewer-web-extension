@@ -13,10 +13,11 @@ export const directLocalStrategy: SourceFetchStrategy = async (target) => {
     throw new SourceFetchError('generic', t('errorGeneric', [t('errorUnknown')]));
   }
 
+  let fallbackSnapshot: Awaited<ReturnType<SourceFetchStrategy>> | null = null;
   try {
     const sessionRes = await requestSessionSource();
     if (sessionRes.source && (!sessionRes.source.url || sessionRes.source.url === target.url.toString())) {
-      return {
+      const snapshot = {
         rawText: sessionRes.source.text,
         byteSize: sessionRes.source.byteSize,
         targetUrl: target.url,
@@ -28,6 +29,11 @@ export const directLocalStrategy: SourceFetchStrategy = async (target) => {
           ? (mimeToFileType(sessionRes.source.contentType) ?? undefined)
           : undefined,
       };
+      // If we have an authentic raw fetch snapshot (not a DOM fallback), use it directly
+      if (!sessionRes.source.isDomFallback) {
+        return snapshot;
+      }
+      fallbackSnapshot = snapshot;
     }
   } catch {
     // Proceed to direct fetch if session check fails
@@ -44,6 +50,9 @@ export const directLocalStrategy: SourceFetchStrategy = async (target) => {
       targetUrl: target.url,
     };
   } catch {
+    if (fallbackSnapshot) {
+      return fallbackSnapshot;
+    }
     const isAllowed = await browser.extension.isAllowedFileSchemeAccess().catch(() => false);
     if (!isAllowed) {
       throw new SourceFetchError('file-access-denied', t('fileSchemePermissionHelp'));

@@ -12,7 +12,7 @@ const props = defineProps<{
   isSourceTabClosed?: boolean;
 }>();
 
-const httpStatus = computed(() =>
+const httpStatusClass = computed(() =>
   props.httpStatus != null && props.httpStatus >= 400 ? 'http-error' : 'http-success',
 );
 
@@ -24,7 +24,7 @@ const httpStatusLabel = computed(() =>
 <template>
   <div class="status-bar">
     <div class="status-left">
-      <span v-if="httpStatusText || httpStatus != null" class="http-status" :class="[httpStatus]">
+      <span v-if="httpStatusText || props.httpStatus != null" class="http-status" :class="[httpStatusClass]">
         {{ httpStatusLabel }}
       </span>
       <span v-if="isSourceTabClosed" class="snapshot-badge" :title="t('viewerBadgeTabClosedTooltip')">

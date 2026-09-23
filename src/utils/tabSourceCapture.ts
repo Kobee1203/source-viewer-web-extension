@@ -31,7 +31,7 @@ export async function captureTabSource(tabId: number): Promise<TabSourceCaptureR
           browser.runtime.onMessage.removeListener(onMessage);
           resolve(null);
         }
-      }, 1500);
+      }, 2000);
 
       const onMessage = (message: unknown, sender: MessageSender) => {
         if (
