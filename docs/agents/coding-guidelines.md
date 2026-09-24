@@ -33,7 +33,12 @@ This document outlines the strict coding rules and architecture conventions that
 
 - **English Only**: Always use **English** for commit messages, GitHub issues, pull request descriptions, code comments, and documentation.
 
-## 6. Post-Development Workflow
+## 6. Dead Code and Unnecessary Backward Compatibility
+
+- **No dead or ghost code**: Avoid retaining unused variables, commented-out blocks, or dead reactive state.
+- **No speculative backward compatibility**: For internal components and composables within the repository, never preserve obsolete props signatures, parameters, or fallback shims out of speculative caution. Refactor call sites directly and keep component interfaces lean and strictly typed.
+
+## 7. Post-Development Workflow
 
 - **Verification Commands**: After completing any code changes, you must automatically execute the following commands to ensure the codebase remains clean and compiles successfully:
   - `pnpm run lint:fix` (Fix TS/JS/Vue lint errors)

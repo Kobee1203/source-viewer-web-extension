@@ -48,20 +48,10 @@ const props = defineProps<{
   wordWrap: boolean;
   fontSize: number;
   openIn?: OpenInMode;
-  source?: ToolbarSourceState;
+  source: ToolbarSourceState;
   sidebarOpen: boolean;
   isDirectoryLoaded?: boolean;
   canReload?: boolean;
-  // Backward compatibility with legacy individual props
-  targetUrl?: URL | null;
-  code?: string;
-  rawCode?: string;
-  language?: FileType;
-  contentDisposition?: string | null;
-  hasFileHandle?: boolean;
-  isLocalSnapshot?: boolean;
-  isDirectoryFile?: boolean;
-  fileName?: string | null;
 }>();
 const emit = defineEmits<{
   'update:themeId': [value: string];
@@ -76,17 +66,15 @@ const emit = defineEmits<{
   reload: [];
 }>();
 
-const targetUrl = computed(() => toValue(props.source?.targetUrl) ?? props.targetUrl ?? null);
-const code = computed(() => toValue(props.source?.code) ?? props.code ?? '');
-const rawCode = computed(() => toValue(props.source?.rawCode) ?? props.rawCode ?? '');
-const language = computed(() => toValue(props.source?.language) ?? props.language ?? DEFAULT_FILE_TYPE);
-const contentDisposition = computed(
-  () => toValue(props.source?.contentDisposition) ?? props.contentDisposition ?? null,
-);
-const fileName = computed(() => toValue(props.source?.fileName) ?? props.fileName ?? null);
-const hasFileHandle = computed(() => toValue(props.source?.hasFileHandle) ?? props.hasFileHandle ?? false);
-const isLocalSnapshot = computed(() => toValue(props.source?.isLocalSnapshot) ?? props.isLocalSnapshot ?? false);
-const isDirectoryFile = computed(() => toValue(props.source?.isDirectoryFile) ?? props.isDirectoryFile ?? false);
+const targetUrl = computed(() => toValue(props.source.targetUrl) ?? null);
+const code = computed(() => toValue(props.source.code) ?? '');
+const rawCode = computed(() => toValue(props.source.rawCode) ?? '');
+const language = computed(() => toValue(props.source.language) ?? DEFAULT_FILE_TYPE);
+const contentDisposition = computed(() => toValue(props.source.contentDisposition) ?? null);
+const fileName = computed(() => toValue(props.source.fileName) ?? null);
+const hasFileHandle = computed(() => toValue(props.source.hasFileHandle) ?? false);
+const isLocalSnapshot = computed(() => toValue(props.source.isLocalSnapshot) ?? false);
+const isDirectoryFile = computed(() => toValue(props.source.isDirectoryFile) ?? false);
 
 const canReload = computed(
   () =>

@@ -13,22 +13,16 @@ export interface StatusBarSourceState {
 }
 
 const props = defineProps<{
-  source?: StatusBarSourceState;
-  bytes?: number;
-  httpStatus?: number | null;
-  httpStatusText?: string;
-  isLocalSnapshot?: boolean;
-  isDomFallback?: boolean;
-  isSourceTabClosed?: boolean;
+  source: StatusBarSourceState;
   directoryName?: string | null;
 }>();
 
-const bytes = computed(() => toValue(props.source?.byteSize) ?? props.bytes ?? 0);
-const httpStatus = computed(() => toValue(props.source?.httpStatus) ?? props.httpStatus ?? null);
-const httpStatusText = computed(() => toValue(props.source?.httpStatusText) ?? props.httpStatusText ?? '');
-const isLocalSnapshot = computed(() => toValue(props.source?.isLocalSnapshot) ?? props.isLocalSnapshot ?? false);
-const isDomFallback = computed(() => toValue(props.source?.isDomFallback) ?? props.isDomFallback ?? false);
-const isSourceTabClosed = computed(() => toValue(props.source?.isSourceTabClosed) ?? props.isSourceTabClosed ?? false);
+const bytes = computed(() => toValue(props.source.byteSize) ?? 0);
+const httpStatus = computed(() => toValue(props.source.httpStatus) ?? null);
+const httpStatusText = computed(() => toValue(props.source.httpStatusText) ?? '');
+const isLocalSnapshot = computed(() => toValue(props.source.isLocalSnapshot) ?? false);
+const isDomFallback = computed(() => toValue(props.source.isDomFallback) ?? false);
+const isSourceTabClosed = computed(() => toValue(props.source.isSourceTabClosed) ?? false);
 
 const httpStatusClass = computed(() =>
   httpStatus.value != null && httpStatus.value >= 400 ? 'http-error' : 'http-success',
