@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Unified Tab Source Capture & Live Refresh**:
+  - **Force-Cache Capture**: Implemented tab source capture that fetches unmodified source code directly from browser cache via background scripts before falling back to DOM snapshots.
+  - **Live Tab Refresh**: Added a source refresh mechanism (`requestRefreshTabSource`) allowing the viewer to re-capture updated content directly from the active host tab.
+  - **Contextual Status Badges**: Added visual indicators in the status bar for DOM extraction fallbacks, closed source tabs, and local snapshot restores.
+- **Local Directory Projects & Virtual File System Navigation**:
+  - **Directory Loading**: Added support for opening entire local folders via the directory picker or drag-and-drop.
+  - **Interactive Directory Tree**: Dynamically builds the Reference Sidebar's Virtual File System (VFS) tree from loaded directories, with automatic entrypoint resolution (`index.html`, `sample.html`).
+  - **In-Place File Link Resolution**: Intercepts cross-reference links in the code viewer and sidebar shortcuts to seamlessly navigate between local files in the active directory project.
+  - **Project Session Persistence**: Persists loaded directory files and active paths in IndexedDB, automatically restoring local projects on reload when no URL parameter is present.
+
+### Changed
+
+- **Viewer Architecture Modularization**:
+  - **Composables Extraction**: Decomposed the monolithic `src/entrypoints/viewer/App.vue` into focused composables (`useViewerDragAndDrop`, `useViewerProjectActions`, `useViewerNavigationResolver`, `useViewerSidebarSync`), reducing `App.vue` script lines by 75%.
+  - **Consolidated Component Props**: Unified 17 separate props on `Toolbar.vue` and 8 on `StatusBar.vue` into a single, strictly typed `:source` prop.
+  - **Dead Code Purge**: Cleaned up obsolete legacy props and redundant fallbacks across viewer components, adhering to the updated coding guidelines against speculative backward compatibility.
+- **Agent Coding Guidelines**: Added Section 6 to `docs/agents/coding-guidelines.md` forbidding dead code, unused reactive state, and speculative backward-compatibility shims on internal components.
+
+### Fixed
+
+- **Firefox Local File Scheme In-Place Viewing**: Allowed in-place iframe injection for local `file://` scheme on Firefox.
+- **Tab Source Capture Error Handling**: Handled restricted browser tabs and scripting failures gracefully without crashing the viewer.
+
 ## [1.11.0] - 2026-09-20
 
 ### Added
