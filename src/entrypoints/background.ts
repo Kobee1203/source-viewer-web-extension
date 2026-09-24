@@ -16,6 +16,7 @@ import { viewerUrl } from '@/utils/viewerUrl';
 
 export default defineBackground(() => {
   const nativeViewer = createNativeViewerController();
+  const isFirefox = navigator.userAgent.includes('Firefox');
 
   const CONTEXT_MENU_ID = 'view-source-viewer';
 
@@ -43,7 +44,6 @@ export default defineBackground(() => {
       return;
     }
 
-    const isFirefox = navigator.userAgent.includes('Firefox');
     // On Chromium, extension pages with file scheme access can read file:/// URLs directly from disk,
     // avoiding CORS restrictions and retrieving the authentic source before JS execution.
     // On Firefox, moz-extension:// is blocked from reading file:///, requiring in-tab source capture.
@@ -115,7 +115,7 @@ export default defineBackground(() => {
 
     const targetUrl = new URL(url.slice('view-source:'.length));
     if (isRestricted(targetUrl)) return;
-    if (targetUrl.protocol === 'file:') return;
+    if (isFirefox && targetUrl.protocol === 'file:') return;
 
     const isFileDisallowed = targetUrl.protocol === 'file:' && !(await browser.extension.isAllowedFileSchemeAccess());
     const dest = isFileDisallowed ? `${viewerUrl(targetUrl.toString())}&fileAccess=0` : viewerUrl(targetUrl.toString());
