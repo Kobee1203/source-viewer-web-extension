@@ -5,6 +5,7 @@ import { DEFAULT_THEME_ID, THEMES, getThemeType } from '@/utils/themes';
 
 export type OpenInMode = 'new-tab' | 'current-tab';
 export const DEFAULT_OPEN_IN: OpenInMode = 'new-tab';
+export const DEFAULT_CONTEXT_MENU = true;
 
 function getInitialTheme(): string {
   try {
@@ -43,6 +44,14 @@ function getInitialOpenIn(): OpenInMode {
   return DEFAULT_OPEN_IN;
 }
 
+function getInitialContextMenu(): boolean {
+  try {
+    const local = localStorage.getItem('viewer-contextMenu');
+    if (local !== null) return local === 'true';
+  } catch {}
+  return DEFAULT_CONTEXT_MENU;
+}
+
 /**
  * Reactive user preferences (theme + word wrap + code font size + open in mode) backed by browser.storage.local.
  * Initialized synchronously from window.localStorage to eliminate initial visual flicker.
@@ -52,6 +61,7 @@ export function usePreferences() {
   const wordWrap = ref(getInitialWordWrap());
   const codeFontSize = ref(getInitialFontSize());
   const openIn = ref<OpenInMode>(getInitialOpenIn());
+  const contextMenu = ref(getInitialContextMenu());
 
   try {
     if (!localStorage.getItem('viewer-theme-type')) {
@@ -59,7 +69,7 @@ export function usePreferences() {
     }
   } catch {}
 
-  void browser.storage.local.get(['theme', 'wordWrap', 'codeFontSize', 'openIn']).then((result) => {
+  void browser.storage.local.get(['theme', 'wordWrap', 'codeFontSize', 'openIn', 'contextMenu']).then((result) => {
     const savedTheme = result.theme;
     if (typeof savedTheme === 'string' && THEMES.some((theme) => theme.id === savedTheme)) {
       themeId.value = savedTheme;
@@ -86,6 +96,12 @@ export function usePreferences() {
       openIn.value = result.openIn;
       try {
         localStorage.setItem('viewer-openIn', result.openIn);
+      } catch {}
+    }
+    if (typeof result.contextMenu === 'boolean') {
+      contextMenu.value = result.contextMenu;
+      try {
+        localStorage.setItem('viewer-contextMenu', String(result.contextMenu));
       } catch {}
     }
   });
@@ -117,6 +133,12 @@ export function usePreferences() {
     } catch {}
     void browser.storage.local.set({ openIn: value });
   });
+  watch(contextMenu, (value) => {
+    try {
+      localStorage.setItem('viewer-contextMenu', String(value));
+    } catch {}
+    void browser.storage.local.set({ contextMenu: value });
+  });
 
-  return { themeId, wordWrap, codeFontSize, openIn };
+  return { themeId, wordWrap, codeFontSize, openIn, contextMenu };
 }

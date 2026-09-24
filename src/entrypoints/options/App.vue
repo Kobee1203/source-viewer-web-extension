@@ -5,7 +5,7 @@ import { DEFAULT_FONT_SIZE } from '@/utils/fonts';
 import { t } from '@/utils/i18n';
 import { THEMES } from '@/utils/themes';
 
-const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
+const { themeId, wordWrap, codeFontSize, openIn, contextMenu } = usePreferences();
 
 const fontSizes = computed(() => {
   const sizes: { value: number; label: string }[] = [];
@@ -17,6 +17,12 @@ const fontSizes = computed(() => {
 function onOpenInChange(event: Event): void {
   if (event.target instanceof HTMLSelectElement) {
     openIn.value = event.target.value as OpenInMode;
+  }
+}
+
+function onContextMenuChange(event: Event): void {
+  if (event.target instanceof HTMLInputElement) {
+    contextMenu.value = event.target.checked;
   }
 }
 
@@ -55,6 +61,20 @@ function onWordWrapChange(event: Event): void {
           <option value="new-tab">{{ t('settingsOpenInNewTab') }}</option>
           <option value="current-tab">{{ t('settingsOpenInCurrentTab') }}</option>
         </select>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <label for="setting-context-menu" class="setting-label">{{ t('settingsContextMenuLabel') }}</label>
+          <span class="setting-desc">{{ t('settingsContextMenuDescription') }}</span>
+        </div>
+        <input
+          id="setting-context-menu"
+          type="checkbox"
+          :checked="contextMenu"
+          class="setting-checkbox"
+          @change="onContextMenuChange"
+        />
       </div>
 
       <div class="setting-row">

@@ -7,6 +7,8 @@ settingsOpenInLabel: 'Open source viewer in:'
 settingsOpenInDescription: 'Choose where the source viewer should open when clicking the toolbar icon or context menu.'
 settingsOpenInNewTab: 'New tab (default)'
 settingsOpenInCurrentTab: 'Current tab (In-place)'
+settingsContextMenuLabel: 'Context menu'
+settingsContextMenuDescription: "Show 'View source with Source Viewer' in the browser right-click menu."
 viewerClose: 'Close viewer'
 viewerWordWrap: 'Line wrap'
 viewerTheme: 'Theme:'

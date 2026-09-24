@@ -20,12 +20,26 @@ export default defineBackground(() => {
 
   const CONTEXT_MENU_ID = 'view-source-viewer';
 
-  browser.runtime.onInstalled.addListener(() => {
-    browser.contextMenus.create({
-      id: CONTEXT_MENU_ID,
-      title: t('contextMenuViewSource'),
-      contexts: ['page', 'frame', 'link', 'selection'],
-    });
+  async function syncContextMenu(enabled = true): Promise<void> {
+    await browser.contextMenus.removeAll();
+    if (enabled) {
+      browser.contextMenus.create({
+        id: CONTEXT_MENU_ID,
+        title: t('contextMenuViewSource'),
+        contexts: ['page', 'frame', 'link', 'selection'],
+      });
+    }
+  }
+
+  browser.runtime.onInstalled.addListener(async () => {
+    const { contextMenu } = await browser.storage.local.get('contextMenu');
+    await syncContextMenu(contextMenu !== false);
+  });
+
+  browser.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local' && changes.contextMenu) {
+      void syncContextMenu(changes.contextMenu.newValue !== false);
+    }
   });
 
   async function openSourceViewer(rawUrl?: string, tabId?: number, isLink = false): Promise<void> {

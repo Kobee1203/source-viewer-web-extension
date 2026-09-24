@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
   - **Interactive Directory Tree**: Dynamically builds the Reference Sidebar's Virtual File System (VFS) tree from loaded directories, with automatic entrypoint resolution (`index.html`, `sample.html`).
   - **In-Place File Link Resolution**: Intercepts cross-reference links in the code viewer and sidebar shortcuts to seamlessly navigate between local files in the active directory project.
   - **Project Session Persistence**: Persists loaded directory files and active paths in IndexedDB, automatically restoring local projects on reload when no URL parameter is present.
+- **Configurable Context Menu Item** (#36):
+  - Added an option in extension preferences and the viewer settings modal to toggle the "View source with Source Viewer" entry in the browser's right-click context menu.
 
 ### Changed
 

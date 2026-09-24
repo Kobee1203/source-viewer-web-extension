@@ -48,6 +48,7 @@ const props = defineProps<{
   wordWrap: boolean;
   fontSize: number;
   openIn?: OpenInMode;
+  contextMenu?: boolean;
   source: ToolbarSourceState;
   sidebarOpen: boolean;
   isDirectoryLoaded?: boolean;
@@ -58,6 +59,7 @@ const emit = defineEmits<{
   'update:wordWrap': [value: boolean];
   'update:fontSize': [value: number];
   'update:openIn': [value: OpenInMode];
+  'update:contextMenu': [value: boolean];
   search: [];
   'toggle-sidebar': [];
   'open-local': [];
@@ -282,7 +284,9 @@ function onNativeAuxClick(event: MouseEvent): void {
     <SettingsDialog
       v-if="showSettings && openIn"
       :open-in="openIn"
+      :context-menu="contextMenu"
       @update:open-in="(val) => emit('update:openIn', val)"
+      @update:context-menu="(val) => emit('update:contextMenu', val)"
       @closed="showSettings = false"
     />
   </div>
