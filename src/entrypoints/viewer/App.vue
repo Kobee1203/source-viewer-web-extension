@@ -16,63 +16,38 @@ import { useViewerProjectActions } from '@/composables/viewer/useViewerProjectAc
 import { useViewerSidebarSync } from '@/composables/viewer/useViewerSidebarSync';
 import { t } from '@/utils/i18n';
 
-const {
-  loading,
-  errorMessage,
-  errorWithNativeButton,
-  fileAccessDenied,
-  code,
-  rawCode,
-  language,
-  byteSize,
-  targetUrl,
-  fileName,
-  isLocalSnapshot,
-  isDomFallback,
-  isSourceTabClosed,
-  isDirectoryFile,
-  hasFileHandle,
-  contentDisposition,
-  httpStatus,
-  httpStatusText,
-  load,
-  loadFromLocalFile,
-  loadFromDirectoryFile,
-  refreshSource,
-  clearUrl,
-} = useSourceFetch();
-
+const sourceFetch = useSourceFetch();
 const localDirectory = useLocalDirectory();
-const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
 const sidebar = useReferenceSidebar();
+const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
 
-const baseUrl = computed(() => targetUrl.value?.toString() ?? '');
+const baseUrl = computed(() => sourceFetch.targetUrl.value?.toString() ?? '');
 const codeView = useTemplateRef('codeView');
 
 const { openLocalFile, pickAndOpenLocalFile, openDirectory, onDirectoryLoaded, closeDirectory } =
   useViewerProjectActions({
     localDirectory,
     sidebar,
-    clearUrl,
-    load,
-    loadFromLocalFile,
-    loadFromDirectoryFile,
+    clearUrl: sourceFetch.clearUrl,
+    load: sourceFetch.load,
+    loadFromLocalFile: sourceFetch.loadFromLocalFile,
+    loadFromDirectoryFile: sourceFetch.loadFromDirectoryFile,
   });
 
 const { onSidebarNavigate, onSidebarNavigateShortcut, onLinkClick } = useViewerNavigationResolver({
   localDirectory,
   sidebar,
-  load,
-  loadFromDirectoryFile,
+  load: sourceFetch.load,
+  loadFromDirectoryFile: sourceFetch.loadFromDirectoryFile,
 });
 
 useViewerSidebarSync({
   localDirectory,
   sidebar,
-  code,
+  code: sourceFetch.code,
   baseUrl,
-  loading,
-  errorMessage,
+  loading: sourceFetch.loading,
+  errorMessage: sourceFetch.errorMessage,
 });
 
 useViewerDragAndDrop({
@@ -87,7 +62,7 @@ useViewerDragAndDrop({
   onDropFile: (file) => openLocalFile(file),
 });
 
-void load();
+void sourceFetch.load();
 </script>
 
 <template>
@@ -97,23 +72,15 @@ void load();
       v-model:word-wrap="wordWrap"
       v-model:font-size="codeFontSize"
       v-model:open-in="openIn"
-      :target-url="targetUrl"
-      :code="code"
-      :raw-code="rawCode"
-      :language="language"
-      :content-disposition="contentDisposition"
+      :source="sourceFetch"
       :sidebar-open="sidebar.isOpen.value"
-      :has-file-handle="hasFileHandle"
-      :is-local-snapshot="isLocalSnapshot"
-      :is-directory-file="isDirectoryFile"
       :is-directory-loaded="localDirectory.isLoaded.value"
-      :file-name="fileName"
       @search="codeView?.openSearch()"
       @toggle-sidebar="sidebar.toggle()"
       @open-local="pickAndOpenLocalFile"
       @open-directory="openDirectory"
       @close-directory="closeDirectory"
-      @reload="refreshSource"
+      @reload="sourceFetch.refreshSource"
     />
 
     <div id="main-area">
@@ -131,33 +98,37 @@ void load();
       />
 
       <div id="content">
-        <div v-if="loading" class="loader">{{ t('viewerLoading') }}</div>
+        <div v-if="sourceFetch.loading.value" class="loader">{{ t('viewerLoading') }}</div>
         <ErrorView
-          v-else-if="fileAccessDenied"
-          :url="targetUrl"
+          v-else-if="sourceFetch.fileAccessDenied.value"
+          :url="sourceFetch.targetUrl.value"
           :message="t('fileSchemePermissionHelp')"
           :file-access-denied="true"
           @file-selected="openLocalFile"
           @directory-loaded="onDirectoryLoaded"
         />
         <ErrorView
-          v-else-if="errorMessage && errorWithNativeButton && targetUrl"
-          :url="targetUrl"
-          :message="errorMessage"
+          v-else-if="
+            sourceFetch.errorMessage.value && sourceFetch.errorWithNativeButton.value && sourceFetch.targetUrl.value
+          "
+          :url="sourceFetch.targetUrl.value"
+          :message="sourceFetch.errorMessage.value"
           @file-selected="openLocalFile"
           @directory-loaded="onDirectoryLoaded"
         />
-        <div v-else-if="errorMessage" class="loader">{{ errorMessage }}</div>
+        <div v-else-if="sourceFetch.errorMessage.value" class="loader">
+          {{ sourceFetch.errorMessage.value }}
+        </div>
         <LocalDropZone
-          v-else-if="!code && !loading"
+          v-else-if="!sourceFetch.code.value && !sourceFetch.loading.value"
           @file-selected="openLocalFile"
           @directory-loaded="onDirectoryLoaded"
         />
         <CodeView
           v-else
           ref="codeView"
-          :code
-          :language
+          :code="sourceFetch.code.value"
+          :language="sourceFetch.language.value"
           :base-url
           :wrap="wordWrap"
           :theme-id
@@ -168,13 +139,8 @@ void load();
     </div>
 
     <StatusBar
-      v-if="byteSize !== null"
-      :bytes="byteSize"
-      :http-status="httpStatus"
-      :http-status-text="httpStatusText"
-      :is-local-snapshot="isLocalSnapshot"
-      :is-dom-fallback="isDomFallback"
-      :is-source-tab-closed="isSourceTabClosed"
+      v-if="sourceFetch.byteSize.value !== null"
+      :source="sourceFetch"
       :directory-name="localDirectory.isLoaded.value ? localDirectory.rootName.value : null"
     />
   </div>

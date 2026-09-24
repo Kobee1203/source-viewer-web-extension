@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { type Ref, computed, ref, toValue } from 'vue';
 import {
   Check,
   Copy,
@@ -25,28 +25,42 @@ import SettingsDialog from '@/components/SettingsDialog.vue';
 import { useCopyFeedback } from '@/composables/useCopyFeedback';
 import type { OpenInMode } from '@/composables/usePreferences';
 import { downloadSource } from '@/utils/download';
-import type { FileType } from '@/utils/fileType';
+import { DEFAULT_FILE_TYPE, type FileType } from '@/utils/fileType';
 import { DEFAULT_FONT_SIZE } from '@/utils/fonts';
 import { t } from '@/utils/i18n';
 import { openNativeViewer } from '@/utils/nativeViewer';
 import { THEMES } from '@/utils/themes';
+
+export interface ToolbarSourceState {
+  code: string | Ref<string>;
+  rawCode?: string | Ref<string>;
+  language?: FileType | Ref<FileType>;
+  targetUrl?: URL | null | Ref<URL | null>;
+  fileName?: string | null | Ref<string | null>;
+  contentDisposition?: string | null | Ref<string | null>;
+  hasFileHandle?: boolean | Ref<boolean>;
+  isLocalSnapshot?: boolean | Ref<boolean>;
+  isDirectoryFile?: boolean | Ref<boolean>;
+}
 
 const props = defineProps<{
   themeId: string;
   wordWrap: boolean;
   fontSize: number;
   openIn?: OpenInMode;
-  targetUrl: URL | null;
-  code: string;
-  rawCode: string;
-  language: FileType;
-  contentDisposition: string | null;
+  source?: ToolbarSourceState;
   sidebarOpen: boolean;
+  isDirectoryLoaded?: boolean;
+  canReload?: boolean;
+  // Backward compatibility with legacy individual props
+  targetUrl?: URL | null;
+  code?: string;
+  rawCode?: string;
+  language?: FileType;
+  contentDisposition?: string | null;
   hasFileHandle?: boolean;
   isLocalSnapshot?: boolean;
   isDirectoryFile?: boolean;
-  isDirectoryLoaded?: boolean;
-  canReload?: boolean;
   fileName?: string | null;
 }>();
 const emit = defineEmits<{
@@ -62,10 +76,22 @@ const emit = defineEmits<{
   reload: [];
 }>();
 
+const targetUrl = computed(() => toValue(props.source?.targetUrl) ?? props.targetUrl ?? null);
+const code = computed(() => toValue(props.source?.code) ?? props.code ?? '');
+const rawCode = computed(() => toValue(props.source?.rawCode) ?? props.rawCode ?? '');
+const language = computed(() => toValue(props.source?.language) ?? props.language ?? DEFAULT_FILE_TYPE);
+const contentDisposition = computed(
+  () => toValue(props.source?.contentDisposition) ?? props.contentDisposition ?? null,
+);
+const fileName = computed(() => toValue(props.source?.fileName) ?? props.fileName ?? null);
+const hasFileHandle = computed(() => toValue(props.source?.hasFileHandle) ?? props.hasFileHandle ?? false);
+const isLocalSnapshot = computed(() => toValue(props.source?.isLocalSnapshot) ?? props.isLocalSnapshot ?? false);
+const isDirectoryFile = computed(() => toValue(props.source?.isDirectoryFile) ?? props.isDirectoryFile ?? false);
+
 const canReload = computed(
   () =>
     props.canReload ??
-    Boolean(props.hasFileHandle || props.targetUrl || props.isLocalSnapshot || props.isDirectoryFile),
+    Boolean(hasFileHandle.value || targetUrl.value || isLocalSnapshot.value || isDirectoryFile.value),
 );
 
 const showSettings = ref(false);
@@ -78,19 +104,19 @@ function onCloseInplace(): void {
 const { copied, copy } = useCopyFeedback<boolean>(2000);
 
 async function onCopyFormatted(): Promise<void> {
-  if (!props.code) return;
-  await copy(props.code, true);
+  if (!code.value) return;
+  await copy(code.value, true);
 }
 
 async function onCopyRaw(): Promise<void> {
-  const text = props.rawCode || props.code;
+  const text = rawCode.value || code.value;
   if (!text) return;
   await copy(text, true);
 }
 
 async function onCopyUrl(): Promise<void> {
-  if (!props.targetUrl) return;
-  await copy(props.targetUrl.toString(), true);
+  if (!targetUrl.value) return;
+  await copy(targetUrl.value.toString(), true);
 }
 
 const copyMenuItems = computed<DropdownMenuItem[]>(() => {
@@ -106,7 +132,7 @@ const copyMenuItems = computed<DropdownMenuItem[]>(() => {
       onSelect: () => void onCopyRaw(),
     },
   ];
-  if (props.targetUrl) {
+  if (targetUrl.value) {
     items.push({
       label: t('viewerCopyUrl'),
       icon: Link,
@@ -141,15 +167,15 @@ function toggleWrap(): void {
 
 /** Opens the target URL in the browser's native `view-source:` viewer. */
 function openNative(newTab: boolean): void {
-  if (!props.targetUrl) return;
-  void openNativeViewer(props.targetUrl, newTab);
+  if (!targetUrl.value) return;
+  void openNativeViewer(targetUrl.value, newTab);
 }
 
 /** Downloads the formatted source shown in the viewer. */
 function onDownload(): void {
-  const url = props.targetUrl ?? (props.fileName ? new URL('file:///' + props.fileName) : null);
-  if (!url || !props.code) return;
-  downloadSource(props.code, props.language, url, props.contentDisposition);
+  const url = targetUrl.value ?? (fileName.value ? new URL('file:///' + fileName.value) : null);
+  if (!url || !code.value) return;
+  downloadSource(code.value, language.value, url, contentDisposition.value);
 }
 
 // No real `href`: `view-source:` cannot be navigated to via <a href>, so gestures

@@ -1,10 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { type Ref, computed, toValue } from 'vue';
 import { formatBytes } from '@/utils/format';
 import { t } from '@/utils/i18n';
 
+export interface StatusBarSourceState {
+  byteSize?: number | null | Ref<number | null>;
+  httpStatus?: number | null | Ref<number | null>;
+  httpStatusText?: string | Ref<string>;
+  isLocalSnapshot?: boolean | Ref<boolean>;
+  isDomFallback?: boolean | Ref<boolean>;
+  isSourceTabClosed?: boolean | Ref<boolean>;
+}
+
 const props = defineProps<{
-  bytes: number;
+  source?: StatusBarSourceState;
+  bytes?: number;
   httpStatus?: number | null;
   httpStatusText?: string;
   isLocalSnapshot?: boolean;
@@ -13,19 +23,26 @@ const props = defineProps<{
   directoryName?: string | null;
 }>();
 
+const bytes = computed(() => toValue(props.source?.byteSize) ?? props.bytes ?? 0);
+const httpStatus = computed(() => toValue(props.source?.httpStatus) ?? props.httpStatus ?? null);
+const httpStatusText = computed(() => toValue(props.source?.httpStatusText) ?? props.httpStatusText ?? '');
+const isLocalSnapshot = computed(() => toValue(props.source?.isLocalSnapshot) ?? props.isLocalSnapshot ?? false);
+const isDomFallback = computed(() => toValue(props.source?.isDomFallback) ?? props.isDomFallback ?? false);
+const isSourceTabClosed = computed(() => toValue(props.source?.isSourceTabClosed) ?? props.isSourceTabClosed ?? false);
+
 const httpStatusClass = computed(() =>
-  props.httpStatus != null && props.httpStatus >= 400 ? 'http-error' : 'http-success',
+  httpStatus.value != null && httpStatus.value >= 400 ? 'http-error' : 'http-success',
 );
 
 const httpStatusLabel = computed(() =>
-  props.httpStatusText ? `HTTP ${props.httpStatus} - ${props.httpStatusText}` : `HTTP ${props.httpStatus}`,
+  httpStatusText.value ? `HTTP ${httpStatus.value} - ${httpStatusText.value}` : `HTTP ${httpStatus.value}`,
 );
 </script>
 
 <template>
   <div class="status-bar">
     <div class="status-left">
-      <span v-if="httpStatusText || props.httpStatus != null" class="http-status" :class="[httpStatusClass]">
+      <span v-if="httpStatusText || httpStatus != null" class="http-status" :class="[httpStatusClass]">
         {{ httpStatusLabel }}
       </span>
       <span v-if="directoryName" class="directory-badge" :title="t('viewerDirectoryBadge')">
@@ -41,7 +58,7 @@ const httpStatusLabel = computed(() =>
         {{ t('viewerSnapshotBadge') }}
       </span>
     </div>
-    <span class="page-size">{{ t('viewerPageSize', [formatBytes(props.bytes)]) }}</span>
+    <span class="page-size">{{ t('viewerPageSize', [formatBytes(bytes)]) }}</span>
   </div>
 </template>
 
