@@ -4,6 +4,10 @@ export const mockBrowser = {
   runtime: {
     sendMessage: vi.fn(),
     getURL: vi.fn((path: string) => `chrome-extension://dummy-id${path}`),
+    onMessage: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
   },
   extension: {
     isAllowedFileSchemeAccess: vi.fn().mockResolvedValue(true),
@@ -13,11 +17,23 @@ export const mockBrowser = {
       get: vi.fn().mockResolvedValue({}),
       set: vi.fn().mockResolvedValue(undefined),
     },
+    session: {
+      get: vi.fn().mockResolvedValue({}),
+      set: vi.fn().mockResolvedValue(undefined),
+      remove: vi.fn().mockResolvedValue(undefined),
+    },
+  },
+  scripting: {
+    executeScript: vi.fn().mockResolvedValue([]),
   },
   tabs: {
     query: vi.fn().mockResolvedValue([]),
     create: vi.fn().mockResolvedValue({ id: 1 }),
     update: vi.fn().mockResolvedValue({ id: 1 }),
+    get: vi.fn().mockResolvedValue({ id: 1 }),
+    onRemoved: {
+      addListener: vi.fn(),
+    },
   },
 };
 
@@ -36,4 +52,5 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockBrowser.extension.isAllowedFileSchemeAccess.mockResolvedValue(true);
   mockBrowser.storage.local.get.mockResolvedValue({});
+  mockBrowser.storage.session.get.mockResolvedValue({});
 });

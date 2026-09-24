@@ -1,5 +1,7 @@
+import type { StoredDirectoryFile } from '@/utils/directoryStore';
 import type { ReferenceEntry } from '@/utils/extractReferences';
-import type { FileType } from '@/utils/fileType';
+import { type FileType, extensionToFileType } from '@/utils/fileType';
+import { classifyLinkTarget } from '@/utils/linkTarget';
 
 // ---------------------------------------------------------------------------
 // Node types
@@ -277,4 +279,78 @@ function insertSorted(nodes: VfsNode[], node: VfsNode): void {
   }
 
   nodes.splice(insertIndex, 0, node);
+}
+
+/**
+ * Builds a complete VfsFolderNode hierarchy representing a loaded local directory
+ * and its nested files.
+ */
+export function buildDirectoryVfsTree(files: StoredDirectoryFile[], rootName: string): VfsFolderNode {
+  const rootFolder: VfsFolderNode = {
+    kind: 'folder',
+    name: rootName,
+    key: rootName,
+    url: null,
+    linkTarget: null,
+    children: [],
+    isExpanded: true,
+    isRootDomain: true,
+  };
+
+  for (const file of files) {
+    const rawPath = file.path.replace(/^\/+/, '');
+    const segments = rawPath.split('/').filter(Boolean);
+    if (segments.length === 0) continue;
+
+    const folderSegments = segments.slice(0, -1);
+    const lastSegment = segments[segments.length - 1];
+
+    let currentLevel = rootFolder.children;
+    let pathSoFar = rootName;
+
+    for (const seg of folderSegments) {
+      pathSoFar = `${pathSoFar}/${seg}`;
+      let folder = findFolder(currentLevel, pathSoFar);
+      if (!folder) {
+        folder = {
+          kind: 'folder',
+          name: seg,
+          key: pathSoFar,
+          url: null,
+          linkTarget: null,
+          children: [],
+          isExpanded: true,
+          isRootDomain: false,
+        };
+        insertSorted(currentLevel, folder);
+      }
+      currentLevel = folder.children;
+    }
+
+    const fileUrl = `file:///${rootName}/${rawPath}`;
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(fileUrl);
+    } catch {
+      parsedUrl = new URL('file:///' + rawPath);
+    }
+    const linkTargetType = classifyLinkTarget(parsedUrl);
+
+    const fileNode: VfsFileNode = {
+      kind: 'file',
+      name: lastSegment,
+      url: fileUrl,
+      linkTarget: linkTargetType === 'font' ? 'font' : 'source',
+      fileType: extensionToFileType(parsedUrl),
+      count: 1,
+      isExplored: false,
+      isLoading: false,
+      hasReferences: null,
+      isExpanded: false,
+      references: [],
+    };
+    insertSorted(currentLevel, fileNode);
+  }
+
+  return rootFolder;
 }

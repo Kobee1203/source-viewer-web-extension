@@ -1,4 +1,4 @@
-import { isHtmlExtension } from '@/utils/fileType';
+import { isHtmlDocument } from '@/utils/fileType';
 
 /**
  * Extracts the raw source text directly from the host page's DOM.
@@ -7,7 +7,7 @@ import { isHtmlExtension } from '@/utils/fileType';
  * For raw source files (CSS, JS, JSON, XML), browsers natively wrap the raw text in a `<pre>` element.
  */
 export function extractHostSource(): string {
-  const isHtml = isHtmlExtension(location.pathname) || document.contentType === 'text/html';
+  const isHtml = isHtmlDocument(location.pathname, document.contentType);
   if (isHtml) {
     const doctype = document.doctype
       ? `<!DOCTYPE ${document.doctype.name}` +

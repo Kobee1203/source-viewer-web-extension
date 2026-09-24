@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, provide, ref } from 'vue';
-import { X } from '@lucide/vue';
+import { FolderX, X } from '@lucide/vue';
 import ReferenceTreeNode from '@/components/ReferenceTreeNode.vue';
 import type { ReferenceEntry, VfsFileNode, VfsFolderNode, VfsNode } from '@/composables/useReferenceSidebar';
 import { t } from '@/utils/i18n';
@@ -8,6 +8,7 @@ import { t } from '@/utils/i18n';
 const props = defineProps<{
   vfsTree: VfsNode[];
   activeUrl: string;
+  directoryName?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -16,6 +17,7 @@ const emit = defineEmits<{
   'toggle-folder': [node: VfsFolderNode];
   'toggle-file': [node: VfsFileNode];
   close: [];
+  'close-directory': [];
 }>();
 
 const sidebarEl = ref<HTMLElement | null>(null);
@@ -85,16 +87,30 @@ function nodeKey(node: VfsNode): string {
   <aside ref="sidebarEl" class="reference-sidebar" :aria-label="t('sidebarTitle')">
     <!-- Header -->
     <div class="sidebar-header">
-      <span class="sidebar-title">{{ t('sidebarTitle') }}</span>
-      <button
-        type="button"
-        class="close-btn"
-        :title="t('dialogClose')"
-        :aria-label="t('dialogClose')"
-        @click="emit('close')"
-      >
-        <X :size="14" />
-      </button>
+      <span class="sidebar-title" :title="directoryName ?? t('sidebarTitle')">
+        {{ directoryName ?? t('sidebarTitle') }}
+      </span>
+      <div class="sidebar-actions">
+        <button
+          v-if="directoryName"
+          type="button"
+          class="action-btn"
+          :title="t('viewerCloseDirectory')"
+          :aria-label="t('viewerCloseDirectory')"
+          @click="emit('close-directory')"
+        >
+          <FolderX :size="14" />
+        </button>
+        <button
+          type="button"
+          class="close-btn"
+          :title="t('dialogClose')"
+          :aria-label="t('dialogClose')"
+          @click="emit('close')"
+        >
+          <X :size="14" />
+        </button>
+      </div>
     </div>
 
     <!-- VFS tree -->
@@ -147,6 +163,13 @@ function nodeKey(node: VfsNode): string {
   opacity: 0.7;
 }
 
+.sidebar-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.action-btn,
 .close-btn {
   display: inline-flex;
   align-items: center;
@@ -162,6 +185,7 @@ function nodeKey(node: VfsNode): string {
   opacity: 0.6;
 }
 
+.action-btn:hover,
 .close-btn:hover {
   background: var(--btn-bg-hover);
   opacity: 1;

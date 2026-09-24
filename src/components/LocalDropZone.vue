@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { FileUp, FolderOpen } from '@lucide/vue';
+import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import { pickLocalFile } from '@/composables/useLocalFile';
 import { t } from '@/utils/i18n';
 
 const emit = defineEmits<{
   'file-selected': [file: File, handle?: FileSystemFileHandle];
+  'directory-loaded': [];
 }>();
 
 const isDragging = ref(false);
@@ -19,19 +21,36 @@ function onDragLeave(): void {
   isDragging.value = false;
 }
 
-function onDrop(event: DragEvent): void {
+async function onDrop(event: DragEvent): Promise<void> {
   event.preventDefault();
   isDragging.value = false;
-  const file = event.dataTransfer?.files?.[0];
+  if (!event.dataTransfer) return;
+
+  const { loadFromDataTransfer } = useLocalDirectory();
+  const loadedDir = await loadFromDataTransfer(event.dataTransfer);
+  if (loadedDir) {
+    emit('directory-loaded');
+    return;
+  }
+
+  const file = event.dataTransfer.files?.[0];
   if (file) {
     emit('file-selected', file);
   }
 }
 
-async function onBrowse(): Promise<void> {
+async function onBrowseFile(): Promise<void> {
   const result = await pickLocalFile();
   if (result) {
     emit('file-selected', result.file, result.handle);
+  }
+}
+
+async function onBrowseDirectory(): Promise<void> {
+  const { pickDirectory } = useLocalDirectory();
+  const ok = await pickDirectory();
+  if (ok) {
+    emit('directory-loaded');
   }
 }
 </script>
@@ -46,18 +65,25 @@ async function onBrowse(): Promise<void> {
     @dragover="onDragOver"
     @dragleave="onDragLeave"
     @drop="onDrop"
-    @click="onBrowse"
-    @keydown.enter.prevent="onBrowse"
-    @keydown.space.prevent="onBrowse"
+    @click="onBrowseFile"
+    @keydown.enter.prevent="onBrowseFile"
+    @keydown.space.prevent="onBrowseFile"
   >
     <div class="drop-content">
       <FileUp v-if="isDragging" class="drop-icon pulse" :size="48" />
       <FolderOpen v-else class="drop-icon" :size="48" />
       <h2 class="drop-title">{{ t('viewerDropFileHere') }}</h2>
       <p class="drop-hint">{{ t('viewerDropHint') }}</p>
-      <button type="button" class="browse-btn" @click.stop="onBrowse">
-        {{ t('viewerOpenLocalFile') }}
-      </button>
+      <div class="drop-actions">
+        <button type="button" class="browse-btn" @click.stop="onBrowseFile">
+          <FileUp :size="16" class="btn-ic" />
+          {{ t('viewerOpenLocalFile') }}
+        </button>
+        <button type="button" class="browse-btn secondary" @click.stop="onBrowseDirectory">
+          <FolderOpen :size="16" class="btn-ic" />
+          {{ t('viewerOpenLocalDirectory') }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -143,7 +169,17 @@ async function onBrowse(): Promise<void> {
   opacity: 0.8;
 }
 
+.drop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
 .browse-btn {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   padding: 8px 18px;
   font-size: 13px;
   font-weight: 600;
@@ -157,5 +193,18 @@ async function onBrowse(): Promise<void> {
 
 .browse-btn:hover {
   background-color: #0056b3;
+}
+
+.browse-btn.secondary {
+  color: var(--app-fg);
+  background-color: var(--toolbar-border);
+}
+
+.browse-btn.secondary:hover {
+  background-color: var(--btn-bg-hover);
+}
+
+.btn-ic {
+  flex-shrink: 0;
 }
 </style>

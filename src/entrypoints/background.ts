@@ -3,14 +3,15 @@ import { defineBackground } from '#imports';
 import { t } from '@/utils/i18n';
 import {
   type FetchSourceRequest,
-  type FetchSourceResponse,
   type RequestViewerInjectionRequest,
   type RequestViewerInjectionResponse,
   type RequestViewerRedirectRequest,
   fetchSource,
 } from '@/utils/messaging';
-import { type OpenNativeRequest, type OpenNativeResponse, createNativeViewerController } from '@/utils/nativeViewer';
+import { type OpenNativeRequest, createNativeViewerController } from '@/utils/nativeViewer';
 import { isRestricted } from '@/utils/restricted';
+import { clearSessionSource, getSessionSource, refreshTabSource, saveSessionSource } from '@/utils/sessionSource';
+import { captureTabSource } from '@/utils/tabSourceCapture';
 import { viewerUrl } from '@/utils/viewerUrl';
 
 export default defineBackground(() => {
@@ -42,7 +43,18 @@ export default defineBackground(() => {
       return;
     }
 
-    if (targetUrl.protocol === 'file:') {
+    const isFirefox = navigator.userAgent.includes('Firefox');
+    // On Chromium, extension pages with file scheme access can read file:/// URLs directly from disk,
+    // avoiding CORS restrictions and retrieving the authentic source before JS execution.
+    // On Firefox, moz-extension:// is blocked from reading file:///, requiring in-tab source capture.
+    const shouldCaptureTab = tabId !== undefined && !isLink && (targetUrl.protocol !== 'file:' || isFirefox);
+
+    let captured = null;
+    if (shouldCaptureTab && tabId !== undefined) {
+      captured = await captureTabSource(tabId);
+    }
+
+    if (targetUrl.protocol === 'file:' && !captured) {
       const isAllowed = await browser.extension.isAllowedFileSchemeAccess();
       if (!isAllowed) {
         void browser.tabs.create({ url: `${viewerUrl(targetUrl.toString())}&fileAccess=0` });
@@ -56,12 +68,18 @@ export default defineBackground(() => {
     if (openIn === 'current-tab' && tabId !== undefined && !isLink) {
       const res = await injectViewer({ type: 'REQUEST_VIEWER_INJECTION', url: targetUrl.toString() }, tabId);
       if (!res.inject) {
+        if (captured) {
+          await saveSessionSource(tabId, captured, targetUrl.toString(), tabId);
+        }
         void browser.tabs.update(tabId, { url: viewerUrl(targetUrl.toString()) });
       }
       return;
     }
 
-    void browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
+    const newTab = await browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
+    if (captured && newTab.id !== undefined) {
+      await saveSessionSource(newTab.id, captured, targetUrl.toString(), tabId);
+    }
   }
 
   // Toolbar icon: open our viewer for the current tab (or empty viewer when on blank/restricted page).
@@ -73,8 +91,13 @@ export default defineBackground(() => {
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId !== CONTEXT_MENU_ID) return;
     const isLink = Boolean(info.linkUrl);
-    const url = info.linkUrl || info.frameUrl || info.pageUrl || tab?.url;
+    const url = info.linkUrl || info.pageUrl || info.frameUrl || tab?.url;
     void openSourceViewer(url, tab?.id, isLink);
+  });
+
+  // Clean up session source cache when a viewer tab is closed.
+  browser.tabs.onRemoved.addListener((tabId) => {
+    void clearSessionSource(tabId);
   });
 
   // Intercept navigations to view-source: and redirect them to our viewer,
@@ -92,6 +115,7 @@ export default defineBackground(() => {
 
     const targetUrl = new URL(url.slice('view-source:'.length));
     if (isRestricted(targetUrl)) return;
+    if (targetUrl.protocol === 'file:') return;
 
     const isFileDisallowed = targetUrl.protocol === 'file:' && !(await browser.extension.isAllowedFileSchemeAccess());
     const dest = isFileDisallowed ? `${viewerUrl(targetUrl.toString())}&fileAccess=0` : viewerUrl(targetUrl.toString());
@@ -131,32 +155,28 @@ export default defineBackground(() => {
 
   // Returning a Promise is how a message listener replies asynchronously.
   // (no-misused-promises' argument check is relaxed for this file in eslint.config.)
-  browser.runtime.onMessage.addListener(
-    (
-      message,
-      sender,
-    ):
-      | Promise<FetchSourceResponse>
-      | Promise<OpenNativeResponse>
-      | Promise<RequestViewerInjectionResponse>
-      | Promise<void>
-      | false => {
-      if (typeof message !== 'object' || message === null) return false;
-      const type = (message as { type?: unknown }).type;
+  browser.runtime.onMessage.addListener((message, sender): Promise<unknown> | false => {
+    if (typeof message !== 'object' || message === null) return false;
+    const type = (message as { type?: unknown }).type;
 
-      if (type === 'OPEN_NATIVE') {
-        return nativeViewer.open(message as OpenNativeRequest, sender.tab?.id);
-      }
-      if (type === 'FETCH_SOURCE') {
-        return fetchSource(message as FetchSourceRequest);
-      }
-      if (type === 'REQUEST_VIEWER_INJECTION') {
-        return injectViewer(message as RequestViewerInjectionRequest, sender.tab?.id);
-      }
-      if (type === 'REQUEST_VIEWER_REDIRECT') {
-        return redirectToViewer(message as RequestViewerRedirectRequest, sender.tab?.id);
-      }
-      return false;
-    },
-  );
+    if (type === 'OPEN_NATIVE') {
+      return nativeViewer.open(message as OpenNativeRequest, sender.tab?.id);
+    }
+    if (type === 'FETCH_SOURCE') {
+      return fetchSource(message as FetchSourceRequest);
+    }
+    if (type === 'GET_SESSION_SOURCE') {
+      return getSessionSource(sender.tab?.id);
+    }
+    if (type === 'REFRESH_TAB_SOURCE') {
+      return refreshTabSource(sender.tab?.id);
+    }
+    if (type === 'REQUEST_VIEWER_INJECTION') {
+      return injectViewer(message as RequestViewerInjectionRequest, sender.tab?.id);
+    }
+    if (type === 'REQUEST_VIEWER_REDIRECT') {
+      return redirectToViewer(message as RequestViewerRedirectRequest, sender.tab?.id);
+    }
+    return false;
+  });
 });

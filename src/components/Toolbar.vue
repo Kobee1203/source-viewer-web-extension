@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { type Ref, computed, ref, toValue } from 'vue';
 import {
   Check,
   Copy,
   Download,
   FileCode,
   FileText,
+  FileUp,
   FolderOpen,
+  FolderX,
   Link,
   Palette,
   PanelLeft,
@@ -23,25 +25,33 @@ import SettingsDialog from '@/components/SettingsDialog.vue';
 import { useCopyFeedback } from '@/composables/useCopyFeedback';
 import type { OpenInMode } from '@/composables/usePreferences';
 import { downloadSource } from '@/utils/download';
-import type { FileType } from '@/utils/fileType';
+import { DEFAULT_FILE_TYPE, type FileType } from '@/utils/fileType';
 import { DEFAULT_FONT_SIZE } from '@/utils/fonts';
 import { t } from '@/utils/i18n';
 import { openNativeViewer } from '@/utils/nativeViewer';
 import { THEMES } from '@/utils/themes';
+
+export interface ToolbarSourceState {
+  code: string | Ref<string>;
+  rawCode?: string | Ref<string>;
+  language?: FileType | Ref<FileType>;
+  targetUrl?: URL | null | Ref<URL | null>;
+  fileName?: string | null | Ref<string | null>;
+  contentDisposition?: string | null | Ref<string | null>;
+  hasFileHandle?: boolean | Ref<boolean>;
+  isLocalSnapshot?: boolean | Ref<boolean>;
+  isDirectoryFile?: boolean | Ref<boolean>;
+}
 
 const props = defineProps<{
   themeId: string;
   wordWrap: boolean;
   fontSize: number;
   openIn?: OpenInMode;
-  targetUrl: URL | null;
-  code: string;
-  rawCode: string;
-  language: FileType;
-  contentDisposition: string | null;
+  source: ToolbarSourceState;
   sidebarOpen: boolean;
-  hasFileHandle?: boolean;
-  fileName?: string | null;
+  isDirectoryLoaded?: boolean;
+  canReload?: boolean;
 }>();
 const emit = defineEmits<{
   'update:themeId': [value: string];
@@ -51,8 +61,26 @@ const emit = defineEmits<{
   search: [];
   'toggle-sidebar': [];
   'open-local': [];
-  'reload-local': [];
+  'open-directory': [];
+  'close-directory': [];
+  reload: [];
 }>();
+
+const targetUrl = computed(() => toValue(props.source.targetUrl) ?? null);
+const code = computed(() => toValue(props.source.code) ?? '');
+const rawCode = computed(() => toValue(props.source.rawCode) ?? '');
+const language = computed(() => toValue(props.source.language) ?? DEFAULT_FILE_TYPE);
+const contentDisposition = computed(() => toValue(props.source.contentDisposition) ?? null);
+const fileName = computed(() => toValue(props.source.fileName) ?? null);
+const hasFileHandle = computed(() => toValue(props.source.hasFileHandle) ?? false);
+const isLocalSnapshot = computed(() => toValue(props.source.isLocalSnapshot) ?? false);
+const isDirectoryFile = computed(() => toValue(props.source.isDirectoryFile) ?? false);
+
+const canReload = computed(
+  () =>
+    props.canReload ??
+    Boolean(hasFileHandle.value || targetUrl.value || isLocalSnapshot.value || isDirectoryFile.value),
+);
 
 const showSettings = ref(false);
 const isInplace = typeof window !== 'undefined' && window.parent !== window;
@@ -64,19 +92,19 @@ function onCloseInplace(): void {
 const { copied, copy } = useCopyFeedback<boolean>(2000);
 
 async function onCopyFormatted(): Promise<void> {
-  if (!props.code) return;
-  await copy(props.code, true);
+  if (!code.value) return;
+  await copy(code.value, true);
 }
 
 async function onCopyRaw(): Promise<void> {
-  const text = props.rawCode || props.code;
+  const text = rawCode.value || code.value;
   if (!text) return;
   await copy(text, true);
 }
 
 async function onCopyUrl(): Promise<void> {
-  if (!props.targetUrl) return;
-  await copy(props.targetUrl.toString(), true);
+  if (!targetUrl.value) return;
+  await copy(targetUrl.value.toString(), true);
 }
 
 const copyMenuItems = computed<DropdownMenuItem[]>(() => {
@@ -92,7 +120,7 @@ const copyMenuItems = computed<DropdownMenuItem[]>(() => {
       onSelect: () => void onCopyRaw(),
     },
   ];
-  if (props.targetUrl) {
+  if (targetUrl.value) {
     items.push({
       label: t('viewerCopyUrl'),
       icon: Link,
@@ -127,15 +155,15 @@ function toggleWrap(): void {
 
 /** Opens the target URL in the browser's native `view-source:` viewer. */
 function openNative(newTab: boolean): void {
-  if (!props.targetUrl) return;
-  void openNativeViewer(props.targetUrl, newTab);
+  if (!targetUrl.value) return;
+  void openNativeViewer(targetUrl.value, newTab);
 }
 
 /** Downloads the formatted source shown in the viewer. */
 function onDownload(): void {
-  const url = props.targetUrl ?? (props.fileName ? new URL('file:///' + props.fileName) : null);
-  if (!url || !props.code) return;
-  downloadSource(props.code, props.language, url, props.contentDisposition);
+  const url = targetUrl.value ?? (fileName.value ? new URL('file:///' + fileName.value) : null);
+  if (!url || !code.value) return;
+  downloadSource(code.value, language.value, url, contentDisposition.value);
 }
 
 // No real `href`: `view-source:` cannot be navigated to via <a href>, so gestures
@@ -155,7 +183,7 @@ function onNativeAuxClick(event: MouseEvent): void {
 <template>
   <div class="toolbar">
     <IconButton
-      v-if="code && targetUrl"
+      v-if="code && (targetUrl || isDirectoryLoaded)"
       :active="sidebarOpen"
       :label="t('viewerToggleSidebar')"
       @click="emit('toggle-sidebar')"
@@ -168,10 +196,18 @@ function onNativeAuxClick(event: MouseEvent): void {
     </IconButton>
 
     <IconButton :label="t('viewerOpenLocalFile')" @click="emit('open-local')">
+      <FileUp :size="20" />
+    </IconButton>
+
+    <IconButton :label="t('viewerOpenLocalDirectory')" @click="emit('open-directory')">
       <FolderOpen :size="20" />
     </IconButton>
 
-    <IconButton v-if="hasFileHandle" :label="t('viewerReload')" @click="emit('reload-local')">
+    <IconButton v-if="isDirectoryLoaded" :label="t('viewerCloseDirectory')" @click="emit('close-directory')">
+      <FolderX :size="20" />
+    </IconButton>
+
+    <IconButton v-if="canReload" :label="t('viewerReload')" @click="emit('reload')">
       <RefreshCw :size="20" />
     </IconButton>
 

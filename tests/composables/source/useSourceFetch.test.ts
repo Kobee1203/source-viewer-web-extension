@@ -95,4 +95,64 @@ describe('useSourceFetch', () => {
     expect(isLocalSnapshot.value).toBe(true);
     expect(code.value).toContain('body {\n  margin: 0;\n}');
   });
+
+  it('refreshSource re-captures fresh source from active source tab', async () => {
+    mockBrowser.runtime.sendMessage.mockResolvedValueOnce({
+      ok: true,
+      source: {
+        text: '<h1>Refreshed</h1>',
+        byteSize: 18,
+        isDomFallback: false,
+        timestamp: 99999,
+      },
+    });
+
+    const { code, rawCode, isDomFallback, isSourceTabClosed, refreshSource } = useSourceFetch();
+
+    await refreshSource();
+
+    expect(rawCode.value).toBe('<h1>Refreshed</h1>');
+    expect(code.value).toContain('<h1>Refreshed</h1>');
+    expect(isDomFallback.value).toBe(false);
+    expect(isSourceTabClosed.value).toBe(false);
+  });
+
+  it('refreshSource flags isSourceTabClosed when source tab is closed', async () => {
+    mockBrowser.runtime.sendMessage.mockResolvedValueOnce({
+      ok: false,
+      sourceTabClosed: true,
+      source: {
+        text: '<h1>Existing Snapshot</h1>',
+        byteSize: 26,
+        isDomFallback: false,
+        timestamp: 12345,
+      },
+    });
+
+    const { isSourceTabClosed, refreshSource } = useSourceFetch();
+
+    await refreshSource();
+
+    expect(isSourceTabClosed.value).toBe(true);
+  });
+
+  it('clears URL query parameters and loads file from active directory without fetch', async () => {
+    history.replaceState(null, '', '/viewer.html?url=file%3A%2F%2F%2Ffixtures%2Fsample.html');
+    const { useLocalDirectory } = await import('@/composables/useLocalDirectory');
+    const dir = useLocalDirectory();
+    await dir.initDirectory('fixtures', [
+      { path: 'sample.html', name: 'sample.html', type: 'html', size: 50, text: '<h1>Directory File</h1>' },
+    ]);
+
+    const { loading, code, isDirectoryFile, load } = useSourceFetch();
+
+    await load('file:///fixtures/sample.html');
+
+    expect(loading.value).toBe(false);
+    expect(isDirectoryFile.value).toBe(true);
+    expect(code.value).toContain('<h1>Directory File</h1>');
+    expect(window.location.search).toBe('');
+
+    await dir.closeDirectory();
+  });
 });

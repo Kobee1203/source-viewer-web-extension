@@ -95,4 +95,25 @@ describe('resolveFetchStrategy', () => {
       });
     }
   });
+
+  it('resolves inplaceLocalStrategy for remote https:// URLs when embedded in iframe', () => {
+    const originalTop = window.top;
+    try {
+      Object.defineProperty(window, 'top', {
+        value: {},
+        configurable: true,
+      });
+
+      const strategy = resolveFetchStrategy({
+        kind: 'url',
+        url: new URL('https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js'),
+      });
+      expect(strategy).toBe(inplaceLocalStrategy);
+    } finally {
+      Object.defineProperty(window, 'top', {
+        value: originalTop,
+        configurable: true,
+      });
+    }
+  });
 });

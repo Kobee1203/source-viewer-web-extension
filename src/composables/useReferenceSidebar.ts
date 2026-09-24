@@ -291,6 +291,20 @@ export function useReferenceSidebar() {
     pendingFileUrl.value = null;
   }
 
+  /**
+   * Directly sets the VFS tree from a loaded local directory and activates it.
+   */
+  function setDirectoryTree(tree: VfsNode[], initialActiveUrl: string, autoOpen = true): void {
+    vfsTree.value = tree;
+    activeUrl.value = initialActiveUrl;
+    if (initialActiveUrl) {
+      setRootInfo(initialActiveUrl);
+    }
+    if (autoOpen) {
+      isOpen.value = true;
+    }
+  }
+
   return {
     isOpen,
     vfsTree,
@@ -300,6 +314,7 @@ export function useReferenceSidebar() {
     toggle,
     initFromSource,
     seedFromRootUrl,
+    setDirectoryTree,
     navigateTo,
     navigateToRoot,
     navigateToShortcut,

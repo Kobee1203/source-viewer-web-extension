@@ -74,7 +74,13 @@ export default defineContentScript({
         cleanup();
       } else if (type === 'REQUEST_INPLACE_LOCAL_SOURCE') {
         const text = extractHostSource();
-        iframe.contentWindow?.postMessage({ type: 'INPLACE_LOCAL_SOURCE_DATA', text }, '*');
+        iframe.contentWindow?.postMessage(
+          {
+            type: 'INPLACE_LOCAL_SOURCE_DATA',
+            text,
+          },
+          '*',
+        );
       }
     };
 

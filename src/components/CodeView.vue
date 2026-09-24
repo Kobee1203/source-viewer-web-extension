@@ -18,6 +18,10 @@ const props = defineProps<{
   fontSize: number;
 }>();
 
+const emit = defineEmits<{
+  linkClick: [payload: { rawUrl: string; targetUrl: string; event: MouseEvent }];
+}>();
+
 // Language support and theme are each their own lazy chunk, loaded on demand (see useAsyncExtension).
 const { extension: langSupport } = useAsyncExtension(() => props.language, loadLanguage);
 const { extension: themeExtension, loaded: themeLoaded } = useAsyncExtension(
@@ -45,6 +49,12 @@ function handleReady(payload: { view: EditorView }): void {
 
 function onClick(event: MouseEvent): void {
   if ((event.target as HTMLElement | null)?.closest('.cm-panels')) return;
+  const link = (event.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a.source-link');
+  if (link && !window.getSelection()?.toString()) {
+    const rawUrl = link.dataset.rawUrl ?? '';
+    const targetUrl = link.dataset.targetUrl || link.getAttribute('href') || '';
+    emit('linkClick', { rawUrl, targetUrl, event });
+  }
   editorView.value?.scrollDOM.focus();
 }
 
@@ -64,7 +74,7 @@ defineExpose({ openSearch });
 </script>
 
 <template>
-  <div class="code-view" @click="onClick">
+  <div class="code-view" @click="onClick" @auxclick="onClick">
     <CodeMirror
       v-if="initialReady"
       :model-value="code"

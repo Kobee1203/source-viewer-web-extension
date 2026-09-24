@@ -1,35 +1,58 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { type Ref, computed, toValue } from 'vue';
 import { formatBytes } from '@/utils/format';
 import { t } from '@/utils/i18n';
 
+export interface StatusBarSourceState {
+  byteSize?: number | null | Ref<number | null>;
+  httpStatus?: number | null | Ref<number | null>;
+  httpStatusText?: string | Ref<string>;
+  isLocalSnapshot?: boolean | Ref<boolean>;
+  isDomFallback?: boolean | Ref<boolean>;
+  isSourceTabClosed?: boolean | Ref<boolean>;
+}
+
 const props = defineProps<{
-  bytes: number;
-  httpStatus?: number | null;
-  httpStatusText?: string;
-  isLocalSnapshot?: boolean;
+  source: StatusBarSourceState;
+  directoryName?: string | null;
 }>();
 
-const httpStatus = computed(() =>
-  props.httpStatus != null && props.httpStatus >= 400 ? 'http-error' : 'http-success',
+const bytes = computed(() => toValue(props.source.byteSize) ?? 0);
+const httpStatus = computed(() => toValue(props.source.httpStatus) ?? null);
+const httpStatusText = computed(() => toValue(props.source.httpStatusText) ?? '');
+const isLocalSnapshot = computed(() => toValue(props.source.isLocalSnapshot) ?? false);
+const isDomFallback = computed(() => toValue(props.source.isDomFallback) ?? false);
+const isSourceTabClosed = computed(() => toValue(props.source.isSourceTabClosed) ?? false);
+
+const httpStatusClass = computed(() =>
+  httpStatus.value != null && httpStatus.value >= 400 ? 'http-error' : 'http-success',
 );
 
 const httpStatusLabel = computed(() =>
-  props.httpStatusText ? `HTTP ${props.httpStatus} - ${props.httpStatusText}` : `HTTP ${props.httpStatus}`,
+  httpStatusText.value ? `HTTP ${httpStatus.value} - ${httpStatusText.value}` : `HTTP ${httpStatus.value}`,
 );
 </script>
 
 <template>
   <div class="status-bar">
     <div class="status-left">
-      <span v-if="httpStatusText || httpStatus != null" class="http-status" :class="[httpStatus]">
+      <span v-if="httpStatusText || httpStatus != null" class="http-status" :class="[httpStatusClass]">
         {{ httpStatusLabel }}
       </span>
-      <span v-if="isLocalSnapshot" class="snapshot-badge" :title="t('viewerSnapshotRefreshHint')">
+      <span v-if="directoryName" class="directory-badge" :title="t('viewerDirectoryBadge')">
+        📁 {{ directoryName }}
+      </span>
+      <span v-if="isSourceTabClosed" class="snapshot-badge" :title="t('viewerBadgeTabClosedTooltip')">
+        {{ t('viewerBadgeTabClosed') }}
+      </span>
+      <span v-else-if="isDomFallback" class="snapshot-badge" :title="t('viewerBadgeDomTooltip')">
+        {{ t('viewerBadgeDomFallback') }}
+      </span>
+      <span v-else-if="isLocalSnapshot" class="snapshot-badge" :title="t('viewerSnapshotRefreshHint')">
         {{ t('viewerSnapshotBadge') }}
       </span>
     </div>
-    <span class="page-size">{{ t('viewerPageSize', [formatBytes(props.bytes)]) }}</span>
+    <span class="page-size">{{ t('viewerPageSize', [formatBytes(bytes)]) }}</span>
   </div>
 </template>
 
@@ -79,5 +102,15 @@ const httpStatusLabel = computed(() =>
   border: 1px solid var(--app-border);
   border-radius: 8px;
   opacity: 0.9;
+}
+
+.directory-badge {
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--app-fg);
+  background: var(--app-control-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
 }
 </style>

@@ -75,11 +75,20 @@ export function requestViewerRedirect(url: string): Promise<void> {
  * there to avoid the page's own CORS/CSP constraints.
  */
 export async function fetchSource(message: FetchSourceRequest): Promise<FetchSourceResponse> {
-  try {
-    const res = await fetch(message.url, {
+  const tryFetch = (credentials: RequestCredentials) =>
+    fetch(message.url, {
       headers: { Accept: 'text/html,text/plain,*/*' },
-      credentials: 'include',
+      credentials,
     });
+
+  try {
+    let res: Response;
+    try {
+      res = await tryFetch('include');
+    } catch {
+      // If include failed (e.g. CORS wildcard origin mismatch on public CDNs), retry without credentials
+      res = await tryFetch('same-origin');
+    }
     const contentType = res.headers.get('content-type');
     // Read raw bytes and decode ourselves: res.text() would default to UTF-8 whenever the header
     // carries no parseable charset, corrupting legacy-encoded pages (see charset.ts).
@@ -100,4 +109,48 @@ export async function fetchSource(message: FetchSourceRequest): Promise<FetchSou
   } catch (err) {
     return { ok: false, error: (err as Error).message };
   }
+}
+
+/** In-memory payload stored in browser.storage.session for a viewer tab. */
+export interface SessionSourcePayload {
+  url?: string;
+  text: string;
+  byteSize: number;
+  isDomFallback: boolean;
+  contentType?: string;
+  characterSet?: string;
+  sourceTabId?: number;
+  timestamp: number;
+}
+
+/** Request sent from a viewer tab to retrieve its captured session source from the background. */
+export interface GetSessionSourceRequest {
+  type: 'GET_SESSION_SOURCE';
+}
+
+export interface GetSessionSourceResponse {
+  source: SessionSourcePayload | null;
+  sourceTabClosed?: boolean;
+}
+
+export function requestSessionSource(): Promise<GetSessionSourceResponse> {
+  const message: GetSessionSourceRequest = { type: 'GET_SESSION_SOURCE' };
+  return browser.runtime.sendMessage(message);
+}
+
+/** Request sent from a viewer tab to refresh its source by re-capturing its source tab. */
+export interface RefreshTabSourceRequest {
+  type: 'REFRESH_TAB_SOURCE';
+}
+
+export interface RefreshTabSourceResponse {
+  ok: boolean;
+  source: SessionSourcePayload | null;
+  sourceTabClosed?: boolean;
+  error?: string;
+}
+
+export function requestRefreshTabSource(): Promise<RefreshTabSourceResponse> {
+  const message: RefreshTabSourceRequest = { type: 'REFRESH_TAB_SOURCE' };
+  return browser.runtime.sendMessage(message);
 }

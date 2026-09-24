@@ -53,7 +53,21 @@
           themes, font glyph inspection, and deep structural search capabilities across web pages.
         </p>
         <p>Source Viewer parses and formats web documents on the fly with rich CodeMirror 6 syntax trees.</p>
+        <div id="dynamic-container"></div>
       </article>
     </main>
+
+    <script>
+      // Dynamic client-side DOM injection on page load for inspection verification
+      const dynamicContainer = document.getElementById('dynamic-container');
+      if (dynamicContainer) {
+        const dynamicSection = document.createElement('section');
+        dynamicSection.id = 'client-injected-features';
+        dynamicSection.className = 'dynamic-features-card';
+        dynamicSection.innerHTML =
+          '<h2>Client-Side Runtime Features</h2><p>This section was dynamically injected by client-side JavaScript to demonstrate differences between static page source and rendered DOM trees.</p>';
+        dynamicContainer.appendChild(dynamicSection);
+      }
+    </script>
   </body>
 </html>
