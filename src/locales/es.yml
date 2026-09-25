@@ -7,6 +7,8 @@ settingsOpenInLabel: 'Abrir el visor de código en:'
 settingsOpenInDescription: 'Elija dónde abrir el visor al hacer clic en el icono de la barra de herramientas o en el menú contextual.'
 settingsOpenInNewTab: 'Pestaña nueva (predeterminado)'
 settingsOpenInCurrentTab: 'Pestaña actual (In-place)'
+settingsContextMenuLabel: 'Menú contextual'
+settingsContextMenuDescription: "Mostrar 'Ver código fuente con Source Viewer' en el menú contextual del clic derecho."
 viewerClose: 'Cerrar visor'
 viewerWordWrap: 'Ajuste de línea'
 viewerTheme: 'Tema:'

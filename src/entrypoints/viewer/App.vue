@@ -19,7 +19,7 @@ import { t } from '@/utils/i18n';
 const sourceFetch = useSourceFetch();
 const localDirectory = useLocalDirectory();
 const sidebar = useReferenceSidebar();
-const { themeId, wordWrap, codeFontSize, openIn } = usePreferences();
+const { themeId, wordWrap, codeFontSize, openIn, contextMenu } = usePreferences();
 
 const baseUrl = computed(() => sourceFetch.targetUrl.value?.toString() ?? '');
 const codeView = useTemplateRef('codeView');
@@ -72,6 +72,7 @@ void sourceFetch.load();
       v-model:word-wrap="wordWrap"
       v-model:font-size="codeFontSize"
       v-model:open-in="openIn"
+      v-model:context-menu="contextMenu"
       :source="sourceFetch"
       :sidebar-open="sidebar.isOpen.value"
       :is-directory-loaded="localDirectory.isLoaded.value"

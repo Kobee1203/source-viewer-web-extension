@@ -7,6 +7,8 @@ settingsOpenInLabel: 'Abrir o visualizador de código em:'
 settingsOpenInDescription: 'Escolha onde abrir o visualizador ao clicar no ícone da barra de ferramentas ou no menu de contexto.'
 settingsOpenInNewTab: 'Nova aba (padrão)'
 settingsOpenInCurrentTab: 'Aba atual (In-place)'
+settingsContextMenuLabel: 'Menu de contexto'
+settingsContextMenuDescription: "Exibir 'Ver código-fonte com o Source Viewer' no menu de contexto do botão direito."
 viewerClose: 'Fechar visualizador'
 viewerWordWrap: 'Quebra de linha'
 viewerTheme: 'Tema:'

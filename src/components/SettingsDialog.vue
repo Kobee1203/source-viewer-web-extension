@@ -6,10 +6,12 @@ import Dialog from './Dialog.vue';
 
 defineProps<{
   openIn: OpenInMode;
+  contextMenu?: boolean;
 }>();
 
 const emit = defineEmits<{
   'update:openIn': [value: OpenInMode];
+  'update:contextMenu': [value: boolean];
   closed: [];
 }>();
 
@@ -28,6 +30,12 @@ function onOpenInChange(event: Event): void {
     emit('update:openIn', event.target.value as OpenInMode);
   }
 }
+
+function onContextMenuChange(event: Event): void {
+  if (event.target instanceof HTMLInputElement) {
+    emit('update:contextMenu', event.target.checked);
+  }
+}
 </script>
 
 <template>
@@ -39,6 +47,20 @@ function onOpenInChange(event: Event): void {
           <option value="new-tab">{{ t('settingsOpenInNewTab') }}</option>
           <option value="current-tab">{{ t('settingsOpenInCurrentTab') }}</option>
         </select>
+      </div>
+
+      <div v-if="contextMenu !== undefined" class="settings-field settings-field-checkbox">
+        <div class="settings-checkbox-info">
+          <label for="settings-context-menu" class="settings-label">{{ t('settingsContextMenuLabel') }}</label>
+          <span class="settings-desc">{{ t('settingsContextMenuDescription') }}</span>
+        </div>
+        <input
+          id="settings-context-menu"
+          type="checkbox"
+          :checked="contextMenu"
+          class="settings-checkbox"
+          @change="onContextMenuChange"
+        />
       </div>
     </div>
   </Dialog>
@@ -57,6 +79,32 @@ function onOpenInChange(event: Event): void {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.settings-field-checkbox {
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-checkbox-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-desc {
+  font-size: 12px;
+  color: var(--app-fg);
+  opacity: 0.75;
+}
+
+.settings-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--dialog-link);
+  cursor: pointer;
 }
 
 .settings-label {

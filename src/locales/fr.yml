@@ -7,6 +7,8 @@ settingsOpenInLabel: 'Ouvrir la visionneuse dans :'
 settingsOpenInDescription: "Choisissez où la visionneuse s'ouvre lors d'un clic sur l'icône de la barre d'outils ou le menu contextuel."
 settingsOpenInNewTab: 'Nouvel onglet (par défaut)'
 settingsOpenInCurrentTab: 'Onglet actuel (In-place)'
+settingsContextMenuLabel: 'Menu contextuel'
+settingsContextMenuDescription: "Afficher 'Afficher le code source avec Source Viewer' dans le menu contextuel du clic droit."
 viewerClose: 'Fermer la visionneuse'
 viewerWordWrap: 'Retour à la ligne automatique'
 viewerTheme: 'Thème :'

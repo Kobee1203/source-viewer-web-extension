@@ -7,6 +7,8 @@ settingsOpenInLabel: 'Apri il visualizzatore in:'
 settingsOpenInDescription: "Scegli dove aprire il visualizzatore quando si clicca sull'icona della barra degli strumenti o sul menu contestuale."
 settingsOpenInNewTab: 'Nuova scheda (predefinito)'
 settingsOpenInCurrentTab: 'Scheda corrente (In-place)'
+settingsContextMenuLabel: 'Menu contestuale'
+settingsContextMenuDescription: "Mostra 'Visualizza sorgente con Source Viewer' nel menu contestuale del tasto destro."
 viewerClose: 'Chiudi visualizzatore'
 viewerWordWrap: 'A capo automatico'
 viewerTheme: 'Tema:'

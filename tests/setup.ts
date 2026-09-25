@@ -22,6 +22,18 @@ export const mockBrowser = {
       set: vi.fn().mockResolvedValue(undefined),
       remove: vi.fn().mockResolvedValue(undefined),
     },
+    onChanged: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
+  },
+  contextMenus: {
+    create: vi.fn(),
+    remove: vi.fn().mockResolvedValue(undefined),
+    removeAll: vi.fn().mockResolvedValue(undefined),
+    onClicked: {
+      addListener: vi.fn(),
+    },
   },
   scripting: {
     executeScript: vi.fn().mockResolvedValue([]),
