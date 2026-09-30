@@ -2,12 +2,14 @@ import { computed, ref } from 'vue';
 import { resolveFetchStrategy } from '@/composables/source/resolver';
 import {
   type RawSourcePayload,
+  type ResourceType,
   type SourceErrorKind,
   SourceFetchError,
   type SourceStatus,
   type SourceTarget,
 } from '@/composables/source/types';
 import { useViewerNavigation } from '@/composables/source/useViewerNavigation';
+import { useFontLoad } from '@/composables/useFontLoad';
 import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import { getStoredSnapshot } from '@/composables/useLocalFile';
 import { formatSource } from '@/utils/beautify';
@@ -31,12 +33,15 @@ interface FatalErrorState {
  */
 export function useSourceFetch() {
   const navigation = useViewerNavigation();
+  const fontLoad = useFontLoad();
 
   // Internal state machine
   const status = ref<SourceStatus>('idle');
   const fatalError = ref<FatalErrorState | null>(null);
 
-  // Content state
+  // Resource & Content state
+  const resourceType = ref<ResourceType>('code');
+  const fontFormat = ref('');
   const code = ref('');
   const rawCode = ref('');
   const language = ref<FileType>(DEFAULT_FILE_TYPE);
@@ -63,6 +68,9 @@ export function useSourceFetch() {
   const hasFileHandle = computed(() => activeFileHandle.value !== null);
 
   function resetState(): void {
+    fontLoad.unload();
+    resourceType.value = 'code';
+    fontFormat.value = '';
     fatalError.value = null;
     code.value = '';
     rawCode.value = '';
@@ -79,6 +87,49 @@ export function useSourceFetch() {
     snapshotTimestamp.value = null;
   }
 
+  function applyMetadata(payload: RawSourcePayload): void {
+    byteSize.value = payload.byteSize;
+    targetUrl.value = payload.targetUrl ?? null;
+    fileName.value = payload.fileName ?? null;
+    isLocalSnapshot.value = payload.isLocalSnapshot ?? false;
+    isDomFallback.value = payload.isDomFallback ?? false;
+    isSourceTabClosed.value = payload.isSourceTabClosed ?? false;
+    isDirectoryFile.value = payload.isDirectoryFile ?? false;
+    snapshotTimestamp.value = payload.snapshotTimestamp ?? null;
+    activeFileHandle.value = payload.fileHandle ?? null;
+    contentDisposition.value = payload.contentDisposition ?? null;
+    httpStatus.value = payload.httpStatus ?? null;
+    httpStatusText.value = payload.httpStatusText ?? '';
+  }
+
+  async function applyFontPayload(payload: RawSourcePayload): Promise<void> {
+    resourceType.value = 'font';
+    fontFormat.value = payload.fontFormat ?? '';
+    await fontLoad.loadFromBuffer(payload.fontBuffer!, fontFormat.value);
+    if (fontLoad.errorMessage.value) {
+      throw new SourceFetchError('generic', fontLoad.errorMessage.value);
+    }
+  }
+
+  function applyCodePayload(payload: RawSourcePayload): void {
+    let detectedType: FileType = DEFAULT_FILE_TYPE;
+    if (payload.detectedFileType) {
+      detectedType = payload.detectedFileType;
+    } else if (payload.mimeType) {
+      detectedType = mimeToFileType(payload.mimeType) ?? DEFAULT_FILE_TYPE;
+    } else if (payload.targetUrl) {
+      detectedType = getFileType(payload.targetUrl);
+    } else if (payload.fileName) {
+      detectedType = getFileType(new URL(payload.fileName, 'file:///'));
+    }
+
+    resourceType.value = 'code';
+    fontFormat.value = '';
+    language.value = detectedType;
+    rawCode.value = payload.rawText;
+    code.value = formatSource(payload.rawText, detectedType);
+  }
+
   async function executePipeline(target: SourceTarget): Promise<void> {
     resetState();
     status.value = 'loading';
@@ -87,34 +138,13 @@ export function useSourceFetch() {
       const strategy = resolveFetchStrategy(target);
       const payload: RawSourcePayload = await strategy(target);
 
-      // Language detection: explicit type -> MIME type -> URL / filename extension
-      let detectedType: FileType = DEFAULT_FILE_TYPE;
-      if (payload.detectedFileType) {
-        detectedType = payload.detectedFileType;
-      } else if (payload.mimeType) {
-        detectedType = mimeToFileType(payload.mimeType) ?? DEFAULT_FILE_TYPE;
-      } else if (payload.targetUrl) {
-        detectedType = getFileType(payload.targetUrl);
-      } else if (payload.fileName) {
-        detectedType = getFileType(new URL(payload.fileName, 'file:///'));
+      applyMetadata(payload);
+
+      if (payload.resourceType === 'font' && payload.fontBuffer) {
+        await applyFontPayload(payload);
+      } else {
+        applyCodePayload(payload);
       }
-
-      language.value = detectedType;
-      rawCode.value = payload.rawText;
-      code.value = formatSource(payload.rawText, detectedType);
-      byteSize.value = payload.byteSize;
-
-      targetUrl.value = payload.targetUrl ?? null;
-      fileName.value = payload.fileName ?? null;
-      isLocalSnapshot.value = payload.isLocalSnapshot ?? false;
-      isDomFallback.value = payload.isDomFallback ?? false;
-      isSourceTabClosed.value = payload.isSourceTabClosed ?? false;
-      isDirectoryFile.value = payload.isDirectoryFile ?? false;
-      snapshotTimestamp.value = payload.snapshotTimestamp ?? null;
-      activeFileHandle.value = payload.fileHandle ?? null;
-      contentDisposition.value = payload.contentDisposition ?? null;
-      httpStatus.value = payload.httpStatus ?? null;
-      httpStatusText.value = payload.httpStatusText ?? '';
 
       status.value = 'success';
     } catch (err) {
@@ -304,6 +334,10 @@ export function useSourceFetch() {
     contentDisposition,
     httpStatus,
     httpStatusText,
+    resourceType,
+    fontFormat,
+    fontFamily: fontLoad.fontFamily,
+    fontLoad,
     load,
     loadFromLocalFile,
     loadFromDirectoryFile,

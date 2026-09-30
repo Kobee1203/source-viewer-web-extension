@@ -1,12 +1,14 @@
 import { directLocalStrategy } from '@/composables/source/strategies/directLocalStrategy';
 import { directoryFileStrategy } from '@/composables/source/strategies/directoryFileStrategy';
 import { fileObjectStrategy } from '@/composables/source/strategies/fileObjectStrategy';
+import { fontFetchStrategy } from '@/composables/source/strategies/fontFetchStrategy';
 import { inplaceLocalStrategy } from '@/composables/source/strategies/inplaceLocalStrategy';
 import { remoteFetchStrategy } from '@/composables/source/strategies/remoteFetchStrategy';
 import { sessionSnapshotStrategy } from '@/composables/source/strategies/sessionSnapshotStrategy';
 import { SourceFetchError, type SourceFetchStrategy, type SourceTarget } from '@/composables/source/types';
 import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import { t } from '@/utils/i18n';
+import { classifyLinkTarget } from '@/utils/linkTarget';
 import { isRestricted } from '@/utils/restricted';
 
 /**
@@ -34,6 +36,10 @@ export function resolveFetchStrategy(target: SourceTarget): SourceFetchStrategy 
     }
     if (isRestricted(target.url)) {
       throw new SourceFetchError('restricted', t('errorRestricted'), true);
+    }
+
+    if (classifyLinkTarget(target.url) === 'font') {
+      return fontFetchStrategy;
     }
 
     if (typeof window !== 'undefined' && window.self !== window.top) {

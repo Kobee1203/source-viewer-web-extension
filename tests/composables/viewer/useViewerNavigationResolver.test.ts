@@ -1,3 +1,4 @@
+import { withSetup } from '@@/tests/helpers/withSetup';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import { useReferenceSidebar } from '@/composables/useReferenceSidebar';
@@ -6,8 +7,8 @@ import type { VfsFileNode } from '@/utils/buildVfsTree';
 import type { ReferenceEntry } from '@/utils/extractReferences';
 
 describe('useViewerNavigationResolver', () => {
-  const localDirectory = useLocalDirectory();
-  const sidebar = useReferenceSidebar();
+  const [localDirectory] = withSetup(useLocalDirectory);
+  const [sidebar] = withSetup(useReferenceSidebar);
 
   function createFileNode(overrides: Partial<VfsFileNode> = {}): VfsFileNode {
     return {
@@ -50,12 +51,14 @@ describe('useViewerNavigationResolver', () => {
     const load = vi.fn(async () => {});
     const loadFromDirectoryFile = vi.fn(async () => {});
 
-    const resolver = useViewerNavigationResolver({
-      localDirectory,
-      sidebar,
-      load,
-      loadFromDirectoryFile,
-    });
+    const [resolver] = withSetup(() =>
+      useViewerNavigationResolver({
+        localDirectory,
+        sidebar,
+        load,
+        loadFromDirectoryFile,
+      }),
+    );
 
     resolver.onSidebarNavigate(createFileNode());
 
@@ -70,12 +73,14 @@ describe('useViewerNavigationResolver', () => {
 
     const navigateToSpy = vi.spyOn(sidebar, 'navigateTo');
 
-    const resolver = useViewerNavigationResolver({
-      localDirectory,
-      sidebar,
-      load,
-      loadFromDirectoryFile,
-    });
+    const [resolver] = withSetup(() =>
+      useViewerNavigationResolver({
+        localDirectory,
+        sidebar,
+        load,
+        loadFromDirectoryFile,
+      }),
+    );
 
     const node = createFileNode({
       name: 'remote.js',
@@ -97,12 +102,14 @@ describe('useViewerNavigationResolver', () => {
     const load = vi.fn(async () => {});
     const loadFromDirectoryFile = vi.fn(async () => {});
 
-    const resolver = useViewerNavigationResolver({
-      localDirectory,
-      sidebar,
-      load,
-      loadFromDirectoryFile,
-    });
+    const [resolver] = withSetup(() =>
+      useViewerNavigationResolver({
+        localDirectory,
+        sidebar,
+        load,
+        loadFromDirectoryFile,
+      }),
+    );
 
     resolver.onSidebarNavigateShortcut(createReferenceEntry());
 
@@ -118,12 +125,14 @@ describe('useViewerNavigationResolver', () => {
     const load = vi.fn(async () => {});
     const loadFromDirectoryFile = vi.fn(async () => {});
 
-    const resolver = useViewerNavigationResolver({
-      localDirectory,
-      sidebar,
-      load,
-      loadFromDirectoryFile,
-    });
+    const [resolver] = withSetup(() =>
+      useViewerNavigationResolver({
+        localDirectory,
+        sidebar,
+        load,
+        loadFromDirectoryFile,
+      }),
+    );
 
     const event = new MouseEvent('click', { cancelable: true });
     const preventSpy = vi.spyOn(event, 'preventDefault');
@@ -137,5 +146,32 @@ describe('useViewerNavigationResolver', () => {
     expect(preventSpy).toHaveBeenCalled();
     expect(sidebar.activeUrl.value).toBe('file:///app/styles/main.css');
     expect(loadFromDirectoryFile).toHaveBeenCalledWith('styles/main.css');
+  });
+
+  it('intercepts font link clicks and loads them in-place when no directory is loaded', () => {
+    const load = vi.fn(async () => {});
+    const loadFromDirectoryFile = vi.fn(async () => {});
+
+    const [resolver] = withSetup(() =>
+      useViewerNavigationResolver({
+        localDirectory,
+        sidebar,
+        load,
+        loadFromDirectoryFile,
+      }),
+    );
+
+    const event = new MouseEvent('click', { cancelable: true });
+    const preventSpy = vi.spyOn(event, 'preventDefault');
+
+    resolver.onLinkClick({
+      rawUrl: 'https://example.com/fonts/inter.woff2',
+      targetUrl: 'chrome-extension://test/viewer.html?url=https%3A%2F%2Fexample.com%2Ffonts%2Finter.woff2',
+      event,
+    });
+
+    expect(preventSpy).toHaveBeenCalled();
+    expect(sidebar.activeUrl.value).toBe('https://example.com/fonts/inter.woff2');
+    expect(load).toHaveBeenCalledWith('https://example.com/fonts/inter.woff2');
   });
 });

@@ -1,4 +1,5 @@
 import { SourceFetchError, type SourceFetchStrategy } from '@/composables/source/types';
+import { formatFromUrl } from '@/composables/useFontLoad';
 import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import type { FileType } from '@/utils/fileType';
 import { t } from '@/utils/i18n';
@@ -30,6 +31,19 @@ export const directoryFileStrategy: SourceFetchStrategy = async (target) => {
 
   await setActivePath(dirFile.path);
 
+  if (dirFile.isBinary && dirFile.buffer) {
+    return {
+      rawText: '',
+      byteSize: dirFile.size ?? dirFile.buffer.byteLength,
+      fileName: dirFile.name,
+      targetUrl: targetUrl ?? new URL(`file:///${rootName.value}/${dirFile.path}`),
+      isDirectoryFile: true,
+      resourceType: 'font',
+      fontBuffer: dirFile.buffer,
+      fontFormat: formatFromUrl(dirFile.name),
+    };
+  }
+
   const rawText = dirFile.text ?? '';
   const byteSize = dirFile.size ?? new Blob([rawText]).size;
   const detectedFileType = (dirFile.type as FileType) || undefined;
@@ -41,5 +55,6 @@ export const directoryFileStrategy: SourceFetchStrategy = async (target) => {
     targetUrl: targetUrl ?? new URL(`file:///${rootName.value}/${dirFile.path}`),
     detectedFileType,
     isDirectoryFile: true,
+    resourceType: 'code',
   };
 };

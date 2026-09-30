@@ -27,6 +27,8 @@ export type SourceTarget =
   | { kind: 'snapshot' }
   | { kind: 'directory-file'; path: string; url?: URL };
 
+export type ResourceType = 'code' | 'font';
+
 /**
  * Standardized raw source payload returned by all acquisition strategies
  * before language detection, beautification, or view-state hydration.
@@ -47,6 +49,9 @@ export interface RawSourcePayload {
   isDomFallback?: boolean;
   isSourceTabClosed?: boolean;
   isDirectoryFile?: boolean;
+  resourceType?: ResourceType;
+  fontBuffer?: ArrayBuffer;
+  fontFormat?: string;
 }
 
 /**

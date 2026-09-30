@@ -11,7 +11,7 @@ export const fontViewerPreviewScenario: VideoScenario = {
       description: 'Test any web font in real-time with your own custom text and inspect all glyphs',
     });
 
-    const fontViewerUrl = `chrome-extension://${ctx.extensionId}/fontviewer.html?url=${encodeURIComponent(MOCK_URLS.font)}`;
+    const fontViewerUrl = `chrome-extension://${ctx.extensionId}/viewer.html?url=${encodeURIComponent(MOCK_URLS.font)}`;
     await ctx.page.goto(fontViewerUrl);
 
     const previewInput = ctx.page.locator('input.preview-input');

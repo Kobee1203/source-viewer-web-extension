@@ -2,6 +2,7 @@
 import { computed, useTemplateRef } from 'vue';
 import CodeView from '@/components/CodeView.vue';
 import ErrorView from '@/components/ErrorView.vue';
+import FontView from '@/components/FontView.vue';
 import LocalDropZone from '@/components/LocalDropZone.vue';
 import ReferenceSidebar from '@/components/ReferenceSidebar.vue';
 import StatusBar from '@/components/StatusBar.vue';
@@ -121,10 +122,11 @@ void sourceFetch.load();
           {{ sourceFetch.errorMessage.value }}
         </div>
         <LocalDropZone
-          v-else-if="!sourceFetch.code.value && !sourceFetch.loading.value"
+          v-else-if="!sourceFetch.code.value && sourceFetch.resourceType.value !== 'font' && !sourceFetch.loading.value"
           @file-selected="openLocalFile"
           @directory-loaded="onDirectoryLoaded"
         />
+        <FontView v-else-if="sourceFetch.resourceType.value === 'font'" :family="sourceFetch.fontFamily.value" />
         <CodeView
           v-else
           ref="codeView"

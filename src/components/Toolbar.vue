@@ -22,6 +22,7 @@ import {
 import DropdownButton, { type DropdownMenuItem } from '@/components/DropdownButton.vue';
 import IconButton from '@/components/IconButton.vue';
 import SettingsDialog from '@/components/SettingsDialog.vue';
+import type { ResourceType } from '@/composables/source/types';
 import { useCopyFeedback } from '@/composables/useCopyFeedback';
 import type { OpenInMode } from '@/composables/usePreferences';
 import { downloadSource } from '@/utils/download';
@@ -41,6 +42,7 @@ export interface ToolbarSourceState {
   hasFileHandle?: boolean | Ref<boolean>;
   isLocalSnapshot?: boolean | Ref<boolean>;
   isDirectoryFile?: boolean | Ref<boolean>;
+  resourceType?: ResourceType | Ref<ResourceType>;
 }
 
 const props = defineProps<{
@@ -77,6 +79,8 @@ const fileName = computed(() => toValue(props.source.fileName) ?? null);
 const hasFileHandle = computed(() => toValue(props.source.hasFileHandle) ?? false);
 const isLocalSnapshot = computed(() => toValue(props.source.isLocalSnapshot) ?? false);
 const isDirectoryFile = computed(() => toValue(props.source.isDirectoryFile) ?? false);
+const resourceType = computed(() => toValue(props.source.resourceType) ?? 'code');
+const isFont = computed(() => resourceType.value === 'font');
 
 const canReload = computed(
   () =>
@@ -185,7 +189,7 @@ function onNativeAuxClick(event: MouseEvent): void {
 <template>
   <div class="toolbar">
     <IconButton
-      v-if="code && (targetUrl || isDirectoryLoaded)"
+      v-if="(code || isFont) && (targetUrl || isDirectoryLoaded)"
       :active="sidebarOpen"
       :label="t('viewerToggleSidebar')"
       @click="emit('toggle-sidebar')"
@@ -193,7 +197,7 @@ function onNativeAuxClick(event: MouseEvent): void {
       <PanelLeft :size="20" />
     </IconButton>
 
-    <IconButton :active="wordWrap" :label="t('viewerWordWrap')" @click="toggleWrap">
+    <IconButton v-if="!isFont" :active="wordWrap" :label="t('viewerWordWrap')" @click="toggleWrap">
       <WrapText :size="20" />
     </IconButton>
 
@@ -215,22 +219,24 @@ function onNativeAuxClick(event: MouseEvent): void {
 
     <span class="spacer"></span>
 
-    <div class="custom-select">
-      <Type class="lead-ic" :size="20" aria-hidden="true" />
-      <select
-        id="font-size-selector"
-        :value="fontSize"
-        :title="t('viewerFontSize')"
-        :aria-label="t('viewerFontSize')"
-        @change="onFontSizeChange"
-      >
-        <option v-for="size in fontSizes" :key="size.value" :value="size.value">
-          {{ size.label }}
-        </option>
-      </select>
-    </div>
+    <template v-if="!isFont">
+      <div class="custom-select">
+        <Type class="lead-ic" :size="20" aria-hidden="true" />
+        <select
+          id="font-size-selector"
+          :value="fontSize"
+          :title="t('viewerFontSize')"
+          :aria-label="t('viewerFontSize')"
+          @change="onFontSizeChange"
+        >
+          <option v-for="size in fontSizes" :key="size.value" :value="size.value">
+            {{ size.label }}
+          </option>
+        </select>
+      </div>
 
-    <span class="sep"></span>
+      <span class="sep"></span>
+    </template>
 
     <div class="custom-select">
       <Palette class="lead-ic" :size="20" aria-hidden="true" />
@@ -270,6 +276,12 @@ function onNativeAuxClick(event: MouseEvent): void {
       </IconButton>
       <IconButton v-if="targetUrl" :label="t('viewerOpenNative')" @click="onNativeClick" @auxclick="onNativeAuxClick">
         <FileCode :size="20" />
+      </IconButton>
+    </template>
+    <template v-else-if="isFont && targetUrl">
+      <span class="sep"></span>
+      <IconButton :label="t('viewerCopyUrl')" @click="onCopyUrl">
+        <Link :size="20" />
       </IconButton>
     </template>
 

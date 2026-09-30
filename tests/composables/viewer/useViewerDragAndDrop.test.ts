@@ -1,4 +1,4 @@
-import { createApp, defineComponent, h } from 'vue';
+import { withSetup } from '@@/tests/helpers/withSetup';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useViewerDragAndDrop } from '@/composables/viewer/useViewerDragAndDrop';
 
@@ -15,29 +15,11 @@ describe('useViewerDragAndDrop', () => {
     vi.restoreAllMocks();
   });
 
-  function mountComposable<T>(composable: () => T) {
-    let result: T;
-    const app = createApp(
-      defineComponent({
-        setup() {
-          result = composable();
-          return () => h('div');
-        },
-      }),
-    );
-    const container = document.createElement('div');
-    app.mount(container);
-    return {
-      result: result!,
-      unmount: () => app.unmount(),
-    };
-  }
-
   it('manages drag state and calls appropriate drop handlers', async () => {
     const onDropDirectory = vi.fn().mockResolvedValue(false);
     const onDropFile = vi.fn().mockResolvedValue(undefined);
 
-    const { result, unmount } = mountComposable(() => useViewerDragAndDrop({ onDropDirectory, onDropFile }));
+    const [result, app] = withSetup(() => useViewerDragAndDrop({ onDropDirectory, onDropFile }));
 
     expect(addSpy).toHaveBeenCalledWith('dragover', expect.any(Function));
     expect(addSpy).toHaveBeenCalledWith('dragleave', expect.any(Function));
@@ -70,7 +52,7 @@ describe('useViewerDragAndDrop', () => {
       expect(onDropFile).toHaveBeenCalledWith(mockFile);
     });
 
-    unmount();
+    app.unmount();
     expect(removeSpy).toHaveBeenCalledWith('dragover', expect.any(Function));
     expect(removeSpy).toHaveBeenCalledWith('dragleave', expect.any(Function));
     expect(removeSpy).toHaveBeenCalledWith('drop', expect.any(Function));
@@ -80,7 +62,7 @@ describe('useViewerDragAndDrop', () => {
     const onDropDirectory = vi.fn().mockResolvedValue(true);
     const onDropFile = vi.fn().mockResolvedValue(undefined);
 
-    const { unmount } = mountComposable(() => useViewerDragAndDrop({ onDropDirectory, onDropFile }));
+    const [, app] = withSetup(() => useViewerDragAndDrop({ onDropDirectory, onDropFile }));
 
     const mockFile = new File(['test'], 'test.txt', { type: 'text/plain' });
     const dropEvent = new Event('drop', { bubbles: true, cancelable: true });
@@ -96,6 +78,6 @@ describe('useViewerDragAndDrop', () => {
       expect(onDropFile).not.toHaveBeenCalled();
     });
 
-    unmount();
+    app.unmount();
   });
 });

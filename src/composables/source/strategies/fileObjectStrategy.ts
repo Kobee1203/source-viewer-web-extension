@@ -12,20 +12,23 @@ export const fileObjectStrategy: SourceFetchStrategy = async (target) => {
   }
 
   try {
-    const { text, fileType } = await readLocalFile(target.file);
+    const result = await readLocalFile(target.file);
 
     if (!target.handle && !target.isFromSession) {
-      saveSnapshot(target.file.name, text, fileType);
+      saveSnapshot(target.file.name, result.text, result.fileType, result.fontFormat);
     }
 
     return {
-      rawText: text,
+      rawText: result.isFont ? '' : result.text,
       byteSize: target.file.size,
       fileName: target.file.name,
       isLocalSnapshot: !target.handle,
       snapshotTimestamp: !target.handle ? Date.now() : null,
       fileHandle: target.handle ?? null,
-      detectedFileType: fileType,
+      resourceType: result.isFont ? 'font' : 'code',
+      fontBuffer: result.buffer,
+      fontFormat: result.fontFormat,
+      detectedFileType: result.isFont ? undefined : result.fileType,
     };
   } catch (err) {
     throw new SourceFetchError('generic', (err as Error).message);

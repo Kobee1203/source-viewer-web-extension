@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { resolveUrl } from '@/utils/cm-linkify';
-import { fontViewerUrl } from '@/utils/fontViewerUrl';
 import { viewerUrl } from '@/utils/viewerUrl';
 
 describe('cm-linkify resolveUrl', () => {
@@ -19,9 +18,9 @@ describe('cm-linkify resolveUrl', () => {
     expect(htmlUrl).toBe(viewerUrl('file:///Users/john/site/docs/guide.html'));
   });
 
-  it('routes local fonts to fontViewerUrl', () => {
+  it('routes local fonts to viewerUrl', () => {
     const fontUrl = resolveUrl('href', './fonts/inter.woff2', baseUrl);
-    expect(fontUrl).toBe(fontViewerUrl('file:///Users/john/site/fonts/inter.woff2'));
+    expect(fontUrl).toBe(viewerUrl('file:///Users/john/site/fonts/inter.woff2'));
   });
 
   it('routes local images to their native file:/// URL', () => {
@@ -34,9 +33,9 @@ describe('cm-linkify resolveUrl', () => {
     expect(remoteJs).toBe('https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js');
   });
 
-  it('routes remote fonts to fontViewerUrl', () => {
+  it('routes remote fonts to viewerUrl', () => {
     const remoteFont = resolveUrl('href', 'https://example.com/fonts/inter.woff2', baseUrl);
-    expect(remoteFont).toBe(fontViewerUrl('https://example.com/fonts/inter.woff2'));
+    expect(remoteFont).toBe(viewerUrl('https://example.com/fonts/inter.woff2'));
   });
 
   it('ignores invalid or anchor URLs', () => {

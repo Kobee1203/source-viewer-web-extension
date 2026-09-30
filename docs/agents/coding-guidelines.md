@@ -18,7 +18,7 @@ This document outlines the strict coding rules and architecture conventions that
 ## 3. CSS Architecture and Theming
 
 - **Semantic and Dedicated Variables**: Never reuse a specific component's CSS variables for a generic component (e.g., do not use `--toolbar-border` in a generic modal). Define dedicated variables for generic components (e.g., `--dialog-border`).
-- **Shared Styles**: Component styles shared across different entrypoints (`viewer` and `fontviewer`) must be isolated in `src/styles/*.css` (e.g., `dialog.css`, `toolbar.css`).
+- **Shared Styles**: Reusable component styles shared across components must be isolated in `src/styles/*.css` (e.g., `dialog.css`, `toolbar.css`).
 - **Dark / Light Mode Management**:
   - Default variables (Dark Theme) are declared in the base stylesheet (`style.css`).
   - Overrides for Light Theme (`[data-theme-type='light']`) must be declared directly in the `<style>` block of the main entry points (`App.vue`).
@@ -38,7 +38,16 @@ This document outlines the strict coding rules and architecture conventions that
 - **No dead or ghost code**: Avoid retaining unused variables, commented-out blocks, or dead reactive state.
 - **No speculative backward compatibility**: For internal components and composables within the repository, never preserve obsolete props signatures, parameters, or fallback shims out of speculative caution. Refactor call sites directly and keep component interfaces lean and strictly typed.
 
-## 7. Post-Development Workflow
+## 7. DRY and Maintainable Architecture
+
+- **Avoid code duplication (DRY)**: Never duplicate data transformations, file-reading logic, or multi-branch metadata assignments across multiple functions. Proactively extract private helpers, shared composables, or domain utilities with a single point of truth.
+
+## 8. Separation of Concerns & Testing Hygiene
+
+- **No test-specific code in production**: Never introduce guards, flags, shims, or lifecycle branches in production code (e.g. `if (getCurrentInstance())`) solely to accommodate test runners. Production code must remain clean, idiomatic, and unaware of testing frameworks.
+- **Test helpers & wrappers**: Provide dedicated test utilities in `tests/helpers/` (such as `withSetup`) or mock environments to supply the required Vue setup context, plugins, or lifecycle wrappers during testing.
+
+## 9. Post-Development Workflow
 
 - **Verification Commands**: After completing any code changes, you must automatically execute the following commands to ensure the codebase remains clean and compiles successfully:
   - `pnpm run lint:fix` (Fix TS/JS/Vue lint errors)

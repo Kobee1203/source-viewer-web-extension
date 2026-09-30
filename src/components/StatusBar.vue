@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { type Ref, computed, toValue } from 'vue';
+import type { ResourceType } from '@/composables/source/types';
 import { formatBytes } from '@/utils/format';
 import { t } from '@/utils/i18n';
 
@@ -10,6 +11,8 @@ export interface StatusBarSourceState {
   isLocalSnapshot?: boolean | Ref<boolean>;
   isDomFallback?: boolean | Ref<boolean>;
   isSourceTabClosed?: boolean | Ref<boolean>;
+  resourceType?: ResourceType | Ref<ResourceType>;
+  fontFormat?: string | Ref<string>;
 }
 
 const props = defineProps<{
@@ -23,6 +26,10 @@ const httpStatusText = computed(() => toValue(props.source.httpStatusText) ?? ''
 const isLocalSnapshot = computed(() => toValue(props.source.isLocalSnapshot) ?? false);
 const isDomFallback = computed(() => toValue(props.source.isDomFallback) ?? false);
 const isSourceTabClosed = computed(() => toValue(props.source.isSourceTabClosed) ?? false);
+const resourceType = computed(() => toValue(props.source.resourceType) ?? 'code');
+const isFont = computed(() => resourceType.value === 'font');
+const fontFormat = computed(() => toValue(props.source.fontFormat) ?? '');
+const formatLabel = computed(() => (fontFormat.value ? fontFormat.value.toUpperCase() : ''));
 
 const httpStatusClass = computed(() =>
   httpStatus.value != null && httpStatus.value >= 400 ? 'http-error' : 'http-success',
@@ -38,6 +45,9 @@ const httpStatusLabel = computed(() =>
     <div class="status-left">
       <span v-if="httpStatusText || httpStatus != null" class="http-status" :class="[httpStatusClass]">
         {{ httpStatusLabel }}
+      </span>
+      <span v-if="isFont && formatLabel" class="font-format-badge">
+        {{ formatLabel }}
       </span>
       <span v-if="directoryName" class="directory-badge" :title="t('viewerDirectoryBadge')">
         📁 {{ directoryName }}
@@ -102,6 +112,16 @@ const httpStatusLabel = computed(() =>
   border: 1px solid var(--app-border);
   border-radius: 8px;
   opacity: 0.9;
+}
+
+.font-format-badge {
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--app-fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 8px;
 }
 
 .directory-badge {

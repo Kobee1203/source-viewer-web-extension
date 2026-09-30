@@ -44,8 +44,7 @@ flowchart TB
     end
 
     subgraph StandaloneTabs["Standalone Extension Tabs"]
-        ViewerTab["viewer.html\n(Standalone tab)"]
-        FontViewerTab["fontviewer.html\n(Standalone tab)"]
+        ViewerTab["viewer.html\n(Unified multi-view tab: Code & Fonts)"]
         OptionsTab["options.html\n(Settings page)"]
     end
 
@@ -78,8 +77,7 @@ flowchart TB
 | **Lightweight Content Script** | `src/entrypoints/content.ts`                   | Runs on top-frame navigation at `document_start` (`matches: http, https, file`) | Reads `document.contentType` and URL, injects root hiding style (`:root { visibility: hidden !important; }`). Can send runtime messages to background.  | Kept minimal (no Vue, no CodeMirror) to avoid per-page overhead. Isolated world DOM access.                 |
 | **In-Place Content Script**    | `src/entrypoints/inplace-viewer.content.ts`    | Injected dynamically on demand via `browser.scripting.executeScript`            | Mounts full-viewport iframe pointing to `viewer.html?url=...`, updates tab favicon, reads host DOM. Communicates with iframe via `window.postMessage`.  | Runs only when a supported source type is confirmed and page is not CSP sandboxed.                          |
 | **In-Place Iframe**            | `src/entrypoints/viewer/index.html` (embedded) | Embedded in host tab inside an `<iframe>`                                       | Extension origin (`chrome-extension://...`). Full Vue 3, CodeMirror, and UI features. Can access `browser.runtime.sendMessage`.                         | Sandboxed from parent window (cannot touch parent DOM directly; must use `window.postMessage`).             |
-| **Standalone Source Viewer**   | `src/entrypoints/viewer/index.html` (top tab)  | Dedicated browser tab (`chrome-extension://...`)                                | Direct window fetch of `file:///` URLs (when extension has file access toggle enabled). Full access to Web File System Access API and Drag & Drop.      | No parent page DOM to inspect.                                                                              |
-| **Standalone Font Viewer**     | `src/entrypoints/fontviewer/index.html`        | Dedicated browser tab (`chrome-extension://...`)                                | Uses browser `FontFace` API and direct extension fetch (`<all_urls>` permission).                                                                       | Currently isolated from the Source Viewer.                                                                  |
+| **Unified Multi-View Viewer**  | `src/entrypoints/viewer/index.html` (top tab)  | Dedicated browser tab (`chrome-extension://...`)                                | Direct window fetch of `file:///` and font URLs. Full access to Web File System Access API, Drag & Drop, CodeMirror, and FontFace API.                  | No parent page DOM to inspect.                                                                              |
 
 ---
 
@@ -113,8 +111,7 @@ flowchart TB
 
 - **API**: Standard `window.fetch(url)`.
 - **Usage**:
-  - **Standalone `viewer.html`**: When opened as a top-level tab for a `file:///` URL and the user has granted "Allow access to file URLs", the extension origin has permission to fetch the local file directly.
-  - **Standalone `fontviewer.html`**: Fetches font files directly via `<all_urls>` host permissions to pass the array buffer to `new FontFace()`.
+  - **Standalone `viewer.html`**: When opened as a top-level tab for a `file:///` URL (with granted file access) or a font URL, the extension origin has permission to fetch the resource directly (and pass font buffers to `new FontFace()`).
 
 ### 4. Storage & Persistence
 

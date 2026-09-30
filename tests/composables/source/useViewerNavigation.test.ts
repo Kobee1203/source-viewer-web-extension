@@ -1,3 +1,4 @@
+import { withSetup } from '@@/tests/helpers/withSetup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useViewerNavigation } from '@/composables/source/useViewerNavigation';
 
@@ -13,14 +14,14 @@ describe('useViewerNavigation', () => {
   });
 
   it('reads initial query parameters correctly', () => {
-    const nav = useViewerNavigation();
+    const [nav] = withSetup(useViewerNavigation);
     expect(nav.currentUrl.value).toBe('https://example.com/style.css');
     expect(nav.rootUrl.value).toBeNull();
     expect(nav.fileAccessDisallowed.value).toBe(true);
   });
 
   it('updates url and preserves root parameter on navigateTo', () => {
-    const nav = useViewerNavigation();
+    const [nav] = withSetup(useViewerNavigation);
     nav.navigateTo('https://example.com/reset.css');
 
     expect(nav.currentUrl.value).toBe('https://example.com/reset.css');
@@ -30,7 +31,7 @@ describe('useViewerNavigation', () => {
   });
 
   it('resets query parameters and reactive state on clearUrl', () => {
-    const nav = useViewerNavigation();
+    const [nav] = withSetup(useViewerNavigation);
     expect(nav.currentUrl.value).toBe('https://example.com/style.css');
     expect(window.location.search).toContain('url=https://example.com/style.css');
 

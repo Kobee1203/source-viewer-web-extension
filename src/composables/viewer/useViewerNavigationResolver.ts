@@ -1,10 +1,11 @@
 import type { useLocalDirectory } from '@/composables/useLocalDirectory';
 import type { ReferenceEntry, VfsNode, useReferenceSidebar } from '@/composables/useReferenceSidebar';
+import { classifyLinkTarget } from '@/utils/linkTarget';
 
 export interface UseViewerNavigationResolverOptions {
   localDirectory: ReturnType<typeof useLocalDirectory>;
   sidebar: ReturnType<typeof useReferenceSidebar>;
-  load: () => Promise<void>;
+  load: (url?: string) => Promise<void>;
   loadFromDirectoryFile: (path: string) => Promise<void>;
 }
 
@@ -62,8 +63,6 @@ export function useViewerNavigationResolver(
     targetUrl: string;
     event: MouseEvent;
   }): void {
-    if (!localDirectory.isLoaded.value) return;
-
     let resolvedTarget = clickedTargetUrl;
     try {
       const parsed = new URL(clickedTargetUrl);
@@ -74,10 +73,27 @@ export function useViewerNavigationResolver(
       // not a valid URL
     }
 
-    const matchedFile = localDirectory.getFile(resolvedTarget) ?? localDirectory.getFile(rawUrl);
-    if (matchedFile) {
-      event.preventDefault();
-      revealAndLoadLocalFile(matchedFile.path);
+    if (localDirectory.isLoaded.value) {
+      const matchedFile = localDirectory.getFile(resolvedTarget) ?? localDirectory.getFile(rawUrl);
+      if (matchedFile) {
+        event.preventDefault();
+        revealAndLoadLocalFile(matchedFile.path);
+        return;
+      }
+    }
+
+    // In-place navigation for font links when clicked without modifier keys
+    if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+      try {
+        const parsed = new URL(resolvedTarget);
+        if (classifyLinkTarget(parsed) === 'font') {
+          event.preventDefault();
+          sidebar.activeUrl.value = resolvedTarget;
+          void load(resolvedTarget);
+        }
+      } catch {
+        // not a valid URL
+      }
     }
   }
 
