@@ -9,10 +9,12 @@ This document defines the system architecture, execution contexts, communication
 3. [Communication Transports](#communication-transports)
 4. [Key Workflows & Sequence Diagrams](#key-workflows--sequence-diagrams)
    - [Workflow 1: In-Place Interception & Remote Fetching (HTTP/HTTPS)](#workflow-1-in-place-interception--remote-fetching-httphttps)
-   - [Workflow 2: Local File In-Place DOM Extraction (file://)](#workflow-2-local-file-in-place-dom-extraction-file)
+   - [Workflow 2: In-Place DOM Extraction & Content-Type Propagation](#workflow-2-in-place-dom-extraction--content-type-propagation)
    - [Workflow 3: CSP Sandbox Fallback (Tab Redirection)](#workflow-3-csp-sandbox-fallback-tab-redirection)
-   - [Workflow 4: Explicit Actions & View-Source Interception](#workflow-4-explicit-actions--view-source-interception)
+   - [Workflow 4: Explicit Actions, Tab Source Capture, & View-Source Interception](#workflow-4-explicit-actions-tab-source-capture--view-source-interception)
    - [Workflow 5: Local File Picking, Dropping, & Snapshot Persistence](#workflow-5-local-file-picking-dropping--snapshot-persistence)
+   - [Workflow 6: Local Directory Projects & Virtual File System (VFS) Exploration](#workflow-6-local-directory-projects--virtual-file-system-vfs-exploration)
+   - [Workflow 7: Multi-View Switching (Code vs Fonts)](#workflow-7-multi-view-switching-code-vs-fonts)
 5. [Message Contracts Reference](#message-contracts-reference)
 6. [Architectural Considerations & Constraints](#architectural-considerations--constraints)
 
@@ -49,9 +51,10 @@ flowchart TB
     end
 
     subgraph BrowserAPIs["Browser Extension APIs & Storage"]
-        BrowserStorage["browser.storage.local\n(Preferences: openIn, theme, wrap, etc.)"]
-        BrowserScripting["browser.scripting.executeScript"]
+        BrowserStorage["browser.storage.local (Preferences: openIn, theme, wrap, etc.)\nbrowser.storage.session (Captured tab source cache)"]
+        BrowserScripting["browser.scripting.executeScript\n(inplace-viewer.js, tab-capture.js)"]
         BrowserTabs["browser.tabs / browser.contextMenus"]
+        ClientStorage["IndexedDB (directory-store)\nsessionStorage (file drop snapshot)"]
     end
 
     CS_Light -->|browser.runtime.sendMessage\nREQUEST_VIEWER_INJECTION| SW
@@ -59,9 +62,10 @@ flowchart TB
     SW -->|injects via executeScript| CS_Inplace
 
     IframeApp -->|browser.runtime.sendMessage\nFETCH_SOURCE| SW
-    ViewerTab -->|browser.runtime.sendMessage\nFETCH_SOURCE / OPEN_NATIVE| SW
+    ViewerTab -->|browser.runtime.sendMessage\nFETCH_SOURCE / OPEN_NATIVE\nGET_SESSION_SOURCE| SW
 
     ViewerTab -->|read/write| BrowserStorage
+    ViewerTab -->|read/write| ClientStorage
     SW -->|read/write| BrowserStorage
     SW --> BrowserTabs
     SW --> BrowserScripting
@@ -115,8 +119,10 @@ flowchart TB
 
 ### 4. Storage & Persistence
 
-- **`browser.storage.local`**: Global extension preferences (theme, word wrap, font size, `openIn` preference).
-- **`sessionStorage`**: In-memory tab-scoped snapshot storage for local files dropped into the viewer or selected via file picker without a persistent URL. Ensures F5 reloads preserve the active document and VFS tree.
+- **`browser.storage.local`**: Global extension preferences (theme, word wrap, font size, `openIn` preference, `contextMenu`).
+- **`browser.storage.session`**: In-memory session store managed by the background script to hold captured host tab source payloads keyed by viewer tab ID (`viewer:tab:<id>`), enabling seamless source transfer to standalone viewer tabs and live tab refresh.
+- **`sessionStorage`**: In-memory tab-scoped snapshot storage for standalone local files dropped into the viewer or selected via file picker without a persistent URL. Ensures F5 reloads preserve the active document.
+- **IndexedDB (`directory-store`)**: Client-side storage storing loaded directory file entries (`DirectoryStoreFile`: path, name, type, size, text, buffer) and active navigation state, enabling automatic restoration of local directory projects across sessions.
 
 ---
 
@@ -160,35 +166,36 @@ sequenceDiagram
 
 ---
 
-### Workflow 2: Local File In-Place DOM Extraction (file://)
+### Workflow 2: In-Place DOM Extraction & Content-Type Propagation
 
-When a user navigates to a local source file (`file:///path/to/script.js`):
-_Background service workers in MV3 are forbidden from fetching `file://` URLs, so the iframe delegates reading to the host content script._
+When a user navigates to a local source file (`file:///path/to/script.js`) or an API response rendered directly in the tab (e.g. JSON without a `.json` extension):
+_Background service workers in MV3 are forbidden from fetching `file://` URLs, and direct API navigations use DOM extraction. The iframe delegates reading to the host content script, which also forwards `document.contentType` to ensure proper syntax highlighting and formatting._
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User
-    participant Page as Browser Tab (file:///.../script.js)
+    participant Page as Browser Tab (file:// or API URL)
     participant CS as content.ts
     participant SW as background.ts
     participant InPlaceCS as inplace-viewer.content.ts
     participant Iframe as viewer.html (Iframe)
 
-    User->>Page: Open file:///path/to/script.js
+    User->>Page: Open file:///.../script.js or API URL
     Page->>CS: document_start
-    CS->>CS: detectRedirectFileType() (skips local .html/.htm)
+    CS->>CS: detectRedirectFileType(document.contentType, url)
     CS->>Page: Inject hide style
     CS->>SW: browser.runtime.sendMessage({ type: 'REQUEST_VIEWER_INJECTION' })
     SW->>InPlaceCS: browser.scripting.executeScript()
-    InPlaceCS->>Page: Create iframe[src="viewer.html?url=file:///..."]
+    InPlaceCS->>Page: Create iframe[src="viewer.html?url=..."]
     Page->>Iframe: Initialize Viewer App
-    Iframe->>Iframe: Detected window.self !== window.top && protocol === 'file:'
+    Iframe->>Iframe: Detected window.self !== window.top (in-place iframe)
     Iframe->>InPlaceCS: window.parent.postMessage({ type: 'REQUEST_INPLACE_LOCAL_SOURCE' }, '*')
     InPlaceCS->>Page: extractHostSource() (reads pre/DOM text)
-    InPlaceCS->>Iframe: iframe.contentWindow.postMessage({ type: 'INPLACE_LOCAL_SOURCE_DATA', text }, '*')
-    Iframe->>Iframe: CodeMirror format & render
-    Note over Iframe: Local source rendered in-place without Service Worker fetch!
+    InPlaceCS->>Iframe: iframe.contentWindow.postMessage({ type: 'INPLACE_LOCAL_SOURCE_DATA', text, contentType }, '*')
+    Iframe->>Iframe: applyCodePayload() (maps contentType to language, e.g. JSON)
+    Iframe->>Iframe: formatSource & render CodeMirror
+    Note over Iframe: Source rendered and formatted in-place with authentic MIME type!
 ```
 
 ---
@@ -278,24 +285,95 @@ sequenceDiagram
 
 ---
 
+### Workflow 6: Local Directory Projects & Virtual File System (VFS) Exploration
+
+When a user loads an entire directory of files (via folder picker or folder drop):
+_Files and subdirectories are parsed into an in-memory VFS tree. Directory files and navigation state are persisted in IndexedDB, and link clicks inside the viewer navigate directly between local files without reloading the extension._
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Viewer as viewer.html (useLocalDirectory)
+    participant IDB as IndexedDB (directory-store)
+    participant Sidebar as useReferenceSidebar (VFS)
+    participant Code as CodeView / FontView
+
+    User->>Viewer: Pick folder or drop directory
+    Viewer->>Viewer: Read File entries (text / arrayBuffer for fonts)
+    Viewer->>IDB: setDirectoryFiles(rootName, files)
+    Viewer->>Sidebar: buildDirectoryVfsTree(files, rootName)
+    Sidebar->>Viewer: Resolve default entrypoint (e.g. index.html)
+    Viewer->>Code: Render entrypoint file
+
+    alt User clicks file link in code or sidebar node
+        User->>Code: Click relative link (e.g. ./styles/theme.css)
+        Code->>Viewer: useViewerNavigationResolver.onLinkClick()
+        Viewer->>Sidebar: revealAndLoadLocalFile('styles/theme.css')
+        Sidebar->>Sidebar: Highlight & expand active tree node
+        Viewer->>Code: Load file content from local directory store
+    else User reloads page (F5)
+        User->>Viewer: Reload tab without URL param
+        Viewer->>IDB: restoreDirectory()
+        IDB-->>Viewer: Restored files, rootName & activePath
+        Viewer->>Sidebar: Rebuild VFS tree & restore active document
+    end
+```
+
+---
+
+### Workflow 7: Multi-View Switching (Code vs Fonts)
+
+When navigating to a font resource or switching views in `viewer.html`:
+_Fonts are rendered in a dedicated visual font tester (`FontView`) rather than CodeMirror, sharing a unified toolbar and status bar that dynamically adapt controls._
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Resolver as resolver.ts
+    participant Pipeline as useSourceFetch.ts
+    participant Toolbar as Toolbar.vue
+    participant View as FontView / CodeView
+
+    User->>Pipeline: load(fontUrl)
+    Pipeline->>Resolver: resolveFetchStrategy(target)
+    Resolver-->>Pipeline: fontFetchStrategy (or directoryFileStrategy)
+    Pipeline->>Pipeline: fetch arrayBuffer & fontLoad.loadFromBuffer()
+    Pipeline->>Pipeline: set resourceType = 'font'
+    Pipeline->>Toolbar: Updates controls (shows Copy URL, font preview size)
+    Pipeline->>View: Mounts FontView (family, glyphs, sample text)
+
+    alt User clicks Copy URL
+        User->>Toolbar: Click "Copy URL"
+        Toolbar->>Toolbar: copy(targetUrl) -> transient copied state (2s)
+        Toolbar->>User: Displays checkmark icon & "Copied!" feedback
+    end
+```
+
+---
+
 ## Message Contracts Reference
 
 ### Runtime Messages (`browser.runtime`)
 
-| Message Type               | Direction                             | Payload Interface                                                                      | Response Interface                                                                                                                               | Description                                                                                                           |
-| :------------------------- | :------------------------------------ | :------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- |
-| `FETCH_SOURCE`             | Viewer $\rightarrow$ Background       | `FetchSourceRequest`<br>`{ type: 'FETCH_SOURCE', url: string }`                        | `FetchSourceResponse`<br>`{ ok: true, text, contentType, contentDisposition, byteLength, httpStatus, httpStatusText }` \| `{ ok: false, error }` | Fetches remote source through background to avoid CORS / host CSP restrictions. Decodes raw bytes using page charset. |
-| `REQUEST_VIEWER_INJECTION` | `content.ts` $\rightarrow$ Background | `RequestViewerInjectionRequest`<br>`{ type: 'REQUEST_VIEWER_INJECTION', url: string }` | `RequestViewerInjectionResponse`<br>`{ inject: boolean }`                                                                                        | Requests dynamic injection of `inplace-viewer.content.ts` into the sender tab.                                        |
-| `REQUEST_VIEWER_REDIRECT`  | `content.ts` $\rightarrow$ Background | `RequestViewerRedirectRequest`<br>`{ type: 'REQUEST_VIEWER_REDIRECT', url: string }`   | `void`                                                                                                                                           | Requests full tab navigation to `viewer.html` when host page is CSP-sandboxed.                                        |
-| `OPEN_NATIVE`              | Viewer $\rightarrow$ Background       | `OpenNativeRequest`<br>`{ type: 'OPEN_NATIVE', url: string, newTab: boolean }`         | `OpenNativeResponse`<br>`{ ok: true }` \| `{ ok: false, error }`                                                                                 | Whitelists target tab in `NativeViewerController` and opens `view-source:<url>` without interception.                 |
+| Message Type               | Direction                             | Payload Interface                                                                               | Response Interface                                                                                                                               | Description                                                                                                           |
+| :------------------------- | :------------------------------------ | :---------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- |
+| `FETCH_SOURCE`             | Viewer $\rightarrow$ Background       | `FetchSourceRequest`<br>`{ type: 'FETCH_SOURCE', url: string }`                                 | `FetchSourceResponse`<br>`{ ok: true, text, contentType, contentDisposition, byteLength, httpStatus, httpStatusText }` \| `{ ok: false, error }` | Fetches remote source through background to avoid CORS / host CSP restrictions. Decodes raw bytes using page charset. |
+| `REQUEST_VIEWER_INJECTION` | `content.ts` $\rightarrow$ Background | `RequestViewerInjectionRequest`<br>`{ type: 'REQUEST_VIEWER_INJECTION', url: string }`          | `RequestViewerInjectionResponse`<br>`{ inject: boolean }`                                                                                        | Requests dynamic injection of `inplace-viewer.content.ts` into the sender tab.                                        |
+| `REQUEST_VIEWER_REDIRECT`  | `content.ts` $\rightarrow$ Background | `RequestViewerRedirectRequest`<br>`{ type: 'REQUEST_VIEWER_REDIRECT', url: string }`            | `void`                                                                                                                                           | Requests full tab navigation to `viewer.html` when host page is CSP-sandboxed.                                        |
+| `OPEN_NATIVE`              | Viewer $\rightarrow$ Background       | `OpenNativeRequest`<br>`{ type: 'OPEN_NATIVE', url: string, newTab: boolean }`                  | `OpenNativeResponse`<br>`{ ok: true }` \| `{ ok: false, error }`                                                                                 | Whitelists target tab in `NativeViewerController` and opens `view-source:<url>` without interception.                 |
+| `GET_SESSION_SOURCE`       | Viewer $\rightarrow$ Background       | `GetSessionSourceRequest`<br>`{ type: 'GET_SESSION_SOURCE' }`                                   | `GetSessionSourceResponse`<br>`{ source: SessionSourcePayload \| null, sourceTabClosed?: boolean }`                                              | Retrieves authentic captured source payload stored in `browser.storage.session` for the sender viewer tab.            |
+| `REFRESH_TAB_SOURCE`       | Viewer $\rightarrow$ Background       | `RefreshTabSourceRequest`<br>`{ type: 'REFRESH_TAB_SOURCE' }`                                   | `RefreshTabSourceResponse`<br>`{ ok: boolean, source: SessionSourcePayload \| null, sourceTabClosed?: boolean, error?: string }`                 | Re-captures source from original source tab if still open and updates `browser.storage.session`.                      |
+| `TAB_SOURCE_CAPTURED`      | Content Script $\rightarrow$ SW       | `TabSourceCapturedMessage`<br>`{ type: 'TAB_SOURCE_CAPTURED', result: TabSourceCaptureResult }` | `void`                                                                                                                                           | Injected `tab-capture.js` sends captured cache/DOM source payload back to background script.                          |
 
 ### Window Messages (`window.postMessage`)
 
-| Message Type                   | Direction                          | Payload Schema                                        | Description                                                                                                                     |
-| :----------------------------- | :--------------------------------- | :---------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
-| `CLOSE_INPLACE_VIEWER`         | Iframe $\rightarrow$ Parent Window | `{ type: 'CLOSE_INPLACE_VIEWER' }`                    | Dispatched by toolbar close button. Prompts `inplace-viewer.content.ts` to remove iframe, restore favicon, and unhide host DOM. |
-| `REQUEST_INPLACE_LOCAL_SOURCE` | Iframe $\rightarrow$ Parent Window | `{ type: 'REQUEST_INPLACE_LOCAL_SOURCE' }`            | Sent by iframe when loading a `file://` URL in-place. Requests DOM extraction from `inplace-viewer.content.ts`.                 |
-| `INPLACE_LOCAL_SOURCE_DATA`    | Parent Window $\rightarrow$ Iframe | `{ type: 'INPLACE_LOCAL_SOURCE_DATA', text: string }` | Response carrying extracted host DOM string back into the viewer iframe.                                                        |
+| Message Type                   | Direction                          | Payload Schema                                                                                                          | Description                                                                                                                                             |
+| :----------------------------- | :--------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `CLOSE_INPLACE_VIEWER`         | Iframe $\rightarrow$ Parent Window | `{ type: 'CLOSE_INPLACE_VIEWER' }`                                                                                      | Dispatched by toolbar close button. Prompts `inplace-viewer.content.ts` to remove iframe, restore favicon, and unhide host DOM.                         |
+| `REQUEST_INPLACE_LOCAL_SOURCE` | Iframe $\rightarrow$ Parent Window | `{ type: 'REQUEST_INPLACE_LOCAL_SOURCE' }`                                                                              | Sent by iframe when loading a `file://` URL or direct navigation in-place. Requests DOM extraction from `inplace-viewer.content.ts`.                    |
+| `INPLACE_LOCAL_SOURCE_DATA`    | Parent Window $\rightarrow$ Iframe | `{ type: 'INPLACE_LOCAL_SOURCE_DATA', text: string, contentType?: string, isDomFallback?: boolean, byteSize?: number }` | Response carrying extracted host DOM string, original `document.contentType`, and byte size back into the viewer iframe for authentic language mapping. |
 
 ---
 
