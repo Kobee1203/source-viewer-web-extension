@@ -16,6 +16,7 @@ describe('inplaceLocalStrategy', () => {
             text: 'const inplace = true;',
             isDomFallback: true,
             byteSize: 21,
+            contentType: 'application/javascript',
           },
           '*',
         );
@@ -34,6 +35,7 @@ describe('inplaceLocalStrategy', () => {
       expect(result.rawText).toBe('const inplace = true;');
       expect(result.byteSize).toBe(21);
       expect(result.isDomFallback).toBe(true);
+      expect(result.mimeType).toBe('application/javascript');
       expect(result.targetUrl).toBe(targetUrl);
     } finally {
       window.removeEventListener('message', onParentMessage);
