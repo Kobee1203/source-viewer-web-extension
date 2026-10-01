@@ -6,8 +6,8 @@ export const fontViewerGlyphsScenario: ScreenshotScenario = {
   id: '04-font-viewer-glyphs',
   name: 'Dedicated Font Viewer - Glyphs Grid',
   run: async ({ page, extensionId, screenshotsDir }) => {
-    await page.goto(`chrome-extension://${extensionId}/fontviewer.html?url=${encodeURIComponent(MOCK_URLS.font)}`);
-    await page.waitForSelector('#app-fontviewer', { state: 'visible' });
+    await page.goto(`chrome-extension://${extensionId}/viewer.html?url=${encodeURIComponent(MOCK_URLS.font)}`);
+    await page.waitForSelector('.font-view', { state: 'visible' });
     const glyphsTab = page.locator('.view-switch button').nth(1);
     if (await glyphsTab.isVisible()) {
       await glyphsTab.click();

@@ -78,6 +78,7 @@ export default defineContentScript({
           {
             type: 'INPLACE_LOCAL_SOURCE_DATA',
             text,
+            contentType: document.contentType,
           },
           '*',
         );

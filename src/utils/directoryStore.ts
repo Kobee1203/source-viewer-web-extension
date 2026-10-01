@@ -10,6 +10,7 @@ export interface StoredDirectoryFile {
   size: number;
   text?: string;
   isBinary?: boolean;
+  buffer?: ArrayBuffer;
 }
 
 export interface StoredDirectoryProject {

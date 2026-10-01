@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Unified Multi-View Font & Code Viewer** (#39):
+  - **Single Viewer Application**: Unified the Font Viewer into `viewer.html` alongside `CodeView`, rendering fonts dynamically via `FontView` based on resource type ('code' | 'font') and eliminating the separate `fontviewer.html` entrypoint.
+  - **Font Fetching & Binary Pipeline**: Added `fontFetchStrategy` for remote fonts and enabled binary ArrayBuffer decoding across local files, directory loading, and session snapshots.
+  - **Dynamic Toolbar & Status Bar**: Adaptive controls that adjust based on active resource type, including a "Copy URL" button in font mode with transient checkmark visual feedback.
+  - **Local Directory Font Exploration**: Font files within loaded local directories can be opened, inspected, and navigated directly from the Reference Sidebar tree.
 - **Unified Tab Source Capture & Live Refresh**:
   - **Force-Cache Capture**: Implemented tab source capture that fetches unmodified source code directly from browser cache via background scripts before falling back to DOM snapshots.
   - **Live Tab Refresh**: Added a source refresh mechanism (`requestRefreshTabSource`) allowing the viewer to re-capture updated content directly from the active host tab.
@@ -24,10 +29,17 @@ All notable changes to this project will be documented in this file.
   - **Composables Extraction**: Decomposed the monolithic `src/entrypoints/viewer/App.vue` into focused composables (`useViewerDragAndDrop`, `useViewerProjectActions`, `useViewerNavigationResolver`, `useViewerSidebarSync`), reducing `App.vue` script lines by 75%.
   - **Consolidated Component Props**: Unified 17 separate props on `Toolbar.vue` and 8 on `StatusBar.vue` into a single, strictly typed `:source` prop.
   - **Dead Code Purge**: Cleaned up obsolete legacy props and redundant fallbacks across viewer components, adhering to the updated coding guidelines against speculative backward compatibility.
-- **Agent Coding Guidelines**: Added Section 6 to `docs/agents/coding-guidelines.md` forbidding dead code, unused reactive state, and speculative backward-compatibility shims on internal components.
+- **Composable Testing Modernization**:
+  - Standardized all composable tests using a `withSetup` helper (`tests/helpers/withSetup.ts`), eliminating test-specific shims (e.g. `if (getCurrentInstance())`) from production code.
+- **Agent Coding Guidelines**:
+  - Added Section 6 to `docs/agents/coding-guidelines.md` forbidding dead code, unused reactive state, and speculative backward-compatibility shims on internal components.
+  - Added Section 7 detailing DRY architecture and the KISS principle of inspecting template context before duplicating state.
+  - Added Section 8 enforcing separation of concerns and prohibiting test-specific guards in production code.
 
 ### Fixed
 
+- **Font Links Navigation in Code Viewer** (#39): Removed improper in-place link click interception so clicking font URLs in CodeMirror opens the font in a new tab (`target="_blank"`), consistent with other file types.
+- **In-Place JSON and MIME Formatting** (#39): Propagated document `contentType` from `inplace-viewer.content.ts` to `inplaceLocalStrategy.ts`, fixing an issue where direct navigations to JSON API endpoints without a `.json` extension were incorrectly treated as unformatted HTML.
 - **Firefox Local File Scheme In-Place Viewing**: Allowed in-place iframe injection for local `file://` scheme on Firefox.
 - **Tab Source Capture Error Handling**: Handled restricted browser tabs and scripting failures gracefully without crashing the viewer.
 

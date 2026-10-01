@@ -1,9 +1,10 @@
+import { withSetup } from '@@/tests/helpers/withSetup';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import type { StoredDirectoryFile } from '@/utils/directoryStore';
 
 describe('useLocalDirectory', () => {
-  const dir = useLocalDirectory();
+  const [dir] = withSetup(useLocalDirectory);
 
   beforeEach(async () => {
     await dir.closeDirectory();

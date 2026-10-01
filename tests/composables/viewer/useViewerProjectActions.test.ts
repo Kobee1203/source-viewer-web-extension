@@ -1,11 +1,12 @@
+import { withSetup } from '@@/tests/helpers/withSetup';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import { useReferenceSidebar } from '@/composables/useReferenceSidebar';
 import { useViewerProjectActions } from '@/composables/viewer/useViewerProjectActions';
 
 describe('useViewerProjectActions', () => {
-  const localDirectory = useLocalDirectory();
-  const sidebar = useReferenceSidebar();
+  const [localDirectory] = withSetup(useLocalDirectory);
+  const [sidebar] = withSetup(useReferenceSidebar);
 
   beforeEach(async () => {
     await localDirectory.closeDirectory();
@@ -24,14 +25,16 @@ describe('useViewerProjectActions', () => {
     const loadFromLocalFile = vi.fn(async () => {});
     const loadFromDirectoryFile = vi.fn(async () => {});
 
-    const actions = useViewerProjectActions({
-      localDirectory,
-      sidebar,
-      clearUrl,
-      load,
-      loadFromLocalFile,
-      loadFromDirectoryFile,
-    });
+    const [actions] = withSetup(() =>
+      useViewerProjectActions({
+        localDirectory,
+        sidebar,
+        clearUrl,
+        load,
+        loadFromLocalFile,
+        loadFromDirectoryFile,
+      }),
+    );
 
     const mockFile = new File(['content'], 'file.js');
     await actions.openLocalFile(mockFile);
@@ -51,14 +54,16 @@ describe('useViewerProjectActions', () => {
     const loadFromLocalFile = vi.fn(async () => {});
     const loadFromDirectoryFile = vi.fn(async () => {});
 
-    const actions = useViewerProjectActions({
-      localDirectory,
-      sidebar,
-      clearUrl,
-      load,
-      loadFromLocalFile,
-      loadFromDirectoryFile,
-    });
+    const [actions] = withSetup(() =>
+      useViewerProjectActions({
+        localDirectory,
+        sidebar,
+        clearUrl,
+        load,
+        loadFromLocalFile,
+        loadFromDirectoryFile,
+      }),
+    );
 
     actions.onDirectoryLoaded();
 
@@ -76,14 +81,16 @@ describe('useViewerProjectActions', () => {
 
     vi.spyOn(localDirectory, 'pickDirectory').mockResolvedValue(true);
 
-    const actions = useViewerProjectActions({
-      localDirectory,
-      sidebar,
-      clearUrl,
-      load,
-      loadFromLocalFile,
-      loadFromDirectoryFile,
-    });
+    const [actions] = withSetup(() =>
+      useViewerProjectActions({
+        localDirectory,
+        sidebar,
+        clearUrl,
+        load,
+        loadFromLocalFile,
+        loadFromDirectoryFile,
+      }),
+    );
 
     await actions.openDirectory();
 
@@ -102,14 +109,16 @@ describe('useViewerProjectActions', () => {
     const loadFromLocalFile = vi.fn(async () => {});
     const loadFromDirectoryFile = vi.fn(async () => {});
 
-    const actions = useViewerProjectActions({
-      localDirectory,
-      sidebar,
-      clearUrl,
-      load,
-      loadFromLocalFile,
-      loadFromDirectoryFile,
-    });
+    const [actions] = withSetup(() =>
+      useViewerProjectActions({
+        localDirectory,
+        sidebar,
+        clearUrl,
+        load,
+        loadFromLocalFile,
+        loadFromDirectoryFile,
+      }),
+    );
 
     await actions.closeDirectory();
 

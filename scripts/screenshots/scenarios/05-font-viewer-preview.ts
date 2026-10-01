@@ -6,8 +6,8 @@ export const fontViewerPreviewScenario: ScreenshotScenario = {
   id: '05-font-viewer-preview',
   name: 'Dedicated Font Viewer - Typography Preview',
   run: async ({ page, extensionId, screenshotsDir }) => {
-    await page.goto(`chrome-extension://${extensionId}/fontviewer.html?url=${encodeURIComponent(MOCK_URLS.font)}`);
-    await page.waitForSelector('#app-fontviewer', { state: 'visible' });
+    await page.goto(`chrome-extension://${extensionId}/viewer.html?url=${encodeURIComponent(MOCK_URLS.font)}`);
+    await page.waitForSelector('.font-view', { state: 'visible' });
     const previewTab = page.locator('.view-switch button').nth(0);
     if (await previewTab.isVisible()) {
       await previewTab.click();

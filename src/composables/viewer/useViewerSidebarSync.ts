@@ -41,23 +41,27 @@ export function useViewerSidebarSync(options: UseViewerSidebarSyncOptions): void
     }
   });
 
-  // When the source finishes loading and the sidebar is open: insert its refs into the VFS.
-  watch([code, baseUrl], ([newCode, newBase]) => {
-    if (!sidebar.isOpen.value || !newCode || !newBase) return;
+  // When any file (code or font) finishes loading: highlight it, reveal its ancestors, and sync VFS.
+  watch([baseUrl, code], ([newBase, newCode]) => {
+    if (!newBase) return;
+
+    sidebar.activeUrl.value = newBase;
+    sidebar.revealNode(newBase);
+
+    if (!sidebar.isOpen.value) return;
     if (localDirectory.isLoaded.value) {
-      sidebar.activeUrl.value = newBase;
-      sidebar.initFromSource(newCode, newBase, false);
+      sidebar.initFromSource(newCode ?? '', newBase, false);
       return;
     }
-    sidebar.initFromSource(newCode, newBase, hasDistinctRoot);
+    sidebar.initFromSource(newCode ?? '', newBase, hasDistinctRoot);
   });
 
   // When the sidebar is opened and has not yet been populated from the current source: do it now.
   watch(sidebar.isOpen, (open) => {
-    if (!open || !code.value || !baseUrl.value) return;
+    if (!open || !baseUrl.value) return;
     if (localDirectory.isLoaded.value) return;
     if (!sidebar.rootUrl.value) {
-      sidebar.initFromSource(code.value, baseUrl.value, hasDistinctRoot);
+      sidebar.initFromSource(code.value ?? '', baseUrl.value, hasDistinctRoot);
     }
   });
 

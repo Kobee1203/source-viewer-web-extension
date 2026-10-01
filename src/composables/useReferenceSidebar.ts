@@ -5,7 +5,6 @@ import { mimeToFileType } from '@/utils/contentType';
 import type { ReferenceEntry } from '@/utils/extractReferences';
 import { extractReferences } from '@/utils/extractReferences';
 import { getFileType } from '@/utils/fileType';
-import { fontViewerUrl } from '@/utils/fontViewerUrl';
 import { requestSource } from '@/utils/messaging';
 
 export type { VfsFileNode, VfsFolderNode, VfsNode } from '@/utils/buildVfsTree';
@@ -197,14 +196,6 @@ export function useReferenceSidebar() {
 
     activeUrl.value = url;
 
-    if (
-      (node.kind === 'file' && node.linkTarget === 'font') ||
-      (node.kind === 'folder' && node.linkTarget === 'font')
-    ) {
-      window.open(fontViewerUrl(url), '_blank', 'noopener,noreferrer');
-      return;
-    }
-
     if (node.kind === 'file' && !node.isExplored) {
       node.isLoading = true;
       pendingFileUrl.value = url;
@@ -238,7 +229,7 @@ export function useReferenceSidebar() {
   /**
    * Navigate to a referenced file from a shortcut:
    * - Expands all ancestor folders so the canonical node is visible in the tree.
-   * - Sets the file as active and triggers load (or opens font viewer).
+   * - Sets the file as active and triggers in-place load.
    */
   function navigateToShortcut(refEntry: ReferenceEntry, loadFn: (url: string) => Promise<void>): void {
     const targetNode = revealNode(refEntry.url);
@@ -246,11 +237,7 @@ export function useReferenceSidebar() {
       navigateTo(targetNode, loadFn);
     } else {
       activeUrl.value = refEntry.url;
-      if (refEntry.linkTarget === 'font') {
-        window.open(fontViewerUrl(refEntry.url), '_blank', 'noopener,noreferrer');
-      } else {
-        void loadFn(refEntry.url);
-      }
+      void loadFn(refEntry.url);
     }
   }
 

@@ -50,4 +50,26 @@ describe('fileObjectStrategy', () => {
     // No snapshot should be stored when handle is active
     expect(getStoredSnapshot()).toBeNull();
   });
+
+  it('reads font File object with resourceType "font" and stores snapshot', async () => {
+    const fontBytes = new Uint8Array([0, 1, 0, 0]);
+    const file = new File([fontBytes], 'custom.woff2', { type: 'font/woff2' });
+
+    const result = await fileObjectStrategy({
+      kind: 'file',
+      file,
+    });
+
+    expect(result.rawText).toBe('');
+    expect(result.resourceType).toBe('font');
+    expect(result.fontFormat).toBe('woff2');
+    expect(result.fontBuffer).toBeDefined();
+    expect(result.detectedFileType).toBeUndefined();
+
+    const snapshot = getStoredSnapshot();
+    expect(snapshot?.name).toBe('custom.woff2');
+    expect(snapshot?.fileType).toBe('font');
+    expect(snapshot?.fontFormat).toBe('woff2');
+    expect(snapshot?.text.startsWith('data:')).toBe(true);
+  });
 });

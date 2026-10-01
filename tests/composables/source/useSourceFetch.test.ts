@@ -1,3 +1,4 @@
+import { withSetup } from '@@/tests/helpers/withSetup';
 import { mockBrowser } from '@@/tests/setup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useSourceFetch } from '@/composables/source/useSourceFetch';
@@ -27,7 +28,7 @@ describe('useSourceFetch', () => {
       httpStatusText: 'OK',
     });
 
-    const { loading, code, rawCode, language, byteSize, httpStatus, load } = useSourceFetch();
+    const [{ loading, code, rawCode, language, byteSize, httpStatus, load }] = withSetup(useSourceFetch);
 
     expect(loading.value).toBe(false);
 
@@ -50,7 +51,7 @@ describe('useSourceFetch', () => {
       error: 'Failed to fetch',
     });
 
-    const { loading, errorMessage, errorWithNativeButton, load } = useSourceFetch();
+    const [{ loading, errorMessage, errorWithNativeButton, load }] = withSetup(useSourceFetch);
 
     await load('https://example.com/fail.js');
 
@@ -62,7 +63,7 @@ describe('useSourceFetch', () => {
   it('restores stored snapshot when no URL parameter is provided', async () => {
     saveSnapshot('test.json', '{"name":"vitest"}', 'json');
 
-    const { loading, code, fileName, isLocalSnapshot, language, load } = useSourceFetch();
+    const [{ loading, code, fileName, isLocalSnapshot, language, load }] = withSetup(useSourceFetch);
 
     await load();
 
@@ -74,7 +75,7 @@ describe('useSourceFetch', () => {
   });
 
   it('flags restricted URLs with native button fallback', async () => {
-    const { loading, errorMessage, errorWithNativeButton, load } = useSourceFetch();
+    const [{ loading, errorMessage, errorWithNativeButton, load }] = withSetup(useSourceFetch);
 
     await load('https://chromewebstore.google.com/detail/123');
 
@@ -85,7 +86,7 @@ describe('useSourceFetch', () => {
 
   it('loads from local File instance and formats source', async () => {
     const file = new File(['body{margin:0;}'], 'styles.css', { type: 'text/css' });
-    const { loading, code, fileName, language, isLocalSnapshot, loadFromLocalFile } = useSourceFetch();
+    const [{ loading, code, fileName, language, isLocalSnapshot, loadFromLocalFile }] = withSetup(useSourceFetch);
 
     await loadFromLocalFile(file);
 
@@ -107,7 +108,7 @@ describe('useSourceFetch', () => {
       },
     });
 
-    const { code, rawCode, isDomFallback, isSourceTabClosed, refreshSource } = useSourceFetch();
+    const [{ code, rawCode, isDomFallback, isSourceTabClosed, refreshSource }] = withSetup(useSourceFetch);
 
     await refreshSource();
 
@@ -129,7 +130,7 @@ describe('useSourceFetch', () => {
       },
     });
 
-    const { isSourceTabClosed, refreshSource } = useSourceFetch();
+    const [{ isSourceTabClosed, refreshSource }] = withSetup(useSourceFetch);
 
     await refreshSource();
 
@@ -139,12 +140,12 @@ describe('useSourceFetch', () => {
   it('clears URL query parameters and loads file from active directory without fetch', async () => {
     history.replaceState(null, '', '/viewer.html?url=file%3A%2F%2F%2Ffixtures%2Fsample.html');
     const { useLocalDirectory } = await import('@/composables/useLocalDirectory');
-    const dir = useLocalDirectory();
+    const [dir] = withSetup(useLocalDirectory);
     await dir.initDirectory('fixtures', [
       { path: 'sample.html', name: 'sample.html', type: 'html', size: 50, text: '<h1>Directory File</h1>' },
     ]);
 
-    const { loading, code, isDirectoryFile, load } = useSourceFetch();
+    const [{ loading, code, isDirectoryFile, load }] = withSetup(useSourceFetch);
 
     await load('file:///fixtures/sample.html');
 

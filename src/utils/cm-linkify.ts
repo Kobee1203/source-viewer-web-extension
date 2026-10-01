@@ -2,7 +2,6 @@ import { RangeSetBuilder } from '@codemirror/state';
 import { Decoration, type DecorationSet, type EditorView, ViewPlugin } from '@codemirror/view';
 import type { ViewUpdate } from '@codemirror/view';
 import { extensionToFileType } from '@/utils/fileType';
-import { fontViewerUrl } from '@/utils/fontViewerUrl';
 import { classifyLinkTarget } from '@/utils/linkTarget';
 import { viewerUrl } from '@/utils/viewerUrl';
 
@@ -22,16 +21,13 @@ export function resolveUrl(attr: string, rawUrl: string, baseUrl: string): strin
   }
   try {
     const resolved = new URL(trimmed, baseUrl);
-    // Route by target type: images render natively in the browser, fonts open in the dedicated font
-    // viewer. For source files, link directly to the CSS/JS/JSON/XML types the in-place viewer
-    // handles: the extension still shows the formatted viewer on navigation, while the address bar
-    // keeps the real (copy-able) URL instead of an encoded viewer.html?url=… link. Other or
-    // extensionless sources (e.g. HTML) still go through viewer.html to show their source.
+    // Route by target type: images render natively in the browser, fonts and source files
+    // go through the viewer.
     switch (classifyLinkTarget(resolved)) {
       case 'image':
         return resolved.toString();
       case 'font':
-        return fontViewerUrl(resolved.toString());
+        return viewerUrl(resolved.toString());
       default:
         return extensionToFileType(resolved) ? resolved.toString() : viewerUrl(resolved.toString());
     }

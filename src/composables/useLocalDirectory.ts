@@ -36,6 +36,44 @@ const filesMap = shallowRef<Map<string, StoredDirectoryFile>>(new Map());
 const directoryVfsTree = ref<VfsNode[]>([]);
 
 /**
+ * Reads and converts a local File instance into a StoredDirectoryFile descriptor.
+ */
+async function createStoredDirectoryFile(file: File, filePath: string): Promise<StoredDirectoryFile> {
+  const dummyUrl = new URL('file:///' + filePath);
+  const linkTarget = classifyLinkTarget(dummyUrl);
+  const fileType = extensionToFileType(dummyUrl) ?? '';
+
+  let text: string | undefined;
+  let buffer: ArrayBuffer | undefined;
+  let isBinary = false;
+
+  if (linkTarget === 'font') {
+    isBinary = true;
+    try {
+      buffer = await file.arrayBuffer();
+    } catch {
+      // failed to read font buffer
+    }
+  } else {
+    try {
+      text = await file.text();
+    } catch {
+      isBinary = true;
+    }
+  }
+
+  return {
+    path: filePath,
+    name: file.name,
+    type: fileType,
+    size: file.size,
+    text,
+    isBinary,
+    buffer,
+  };
+}
+
+/**
  * Recursively scans files from a modern FileSystemDirectoryHandle (Chromium).
  */
 async function scanDirectoryHandle(
@@ -53,31 +91,7 @@ async function scanDirectoryHandle(
       try {
         const fileHandle = entry as FileSystemFileHandle;
         const file = await fileHandle.getFile();
-        const dummyUrl = new URL('file:///' + entryPath);
-        const linkTarget = classifyLinkTarget(dummyUrl);
-        const fileType = extensionToFileType(dummyUrl) ?? '';
-
-        let text: string | undefined;
-        let isBinary = false;
-
-        if (linkTarget === 'font') {
-          isBinary = true;
-        } else {
-          try {
-            text = await file.text();
-          } catch {
-            isBinary = true;
-          }
-        }
-
-        results.push({
-          path: entryPath,
-          name: entry.name,
-          type: fileType,
-          size: file.size,
-          text,
-          isBinary,
-        });
+        results.push(await createStoredDirectoryFile(file, entryPath));
       } catch (err) {
         console.warn(`Failed to read file ${entryPath}:`, err);
       }
@@ -124,31 +138,7 @@ async function scanDirectoryEntry(
         const file = await new Promise<File>((resolve, reject) => {
           (entry as FileSystemFileEntry).file(resolve, reject);
         });
-        const dummyUrl = new URL('file:///' + entryPath);
-        const linkTarget = classifyLinkTarget(dummyUrl);
-        const fileType = extensionToFileType(dummyUrl) ?? '';
-
-        let text: string | undefined;
-        let isBinary = false;
-
-        if (linkTarget === 'font') {
-          isBinary = true;
-        } else {
-          try {
-            text = await file.text();
-          } catch {
-            isBinary = true;
-          }
-        }
-
-        results.push({
-          path: entryPath,
-          name: entry.name,
-          type: fileType,
-          size: file.size,
-          text,
-          isBinary,
-        });
+        results.push(await createStoredDirectoryFile(file, entryPath));
       } catch (err) {
         console.warn(`Failed to read entry ${entryPath}:`, err);
       }
@@ -182,31 +172,7 @@ async function scanFileList(fileList: FileList): Promise<{ rootFolderName: strin
     if (parts.some((p) => shouldIgnore(p))) continue;
 
     const filePath = parts.length > 1 ? parts.slice(1).join('/') : parts[0];
-    const dummyUrl = new URL('file:///' + filePath);
-    const linkTarget = classifyLinkTarget(dummyUrl);
-    const fileType = extensionToFileType(dummyUrl) ?? '';
-
-    let text: string | undefined;
-    let isBinary = false;
-
-    if (linkTarget === 'font') {
-      isBinary = true;
-    } else {
-      try {
-        text = await file.text();
-      } catch {
-        isBinary = true;
-      }
-    }
-
-    files.push({
-      path: filePath,
-      name: file.name,
-      type: fileType,
-      size: file.size,
-      text,
-      isBinary,
-    });
+    files.push(await createStoredDirectoryFile(file, filePath));
   }
 
   return { rootFolderName, files };

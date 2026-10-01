@@ -14,6 +14,7 @@ export const inplaceLocalStrategy: SourceFetchStrategy = async (target) => {
     text: string;
     isDomFallback?: boolean;
     byteSize?: number;
+    contentType?: string;
   } | null>((resolve) => {
     let resolved = false;
     const handler = (event: MessageEvent) => {
@@ -27,10 +28,12 @@ export const inplaceLocalStrategy: SourceFetchStrategy = async (target) => {
         const text = (event.data as { text?: unknown }).text;
         const isDomFallback = (event.data as { isDomFallback?: unknown }).isDomFallback;
         const byteSize = (event.data as { byteSize?: unknown }).byteSize;
+        const contentType = (event.data as { contentType?: unknown }).contentType;
         resolve({
           text: typeof text === 'string' ? text : '',
           isDomFallback: typeof isDomFallback === 'boolean' ? isDomFallback : false,
           byteSize: typeof byteSize === 'number' ? byteSize : undefined,
+          contentType: typeof contentType === 'string' ? contentType : undefined,
         });
       }
     };
@@ -54,5 +57,6 @@ export const inplaceLocalStrategy: SourceFetchStrategy = async (target) => {
     byteSize: result.byteSize ?? new Blob([result.text]).size,
     targetUrl: target.url,
     isDomFallback: result.isDomFallback,
+    mimeType: result.contentType,
   };
 };

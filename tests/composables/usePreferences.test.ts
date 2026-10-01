@@ -1,4 +1,5 @@
 import { nextTick } from 'vue';
+import { withSetup } from '@@/tests/helpers/withSetup';
 import { mockBrowser } from '@@/tests/setup';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { DEFAULT_CONTEXT_MENU, DEFAULT_OPEN_IN, usePreferences } from '@/composables/usePreferences';
@@ -11,7 +12,7 @@ describe('usePreferences', () => {
   });
 
   it('initializes with default values when storage is empty', () => {
-    const prefs = usePreferences();
+    const [prefs] = withSetup(usePreferences);
 
     expect(prefs.themeId.value).toBe(DEFAULT_THEME_ID);
     expect(prefs.wordWrap.value).toBe(false);
@@ -26,7 +27,7 @@ describe('usePreferences', () => {
     localStorage.setItem('viewer-wordWrap', 'true');
     localStorage.setItem('viewer-codeFontSize', '18');
 
-    const prefs = usePreferences();
+    const [prefs] = withSetup(usePreferences);
 
     expect(prefs.contextMenu.value).toBe(false);
     expect(prefs.openIn.value).toBe('current-tab');
@@ -42,7 +43,7 @@ describe('usePreferences', () => {
       codeFontSize: 16,
     });
 
-    const prefs = usePreferences();
+    const [prefs] = withSetup(usePreferences);
 
     // Allow promise in usePreferences to resolve
     await Promise.resolve();
@@ -57,7 +58,7 @@ describe('usePreferences', () => {
   });
 
   it('syncs contextMenu updates to localStorage and browser.storage.local', async () => {
-    const prefs = usePreferences();
+    const [prefs] = withSetup(usePreferences);
 
     prefs.contextMenu.value = false;
     await nextTick();
@@ -73,7 +74,7 @@ describe('usePreferences', () => {
   });
 
   it('syncs openIn updates to localStorage and browser.storage.local', async () => {
-    const prefs = usePreferences();
+    const [prefs] = withSetup(usePreferences);
 
     prefs.openIn.value = 'current-tab';
     await nextTick();

@@ -1,10 +1,11 @@
+import { withSetup } from '@@/tests/helpers/withSetup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { directoryFileStrategy } from '@/composables/source/strategies/directoryFileStrategy';
 import { SourceFetchError } from '@/composables/source/types';
 import { useLocalDirectory } from '@/composables/useLocalDirectory';
 
 describe('directoryFileStrategy', () => {
-  const dir = useLocalDirectory();
+  const [dir] = withSetup(useLocalDirectory);
 
   beforeEach(async () => {
     await dir.initDirectory('fixtures', [
