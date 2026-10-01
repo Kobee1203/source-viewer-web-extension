@@ -17,6 +17,8 @@
     "compile": "vue-tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "wxt build && playwright test",
+    "test:e2e:headed": "wxt build && HEADLESS=false playwright test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:css": "stylelint \"src/**/*.{css,vue}\"",
@@ -93,6 +95,7 @@
     "xpath": "^0.0.34"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/js-beautify": "^1.14.3",
     "@vue/eslint-config-typescript": "^14.9.0",
