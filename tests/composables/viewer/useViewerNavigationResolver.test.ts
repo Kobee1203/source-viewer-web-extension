@@ -148,7 +148,7 @@ describe('useViewerNavigationResolver', () => {
     expect(loadFromDirectoryFile).toHaveBeenCalledWith('styles/main.css');
   });
 
-  it('intercepts font link clicks and loads them in-place when no directory is loaded', () => {
+  it('does not intercept font or external link clicks when no local directory match exists', () => {
     const load = vi.fn(async () => {});
     const loadFromDirectoryFile = vi.fn(async () => {});
 
@@ -170,8 +170,8 @@ describe('useViewerNavigationResolver', () => {
       event,
     });
 
-    expect(preventSpy).toHaveBeenCalled();
-    expect(sidebar.activeUrl.value).toBe('https://example.com/fonts/inter.woff2');
-    expect(load).toHaveBeenCalledWith('https://example.com/fonts/inter.woff2');
+    expect(preventSpy).not.toHaveBeenCalled();
+    expect(load).not.toHaveBeenCalled();
+    expect(loadFromDirectoryFile).not.toHaveBeenCalled();
   });
 });

@@ -280,8 +280,14 @@ function onNativeAuxClick(event: MouseEvent): void {
     </template>
     <template v-else-if="isFont && targetUrl">
       <span class="sep"></span>
-      <IconButton :label="t('viewerCopyUrl')" @click="onCopyUrl">
-        <Link :size="20" />
+      <IconButton
+        class="copy-btn"
+        :class="{ copied: !!copied }"
+        :label="copied ? t('viewerCopied') : t('viewerCopyUrl')"
+        @click="onCopyUrl"
+      >
+        <Check v-if="copied" :size="20" />
+        <Link v-else :size="20" />
       </IconButton>
     </template>
 

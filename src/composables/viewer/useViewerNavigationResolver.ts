@@ -1,6 +1,5 @@
 import type { useLocalDirectory } from '@/composables/useLocalDirectory';
 import type { ReferenceEntry, VfsNode, useReferenceSidebar } from '@/composables/useReferenceSidebar';
-import { classifyLinkTarget } from '@/utils/linkTarget';
 
 export interface UseViewerNavigationResolverOptions {
   localDirectory: ReturnType<typeof useLocalDirectory>;
@@ -79,20 +78,6 @@ export function useViewerNavigationResolver(
         event.preventDefault();
         revealAndLoadLocalFile(matchedFile.path);
         return;
-      }
-    }
-
-    // In-place navigation for font links when clicked without modifier keys
-    if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
-      try {
-        const parsed = new URL(resolvedTarget);
-        if (classifyLinkTarget(parsed) === 'font') {
-          event.preventDefault();
-          sidebar.activeUrl.value = resolvedTarget;
-          void load(resolvedTarget);
-        }
-      } catch {
-        // not a valid URL
       }
     }
   }

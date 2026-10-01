@@ -41,6 +41,7 @@ This document outlines the strict coding rules and architecture conventions that
 ## 7. DRY and Maintainable Architecture
 
 - **Avoid code duplication (DRY)**: Never duplicate data transformations, file-reading logic, or multi-branch metadata assignments across multiple functions. Proactively extract private helpers, shared composables, or domain utilities with a single point of truth.
+- **Inspect template context before adding state (KISS)**: Before declaring new reactive variables, duplicate composable instances, or introducing complex discriminated state identifiers, always inspect the component's template. When elements or controls are mutually exclusive (e.g. conditional branches via `v-if` / `v-else-if`), reuse existing reactive state and composables directly instead of duplicating them or over-engineering discriminated markers.
 
 ## 8. Separation of Concerns & Testing Hygiene
 
