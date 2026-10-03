@@ -18,6 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "wxt build && playwright test",
+    "test:e2e:ui": "wxt build && playwright test --ui",
     "test:e2e:headed": "wxt build && HEADLESS=false playwright test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

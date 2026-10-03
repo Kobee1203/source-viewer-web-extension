@@ -24,8 +24,10 @@ export const test = base.extend<{
     const isHeadless = process.env.HEADLESS !== 'false';
     const context = await chromium.launchPersistentContext('', {
       headless: false,
+      locale: 'en-US',
       args: [
         ...(isHeadless ? ['--headless=new'] : []),
+        '--lang=en-US',
         `--disable-extensions-except=${EXTENSION_PATH}`,
         `--load-extension=${EXTENSION_PATH}`,
         '--no-sandbox',

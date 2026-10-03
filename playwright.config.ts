@@ -15,4 +15,10 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   retries: 0,
+  /* Auto-start the fixture server before tests */
+  webServer: {
+    command: 'tsx e2e/server/start.ts',
+    port: 4173,
+    reuseExistingServer: !process.env.CI,
+  },
 });

@@ -1,0 +1,19 @@
+{
+  "name": "source-viewer",
+  "version": "1.0.0",
+  "description": "A test JSON fixture for E2E tests",
+  "author": {
+    "name": "Test Author",
+    "email": "test@example.com"
+  },
+  "dependencies": {
+    "vue": "^3.5.0",
+    "codemirror": "^6.0.0"
+  },
+  "keywords": ["viewer", "source", "extension"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/source-viewer"
+  },
+  "license": "MIT"
+}
