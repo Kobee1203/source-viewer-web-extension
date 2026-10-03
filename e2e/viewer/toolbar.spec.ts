@@ -109,4 +109,50 @@ test.describe('Toolbar', () => {
 
     await page.close();
   });
+
+  test('Settings dialog opens and closes in viewer', async ({ context, extensionId }) => {
+    const page = await context.newPage();
+    const url = `chrome-extension://${extensionId}/viewer.html?url=${encodeURIComponent('http://localhost:4173/source.json')}`;
+    await page.goto(url);
+    await expect(page.locator('.cm-editor')).toBeVisible();
+
+    // Click settings button in toolbar to open modal dialog
+    await page.locator('button:has(svg.lucide-settings)').click();
+
+    // Assert dialog opened with options
+    const dialog = page.locator('dialog.dialog-base');
+    await expect(dialog).toBeVisible();
+    await expect(page.locator('#settings-open-in')).toBeVisible();
+
+    // Close dialog via close button
+    await page.locator('button.dialog-close').click();
+    await expect(dialog).not.toBeVisible();
+
+    await page.close();
+  });
+
+  test('Copy options dropdown displays menu items', async ({ context, extensionId }) => {
+    const page = await context.newPage();
+    const url = `chrome-extension://${extensionId}/viewer.html?url=${encodeURIComponent('http://localhost:4173/source.json')}`;
+    await page.goto(url);
+    await expect(page.locator('.cm-editor')).toBeVisible();
+
+    // Click split button toggle to open copy menu
+    const splitBtnToggle = page.locator('button.split-btn-toggle');
+    await splitBtnToggle.click();
+
+    const menu = page.locator('ul.dropdown-menu[role="menu"]');
+    await expect(menu).toBeVisible();
+
+    // Verify multiple copy options exist
+    const items = page.locator('button.dropdown-item[role="menuitem"]');
+    await expect(items).toHaveCount(3); // formatted, raw, url
+
+    // Click first item to trigger copy
+    await items.first().click();
+    await expect(menu).not.toBeVisible();
+    await expect(page.locator('button.copy-btn')).toHaveClass(/copied/);
+
+    await page.close();
+  });
 });
