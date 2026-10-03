@@ -10,7 +10,7 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   /* Reporter configuration */
-  reporter: [['html', { open: 'never' }]],
+  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['html', { open: 'never' }], ['list']],
   use: {
     trace: 'on-first-retry',
   },
