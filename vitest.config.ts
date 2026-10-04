@@ -11,6 +11,7 @@ export default defineConfig({
     restoreMocks: true,
     unstubGlobals: true,
     unstubEnvs: true,
+    pool: 'vmThreads',
   },
   resolve: {
     alias: {
