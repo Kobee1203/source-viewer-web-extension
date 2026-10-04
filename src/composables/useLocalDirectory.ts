@@ -1,3 +1,4 @@
+/// <reference lib="dom.asynciterable" />
 import { ref, shallowRef } from 'vue';
 import { type VfsNode, buildDirectoryVfsTree } from '@/utils/buildVfsTree';
 import {

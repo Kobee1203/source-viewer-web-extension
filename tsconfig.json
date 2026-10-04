@@ -1,7 +1,6 @@
 {
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
-    "noUncheckedIndexedAccess": false,
-    "lib": ["ESNext", "DOM", "DOM.Iterable", "DOM.AsyncIterable"]
+    "noUncheckedIndexedAccess": false
   }
 }
