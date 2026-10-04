@@ -23,18 +23,18 @@ The release workflow ([`.github/workflows/release.yml`](../../.github/workflows/
 
 To enable automated store submissions, add the following secrets under **Settings > Secrets and variables > Actions > Repository secrets** (click **New repository secret**):
 
-| Store                | Secret Name            | Description / Source                                          |
-| :------------------- | :--------------------- | :------------------------------------------------------------ |
-| **Chrome Web Store** | `CHROME_EXTENSION_ID`  | Extension ID from the Chrome Web Store Developer Dashboard.   |
-|                      | `CHROME_CLIENT_ID`     | OAuth 2.0 Client ID from Google Cloud Console.                |
-|                      | `CHROME_CLIENT_SECRET` | OAuth 2.0 Client Secret from Google Cloud Console.            |
-|                      | `CHROME_REFRESH_TOKEN` | Refresh token generated during OAuth setup.                   |
-| **Firefox AMO**      | `FIREFOX_EXTENSION_ID` | Extension UUID/ID registered on Firefox Add-on Developer Hub. |
-|                      | `FIREFOX_JWT_ISSUER`   | JWT Issuer (API Key) from AMO API Credentials.                |
-|                      | `FIREFOX_JWT_SECRET`   | JWT Secret from AMO API Credentials.                          |
-| **Edge Add-ons**     | `EDGE_PRODUCT_ID`      | Product ID from Microsoft Partner Center dashboard.           |
-|                      | `EDGE_CLIENT_ID`       | Azure AD / Partner Center Client ID.                          |
-|                      | `EDGE_API_KEY`         | Partner Center API Key / Client Secret.                       |
+| Store                | Secret Name                           | Description / Source                                                          |
+| :------------------- | :------------------------------------ | :---------------------------------------------------------------------------- |
+| **Chrome Web Store** | `CHROME_EXTENSION_ID`                 | Extension ID from the Chrome Web Store Developer Dashboard.                   |
+|                      | `CHROME_PUBLISHER_ID`                 | Publisher ID from the Developer Dashboard URL (`/devconsole/<publisher-id>`). |
+|                      | `CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL` | Service Account email address (`client_email` from Google Cloud JSON key).    |
+|                      | `CHROME_SERVICE_ACCOUNT_PRIVATE_KEY`  | Service Account private key (`private_key` from Google Cloud JSON key).       |
+| **Firefox AMO**      | `FIREFOX_EXTENSION_ID`                | Extension UUID/ID registered on Firefox Add-on Developer Hub.                 |
+|                      | `FIREFOX_JWT_ISSUER`                  | JWT Issuer (API Key) from AMO API Credentials.                                |
+|                      | `FIREFOX_JWT_SECRET`                  | JWT Secret from AMO API Credentials.                                          |
+| **Edge Add-ons**     | `EDGE_PRODUCT_ID`                     | Product ID from Microsoft Partner Center dashboard.                           |
+|                      | `EDGE_CLIENT_ID`                      | Azure AD / Partner Center Client ID.                                          |
+|                      | `EDGE_API_KEY`                        | Partner Center API Key / Client Secret.                                       |
 
 > [!TIP]
 > You can generate all of these store credentials locally by running:
@@ -45,13 +45,14 @@ To enable automated store submissions, add the following secrets under **Setting
 >
 > This creates a local `.env.submit` file (ignored by Git) containing all values ready to be copied into GitHub Repository Secrets.
 
-#### Google Cloud Console Note (Chrome OAuth)
+#### Chrome Web Store API v2 Note (Service Account)
 
-When creating the OAuth consent screen in Google Cloud Console under the new **Google Auth Platform** UI:
+The Chrome Web Store submission uses API v2 via a Google Cloud Service Account instead of legacy OAuth user credentials:
 
-1. Navigate to **Audience** (under _Branding_ in the left menu).
-2. Under **Test users** (_Utilisateurs test_), add your Google developer email address.
-3. Without this, token generation will fail with `403 : access_denied` while the application is in testing mode.
+1. Enable the **Chrome Web Store API** on your project in Google Cloud Console.
+2. In **IAM & Admin > Service Accounts**, create a service account and download a **JSON** key.
+3. In the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole), go to **Settings** (or **Paramètres**) > **Service accounts** and add your service account's email address.
+4. Service accounts do not expire and require no OAuth consent screen approval or brand verification.
 
 ---
 

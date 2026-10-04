@@ -111,10 +111,11 @@ jobs:
       - name: Submit to Web Stores
         env:
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dryRun }}
+          CHROME_API_VERSION: v2
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
-          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+          CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: ${{ secrets.CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL }}
+          CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY }}
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
@@ -126,7 +127,7 @@ jobs:
           HAS_FIREFOX=false
           HAS_EDGE=false
 
-          if [[ -n "$CHROME_EXTENSION_ID" && -n "$CHROME_CLIENT_ID" && -n "$CHROME_CLIENT_SECRET" && -n "$CHROME_REFRESH_TOKEN" ]]; then
+          if [[ -n "$CHROME_EXTENSION_ID" && -n "$CHROME_PUBLISHER_ID" && -n "$CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL" && -n "$CHROME_SERVICE_ACCOUNT_PRIVATE_KEY" ]]; then
             HAS_CHROME=true
           fi
 
