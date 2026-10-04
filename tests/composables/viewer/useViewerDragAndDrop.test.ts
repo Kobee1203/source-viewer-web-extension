@@ -1,5 +1,5 @@
 import { withSetup } from '@@/tests/helpers/withSetup';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useViewerDragAndDrop } from '@/composables/viewer/useViewerDragAndDrop';
 
 describe('useViewerDragAndDrop', () => {
@@ -9,10 +9,6 @@ describe('useViewerDragAndDrop', () => {
   beforeEach(() => {
     addSpy = vi.spyOn(window, 'addEventListener');
     removeSpy = vi.spyOn(window, 'removeEventListener');
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   it('manages drag state and calls appropriate drop handlers', async () => {

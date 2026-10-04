@@ -1,5 +1,5 @@
 import { mockBrowser } from '@@/tests/setup';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   clearSessionSource,
   getSessionSource,
@@ -10,10 +10,6 @@ import {
 import * as tabSourceCapture from '@/utils/tabSourceCapture';
 
 describe('sessionSource', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   describe('getSessionSourceKey', () => {
     it('generates the expected key for a viewer tab ID', () => {
       expect(getSessionSourceKey(123)).toBe('viewer:tab:123');

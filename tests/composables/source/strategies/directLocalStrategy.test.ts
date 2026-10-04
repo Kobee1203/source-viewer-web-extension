@@ -8,60 +8,45 @@ describe('directLocalStrategy', () => {
       ok: true,
       text: () => Promise.resolve('console.log("local file");'),
     };
-    const originalFetch = window.fetch;
-    window.fetch = vi.fn().mockResolvedValue(mockResponse);
+    vi.spyOn(window, 'fetch').mockResolvedValue(mockResponse as unknown as Response);
 
-    try {
-      const targetUrl = new URL('file:///path/to/script.js');
-      const result = await directLocalStrategy({
-        kind: 'url',
-        url: targetUrl,
-      });
+    const targetUrl = new URL('file:///path/to/script.js');
+    const result = await directLocalStrategy({
+      kind: 'url',
+      url: targetUrl,
+    });
 
-      expect(result.rawText).toBe('console.log("local file");');
-      expect(result.byteSize).toBe(26);
-      expect(result.targetUrl).toBe(targetUrl);
-    } finally {
-      window.fetch = originalFetch;
-    }
+    expect(result.rawText).toBe('console.log("local file");');
+    expect(result.byteSize).toBe(26);
+    expect(result.targetUrl).toBe(targetUrl);
   });
 
   it('throws file-access-denied SourceFetchError when fetch fails and isAllowedFileSchemeAccess is false', async () => {
-    const originalFetch = window.fetch;
-    window.fetch = vi.fn().mockRejectedValue(new Error('Failed to fetch'));
+    vi.spyOn(window, 'fetch').mockRejectedValue(new Error('Failed to fetch'));
     mockBrowser.extension.isAllowedFileSchemeAccess.mockResolvedValue(false);
 
-    try {
-      await expect(
-        directLocalStrategy({
-          kind: 'url',
-          url: new URL('file:///path/to/script.js'),
-        }),
-      ).rejects.toMatchObject({
-        kind: 'file-access-denied',
-      });
-    } finally {
-      window.fetch = originalFetch;
-    }
+    await expect(
+      directLocalStrategy({
+        kind: 'url',
+        url: new URL('file:///path/to/script.js'),
+      }),
+    ).rejects.toMatchObject({
+      kind: 'file-access-denied',
+    });
   });
 
   it('throws file-access-denied SourceFetchError when fetch fails even if isAllowedFileSchemeAccess is true', async () => {
-    const originalFetch = window.fetch;
-    window.fetch = vi.fn().mockRejectedValue(new TypeError('NetworkError when attempting to fetch resource.'));
+    vi.spyOn(window, 'fetch').mockRejectedValue(new TypeError('NetworkError when attempting to fetch resource.'));
     mockBrowser.extension.isAllowedFileSchemeAccess.mockResolvedValue(true);
 
-    try {
-      await expect(
-        directLocalStrategy({
-          kind: 'url',
-          url: new URL('file:///path/to/script.js'),
-        }),
-      ).rejects.toMatchObject({
-        kind: 'file-access-denied',
-      });
-    } finally {
-      window.fetch = originalFetch;
-    }
+    await expect(
+      directLocalStrategy({
+        kind: 'url',
+        url: new URL('file:///path/to/script.js'),
+      }),
+    ).rejects.toMatchObject({
+      kind: 'file-access-denied',
+    });
   });
 
   it('prioritizes captured session source over window.fetch when available', async () => {
@@ -107,22 +92,17 @@ describe('directLocalStrategy', () => {
       ok: true,
       text: () => Promise.resolve('console.log("app.js");'),
     };
-    const originalFetch = window.fetch;
-    window.fetch = vi.fn().mockResolvedValue(mockResponse);
+    vi.spyOn(window, 'fetch').mockResolvedValue(mockResponse as unknown as Response);
 
-    try {
-      const targetUrl = new URL('file:///path/to/app.js');
-      const result = await directLocalStrategy({
-        kind: 'url',
-        url: targetUrl,
-      });
+    const targetUrl = new URL('file:///path/to/app.js');
+    const result = await directLocalStrategy({
+      kind: 'url',
+      url: targetUrl,
+    });
 
-      expect(result.rawText).toBe('console.log("app.js");');
-      expect(result.byteSize).toBe(22);
-      expect(result.isLocalSnapshot).toBeUndefined();
-      expect(result.targetUrl).toBe(targetUrl);
-    } finally {
-      window.fetch = originalFetch;
-    }
+    expect(result.rawText).toBe('console.log("app.js");');
+    expect(result.byteSize).toBe(22);
+    expect(result.isLocalSnapshot).toBeUndefined();
+    expect(result.targetUrl).toBe(targetUrl);
   });
 });

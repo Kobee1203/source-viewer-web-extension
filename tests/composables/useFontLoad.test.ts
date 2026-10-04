@@ -1,5 +1,5 @@
 import { withSetup } from '@@/tests/helpers/withSetup';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PREVIEW_FONT_FAMILY, formatFromUrl, useFontLoad } from '@/composables/useFontLoad';
 
 class MockFontFace {
@@ -38,10 +38,6 @@ describe('useFontLoad', () => {
       writable: true,
       configurable: true,
     });
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   it('formatFromUrl extracts font extensions', () => {

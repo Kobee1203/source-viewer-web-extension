@@ -1,5 +1,5 @@
 import { withSetup } from '@@/tests/helpers/withSetup';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSourceFetch } from '@/composables/source/useSourceFetch';
 import { PREVIEW_FONT_FAMILY } from '@/composables/useFontLoad';
 
@@ -33,10 +33,6 @@ describe('useSourceFetch - Font Handling', () => {
       writable: true,
       configurable: true,
     });
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   it('loads remote font URL into font mode', async () => {

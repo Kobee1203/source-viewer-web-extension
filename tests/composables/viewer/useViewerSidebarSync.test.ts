@@ -18,7 +18,6 @@ describe('useViewerSidebarSync', () => {
 
   afterEach(() => {
     history.replaceState(null, '', originalLocation);
-    vi.restoreAllMocks();
   });
 
   it('updates sidebar on code/baseUrl change when sidebar is open', async () => {
