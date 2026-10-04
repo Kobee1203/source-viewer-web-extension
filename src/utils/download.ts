@@ -55,7 +55,7 @@ function basename(name: string): string {
 export function filenameFromContentDisposition(header: string | null | undefined): string | null {
   if (!header) return null;
   const extended = /filename\*\s*=\s*[^']*''([^;]+)/i.exec(header);
-  if (extended) {
+  if (extended?.[1]) {
     try {
       return basename(decodeURIComponent(extended[1].trim()));
     } catch {
@@ -63,7 +63,7 @@ export function filenameFromContentDisposition(header: string | null | undefined
     }
   }
   const plain = /filename\s*=\s*"?([^";]+)"?/i.exec(header);
-  return plain ? basename(plain[1]) : null;
+  return plain?.[1] ? basename(plain[1]) : null;
 }
 
 /** Whether a path segment already looks like a filename (ends with a `.ext` of 1-5 alphanumerics). */
@@ -93,7 +93,7 @@ export function extractDocumentTitle(code?: string | null): string | null {
     }
   }
 
-  return match[1].trim() || null;
+  return match?.[1]?.trim() || null;
 }
 
 /**
@@ -183,14 +183,16 @@ export function injectBaseAndCharset(html: string, target: URL): string {
   let baseTag = `<base href="${target.toString()}">`;
 
   const existingBase = /<base\b[^>]*\bhref\s*=\s*["']([^"']*)["'][^>]*>/i.exec(out);
-  if (existingBase) {
-    let resolved = existingBase[1];
+  if (existingBase?.[0] && existingBase[1] !== undefined) {
+    const fullMatch = existingBase[0];
+    const baseHref = existingBase[1];
+    let resolved = baseHref;
     try {
-      resolved = new URL(existingBase[1], target).toString();
+      resolved = new URL(baseHref, target).toString();
     } catch {
       // leave the original value if it can't be resolved
     }
-    out = out.replace(existingBase[0], existingBase[0].replace(existingBase[1], resolved));
+    out = out.replace(fullMatch, fullMatch.replace(baseHref, resolved));
     baseTag = ''; // don't add a second base: the page's own (now absolute) one stays authoritative
   }
 

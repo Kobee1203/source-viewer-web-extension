@@ -22,7 +22,7 @@ describe('useLocalDirectory', () => {
     expect(dir.rootName.value).toBe('test-dir');
     expect(dir.activePath.value).toBe('index.html');
     expect(dir.directoryVfsTree.value).toHaveLength(1);
-    expect(dir.directoryVfsTree.value[0].name).toBe('test-dir');
+    expect(dir.directoryVfsTree.value[0]?.name).toBe('test-dir');
   });
 
   it('selects sample.html if present and no index.html exists', async () => {

@@ -17,7 +17,8 @@ const GENERIC_MIMES = new Set(['', 'text/plain', 'application/octet-stream']);
 
 /** Extracts the lowercased MIME essence (drops `; charset=…` and casing). */
 function essence(mime: string | null | undefined): string {
-  return (mime ?? '').split(';')[0].trim().toLowerCase();
+  const [baseMime] = (mime ?? '').split(';');
+  return (baseMime ?? '').trim().toLowerCase();
 }
 
 /**

@@ -36,8 +36,7 @@ async function main(): Promise<void> {
       const session = await createScreenshotSession(locale, extensionPath, fixtures);
 
       try {
-        for (let i = 0; i < scenarios.length; i++) {
-          const scenario = scenarios[i];
+        for (const [i, scenario] of scenarios.entries()) {
           console.log(`📸 [${locale}] ${i + 1}/${scenarios.length} Capturing ${scenario.name}...`);
           await scenario.run({
             page: session.page,

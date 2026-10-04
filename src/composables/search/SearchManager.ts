@@ -60,8 +60,7 @@ export const structuralSearchField = StateField.define<StructuralSearchState>({
       if (!value.providerId || value.matches.length === 0) return builder.finish();
 
       const sorted = [...value.matches].sort((a, b) => a.from - b.from);
-      for (let i = 0; i < sorted.length; i++) {
-        const m = sorted[i];
+      for (const [i, m] of sorted.entries()) {
         if (i === value.selectedIndex) {
           builder.add(m.from, m.to, selectedMatchMark);
         } else {
@@ -115,10 +114,11 @@ export function performStructuralSearch(view: EditorView, providerId: string, qu
     });
 
     // Scroll to first match
-    if (matches.length > 0) {
+    const firstMatch = matches[0];
+    if (firstMatch) {
       view.dispatch({
-        selection: { anchor: matches[0].from, head: matches[0].to },
-        effects: EditorView.scrollIntoView(matches[0].from, { y: 'center' }),
+        selection: { anchor: firstMatch.from, head: firstMatch.to },
+        effects: EditorView.scrollIntoView(firstMatch.from, { y: 'center' }),
       });
     }
   } catch (err: unknown) {
@@ -139,10 +139,12 @@ export function nextStructuralMatch(view: EditorView) {
   });
 
   const match = state.matches[nextIndex];
-  view.dispatch({
-    selection: { anchor: match.from, head: match.to },
-    effects: EditorView.scrollIntoView(match.from, { y: 'center' }),
-  });
+  if (match) {
+    view.dispatch({
+      selection: { anchor: match.from, head: match.to },
+      effects: EditorView.scrollIntoView(match.from, { y: 'center' }),
+    });
+  }
 }
 
 export function previousStructuralMatch(view: EditorView) {
@@ -155,8 +157,10 @@ export function previousStructuralMatch(view: EditorView) {
   });
 
   const match = state.matches[prevIndex];
-  view.dispatch({
-    selection: { anchor: match.from, head: match.to },
-    effects: EditorView.scrollIntoView(match.from, { y: 'center' }),
-  });
+  if (match) {
+    view.dispatch({
+      selection: { anchor: match.from, head: match.to },
+      effects: EditorView.scrollIntoView(match.from, { y: 'center' }),
+    });
+  }
 }

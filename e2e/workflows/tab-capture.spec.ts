@@ -21,7 +21,7 @@ test.describe('Tab Capture', () => {
     // queries the target tab and opens a new viewer tab for it
     const newPagePromise = context.waitForEvent('page');
 
-    const sw = context.serviceWorkers()[0];
+    const sw = context.serviceWorkers()[0]!;
     await sw.evaluate(async (url) => {
       const c = (globalThis as unknown as { chrome: ChromeTabs }).chrome;
       const [tab] = await c.tabs.query({ url });

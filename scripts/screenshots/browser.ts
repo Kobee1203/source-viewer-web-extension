@@ -13,10 +13,11 @@ export async function getExtensionId(context: BrowserContext): Promise<string> {
   }
   const url = background.url();
   const match = /chrome-extension:\/\/([a-z0-9]+)/.exec(url);
-  if (!match) {
+  const extId = match?.[1];
+  if (!extId) {
     throw new Error(`Unable to resolve extension ID from background service worker: ${url}`);
   }
-  return match[1];
+  return extId;
 }
 
 /**

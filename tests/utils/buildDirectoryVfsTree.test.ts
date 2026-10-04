@@ -50,7 +50,7 @@ describe('buildDirectoryVfsTree', () => {
 
     const root = buildDirectoryVfsTree(files, 'my-repo');
     expect(root.children).toHaveLength(2);
-    expect(root.children[0].name).toBe('index.html');
-    expect(root.children[1].name).toBe('README.md');
+    expect(root.children[0]?.name).toBe('index.html');
+    expect(root.children[1]?.name).toBe('README.md');
   });
 });

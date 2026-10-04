@@ -157,5 +157,5 @@ export function defaultWritingSystemFor(uiLanguage: string): WritingSystem {
     script = undefined;
   }
   const match = script && WRITING_SYSTEMS.find((ws) => ws.scriptCodes.includes(script));
-  return match || WRITING_SYSTEMS[0];
+  return match || WRITING_SYSTEMS[0]!;
 }

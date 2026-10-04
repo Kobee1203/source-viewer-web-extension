@@ -19,7 +19,7 @@ const META_SNIFF_BYTES = 1024;
 export function charsetFromContentType(contentType: string | null | undefined): string | null {
   if (!contentType) return null;
   const match = /charset=["']?([^"';,\s]+)/i.exec(contentType);
-  return match ? match[1] : null;
+  return match?.[1] ?? null;
 }
 
 /**
@@ -29,7 +29,7 @@ export function charsetFromContentType(contentType: string | null | undefined): 
  */
 export function charsetFromHtmlMeta(head: string): string | null {
   const match = /<meta[^>]+charset=["']?([^"'>;,\s]+)/i.exec(head);
-  return match ? match[1] : null;
+  return match?.[1] ?? null;
 }
 
 /**

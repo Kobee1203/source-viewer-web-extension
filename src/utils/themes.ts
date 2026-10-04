@@ -307,7 +307,7 @@ export const DEFAULT_THEME_ID = 'default';
  * the default theme for an unknown id).
  */
 export function getThemeExtension(id: string): Promise<Extension> {
-  return (THEME_DEFS.find((theme) => theme.id === id) ?? THEME_DEFS[0]).load();
+  return (THEME_DEFS.find((theme) => theme.id === id) ?? THEME_DEFS[0]!).load();
 }
 
 /** Resolves a theme id to its light/dark type (falls back to light). */

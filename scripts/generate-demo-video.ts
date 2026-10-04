@@ -57,8 +57,7 @@ async function main(): Promise<void> {
   };
 
   try {
-    for (let i = 0; i < videoScenarios.length; i++) {
-      const scenario = videoScenarios[i];
+    for (const [i, scenario] of videoScenarios.entries()) {
       console.log(`🎥 [${i + 1}/${videoScenarios.length}] Running ${scenario.name}...`);
       await scenario.run(ctx);
     }

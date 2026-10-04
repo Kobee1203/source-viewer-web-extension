@@ -69,7 +69,7 @@ describe('useViewerProjectActions', () => {
 
     expect(clearUrl).toHaveBeenCalled();
     expect(sidebar.vfsTree.value).toHaveLength(1);
-    expect(sidebar.vfsTree.value[0].name).toBe('my-app');
+    expect(sidebar.vfsTree.value[0]?.name).toBe('my-app');
     expect(loadFromDirectoryFile).toHaveBeenCalledWith('index.html');
   });
 

@@ -98,9 +98,10 @@ export class XPathProvider implements StructuralSearchProvider {
 
       for (const node of validNodes) {
         const lineIndex = node.lineNumber - 1;
-        if (lineIndex >= 0 && lineIndex < lineStarts.length) {
+        const lineStart = lineIndex >= 0 && lineIndex < lineStarts.length ? lineStarts[lineIndex] : undefined;
+        if (lineStart !== undefined) {
           const colIndex = node.columnNumber - 1;
-          const startIndex = lineStarts[lineIndex] + colIndex;
+          const startIndex = lineStart + colIndex;
 
           // For elements, startIndex points to '<'. We highlight the tag name.
           if (node.nodeType === 1) {

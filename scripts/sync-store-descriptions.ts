@@ -53,13 +53,16 @@ async function main(): Promise<void> {
   if (args.includes('--all')) {
     targetLocales = allAvailable;
   } else if (localeArg) {
-    targetLocales = [localeArg.split('=')[1]];
+    const val = localeArg.split('=')[1];
+    if (val) targetLocales = [val];
   } else if (localesArg) {
-    targetLocales = localesArg
-      .split('=')[1]
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const val = localesArg.split('=')[1];
+    if (val) {
+      targetLocales = val
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
   }
 
   if (targetLocales.length === 0) {

@@ -11,7 +11,7 @@ function isAbsoluteUrl(value: string): boolean {
   return /^https?:\/\//i.test(trimmed) || trimmed.startsWith('//');
 }
 
-export function resolveUrl(attr: string, rawUrl: string, baseUrl: string): string | null {
+export function resolveUrl(attr: string | undefined, rawUrl: string, baseUrl: string): string | null {
   const trimmed = rawUrl.trim();
   if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('javascript:') || trimmed.startsWith('data:')) {
     return null;
@@ -46,15 +46,17 @@ function buildDecorations(view: EditorView, baseUrl: string): DecorationSet {
 
     let match;
     while ((match = regex.exec(text)) !== null) {
+      const matchText = match[0];
       const attr = match[1];
       const isUrlFunc = !!match[3];
       const rawUrl = isUrlFunc ? match[3] : match[2];
+      if (!matchText || !rawUrl) continue;
 
       const targetUrl = resolveUrl(attr, rawUrl, baseUrl);
       if (targetUrl) {
         // Find the exact offset of the URL within the match
         // Note: indexOf is safe here because we know rawUrl is exactly inside the match
-        const urlStartInMatch = match[0].indexOf(rawUrl);
+        const urlStartInMatch = matchText.indexOf(rawUrl);
         const start = from + match.index + urlStartInMatch;
         const end = start + rawUrl.length;
 

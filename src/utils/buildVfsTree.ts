@@ -139,7 +139,7 @@ export function insertIntoVfs(
   if (segments.length === 0) return;
 
   const folderSegments = segments.slice(0, -1);
-  const lastSegment = segments[segments.length - 1];
+  const lastSegment = segments[segments.length - 1]!;
 
   // Build unique folder keys (always prefixed with hostname so there are no
   // key collisions across different domain folders).
@@ -262,6 +262,7 @@ function insertSorted(nodes: VfsNode[], node: VfsNode): void {
 
   for (let i = 0; i < nodes.length; i++) {
     const existing = nodes[i];
+    if (!existing) continue;
 
     // Skip the root-domain folder: it must remain at position 0.
     if (existing.kind === 'folder' && existing.isRootDomain) continue;
@@ -303,7 +304,7 @@ export function buildDirectoryVfsTree(files: StoredDirectoryFile[], rootName: st
     if (segments.length === 0) continue;
 
     const folderSegments = segments.slice(0, -1);
-    const lastSegment = segments[segments.length - 1];
+    const lastSegment = segments[segments.length - 1]!;
 
     let currentLevel = rootFolder.children;
     let pathSoFar = rootName;

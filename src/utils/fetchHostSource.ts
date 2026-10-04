@@ -25,7 +25,7 @@ export async function fetchHostSource(): Promise<FetchHostSourceResult | null> {
     if (response.ok || (location.protocol === 'file:' && (response.status === 0 || response.status === 200))) {
       const contentType = response.headers.get('content-type') || document.contentType || '';
       const charsetMatch = contentType.match(/;\s*charset=\s*([^\s;]+)/i);
-      const characterSet = charsetMatch ? charsetMatch[1] : document.characterSet || 'utf-8';
+      const characterSet = charsetMatch?.[1] || document.characterSet || 'utf-8';
 
       let text = '';
       try {

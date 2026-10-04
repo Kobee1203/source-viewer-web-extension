@@ -24,7 +24,7 @@ test.describe('Settings', () => {
 
     // Verify values persisted in browser.storage.local
     // Storage keys: 'theme' (string), 'codeFontSize' (number), 'wordWrap' (boolean)
-    const sw = context.serviceWorkers()[0];
+    const sw = context.serviceWorkers()[0]!;
     const result = await sw.evaluate(() => {
       const c = (globalThis as unknown as { chrome: ChromeStorage }).chrome;
       return c.storage.local.get(['theme', 'codeFontSize', 'wordWrap']);
@@ -39,7 +39,7 @@ test.describe('Settings', () => {
 
   test('Settings are applied in the viewer after changing options', async ({ context, extensionId }) => {
     // Seed storage values via service worker (same keys the composable reads)
-    const sw = context.serviceWorkers()[0];
+    const sw = context.serviceWorkers()[0]!;
     await sw.evaluate(() => {
       const c = (globalThis as unknown as { chrome: ChromeStorage }).chrome;
       return c.storage.local.set({

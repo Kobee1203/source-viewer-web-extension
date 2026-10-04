@@ -11,7 +11,7 @@ export function formatFromUrl(target: URL | string): string {
   try {
     const pathname = typeof target === 'string' ? new URL(target, 'http://localhost').pathname : target.pathname;
     const match = /\.([a-z0-9]+)$/i.exec(pathname);
-    return match ? match[1].toLowerCase() : '';
+    return match?.[1]?.toLowerCase() ?? '';
   } catch {
     return '';
   }

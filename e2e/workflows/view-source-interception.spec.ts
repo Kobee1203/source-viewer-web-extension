@@ -14,7 +14,7 @@ test.describe('View-Source Interception', () => {
     // The background script intercepts it and redirects the tab to viewer.html.
     const newPagePromise = context.waitForEvent('page');
 
-    const sw = context.serviceWorkers()[0];
+    const sw = context.serviceWorkers()[0]!;
     await sw.evaluate(async (url) => {
       const c = (globalThis as unknown as { chrome: ChromeTabs }).chrome;
       await c.tabs.create({ url: `view-source:${url}` });

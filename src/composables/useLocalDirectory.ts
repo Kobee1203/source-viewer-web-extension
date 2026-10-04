@@ -166,13 +166,13 @@ async function scanFileList(fileList: FileList): Promise<{ rootFolderName: strin
     const relative = file.webkitRelativePath || file.name;
     const parts = relative.split('/');
 
-    if (parts.length > 1) {
+    if (parts.length > 1 && parts[0]) {
       rootFolderName = parts[0];
     }
 
     if (parts.some((p) => shouldIgnore(p))) continue;
 
-    const filePath = parts.length > 1 ? parts.slice(1).join('/') : parts[0];
+    const filePath = parts.length > 1 ? parts.slice(1).join('/') : (parts[0] ?? relative);
     files.push(await createStoredDirectoryFile(file, filePath));
   }
 
@@ -285,8 +285,7 @@ export function useLocalDirectory() {
     if (!items || items.length === 0) return false;
 
     // 1. Try modern getAsFileSystemHandle (Chromium)
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
+    for (const item of Array.from(items)) {
       if ('getAsFileSystemHandle' in item && typeof item.getAsFileSystemHandle === 'function') {
         try {
           const handle = await item.getAsFileSystemHandle();
@@ -304,8 +303,7 @@ export function useLocalDirectory() {
     }
 
     // 2. Try webkitGetAsEntry (Firefox, Safari, Chromium fallback)
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
+    for (const item of Array.from(items)) {
       if ('webkitGetAsEntry' in item && typeof item.webkitGetAsEntry === 'function') {
         try {
           const entry = item.webkitGetAsEntry();

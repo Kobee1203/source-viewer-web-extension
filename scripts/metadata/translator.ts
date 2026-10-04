@@ -28,7 +28,7 @@ export function extractGlossary(locale: string): Record<string, string> {
     const match = trimmed.match(/^([a-zA-Z0-9_-]+):\s*['"]?(.*?)['"]?$/);
     if (match) {
       const [, key, val] = match;
-      if (val && !val.includes('$1') && !val.startsWith('{')) {
+      if (key && val && !val.includes('$1') && !val.startsWith('{')) {
         glossary[key] = val.replace(/^['"]|['"]$/g, '');
       }
     }

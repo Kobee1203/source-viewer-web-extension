@@ -114,7 +114,7 @@ describe('directoryStore', () => {
       expect(stored?.rootName).toBe('my-project');
       expect(stored?.activePath).toBe('sample.html');
       expect(stored?.files).toHaveLength(1);
-      expect(stored?.files[0].path).toBe('sample.html');
+      expect(stored?.files[0]?.path).toBe('sample.html');
     });
 
     it('updates active directory path', async () => {

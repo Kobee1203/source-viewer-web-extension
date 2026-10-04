@@ -46,10 +46,11 @@ export const test = base.extend<{
     }
     const url = background.url();
     const match = /chrome-extension:\/\/([a-z0-9]+)/.exec(url);
-    if (!match) {
+    const extId = match?.[1];
+    if (!extId) {
       throw new Error(`Unable to resolve extension ID from background service worker: ${url}`);
     }
-    await use(match[1]);
+    await use(extId);
   },
 });
 
