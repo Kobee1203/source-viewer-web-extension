@@ -15,6 +15,10 @@ export default withVueTs(
       'node_modules/**',
       'scripts/fixtures/**',
       'src/public/**', // vendored themes + static assets
+      'e2e/**', // Playwright E2E tests (separate TypeScript context)
+      'playwright-report/**',
+      'test-results/**',
+      'blob-report/**',
     ],
   },
 

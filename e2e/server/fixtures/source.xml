@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns:book="http://example.com/books">
+  <book:entry id="1">
+    <book:title>The Art of Programming</book:title>
+    <book:author>Jane Doe</book:author>
+    <book:year>2024</book:year>
+    <book:price currency="USD">49.99</book:price>
+  </book:entry>
+  <book:entry id="2">
+    <book:title>Web Extensions Guide</book:title>
+    <book:author>John Smith</book:author>
+    <book:year>2025</book:year>
+    <book:price currency="EUR">39.99</book:price>
+  </book:entry>
+  <metadata>
+    <total>2</total>
+    <generated>2025-01-01T00:00:00Z</generated>
+  </metadata>
+</catalog>

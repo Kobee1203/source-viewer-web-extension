@@ -28,3 +28,8 @@ stats.html
 # Store video recordings (track final demo video, ignore raw captures and temp files)
 store/video/raw/
 store/video/temp/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
