@@ -3,3 +3,6 @@ allowBuilds:
   spawn-sync: true
   unrs-resolver: true
   vue-demi: true
+minimumReleaseAgeExclude:
+  - '@lucide/vue@1.52.0'
+  - '@wxt-dev/i18n@0.2.8'
