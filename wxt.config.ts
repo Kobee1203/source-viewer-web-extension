@@ -10,6 +10,11 @@ export default defineConfig({
   modules: ['@wxt-dev/module-vue', '@wxt-dev/i18n/module'],
   // Explicit ES imports everywhere (no auto-imports) for readability / store reviewability.
   imports: false,
+  vite: () => ({
+    build: {
+      chunkSizeWarningLimit: 1000,
+    },
+  }),
   manifest: ({ browser }) => ({
     // AMO (Firefox) caps the manifest name at 45 characters; Chrome allows ~75.
     name:

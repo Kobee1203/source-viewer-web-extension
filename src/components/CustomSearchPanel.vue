@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, onMounted, onUnmounted, ref } from 'vue';
-import { SearchQuery, closeSearchPanel, getSearchQuery, setSearchQuery } from '@codemirror/search';
+import {
+  SearchQuery,
+  closeSearchPanel,
+  findNext,
+  findPrevious,
+  getSearchQuery,
+  setSearchQuery,
+} from '@codemirror/search';
 import type { EditorView } from '@codemirror/view';
 import { HelpCircle } from '@lucide/vue';
 import {
@@ -152,29 +159,27 @@ function applyTextSearch() {
   });
 }
 
-async function onNext() {
+function onNext() {
   if (activeMode.value === 'text') {
-    const { findNext } = await import('@codemirror/search');
     findNext(props.view);
   } else {
     nextStructuralMatch(props.view);
   }
 }
 
-async function onPrev() {
+function onPrev() {
   if (activeMode.value === 'text') {
-    const { findPrevious } = await import('@codemirror/search');
     findPrevious(props.view);
   } else {
     previousStructuralMatch(props.view);
   }
 }
 
-async function onEnter(e: KeyboardEvent) {
+function onEnter(e: KeyboardEvent) {
   if (e.shiftKey) {
-    await onPrev();
+    onPrev();
   } else {
-    await onNext();
+    onNext();
   }
 }
 
