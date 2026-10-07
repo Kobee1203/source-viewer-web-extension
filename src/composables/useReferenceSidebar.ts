@@ -1,10 +1,8 @@
 import { ref } from 'vue';
 import type { VfsFileNode, VfsFolderNode, VfsNode } from '@/utils/buildVfsTree';
 import { insertIntoVfs } from '@/utils/buildVfsTree';
-import { mimeToFileType } from '@/utils/contentType';
 import type { ReferenceEntry } from '@/utils/extractReferences';
 import { extractReferences } from '@/utils/extractReferences';
-import { getFileType } from '@/utils/fileType';
 import { requestSource } from '@/utils/messaging';
 
 export type { VfsFileNode, VfsFolderNode, VfsNode } from '@/utils/buildVfsTree';
@@ -171,12 +169,8 @@ export function useReferenceSidebar() {
     try {
       const response = await requestSource(urlStr);
       if (!response.ok) return;
-      const target = new URL(urlStr);
-      const fileType = mimeToFileType(response.contentType) ?? getFileType(target);
       // Extract refs from raw text: no need to beautify for reference scanning.
-      const { formatSource } = await import('@/utils/beautify');
-      const formatted = formatSource(response.text, fileType);
-      const refs = extractReferences(formatted, urlStr);
+      const refs = extractReferences(response.text, urlStr);
       for (const ref of refs) {
         insertIntoVfs(vfsTree.value, ref, rootHostname.value, rootUrl.value);
       }
