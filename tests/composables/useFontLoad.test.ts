@@ -1,4 +1,6 @@
 import { withSetup } from '@@/tests/helpers/withSetup';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PREVIEW_FONT_FAMILY, formatFromUrl, useFontLoad } from '@/composables/useFontLoad';
 
@@ -122,6 +124,76 @@ describe('useFontLoad', () => {
 
     const [fontLoad] = withSetup(useFontLoad);
     await fontLoad.loadFromUrl('https://example.com/missing.woff2');
+
+    expect(fontLoad.loading.value).toBe(false);
+    expect(fontLoad.fontFamily.value).toBe('');
+    expect(fontLoad.errorMessage.value).toBeTruthy();
+  });
+
+  it('loads EOT font from ArrayBuffer by converting it to TTF', async () => {
+    const fixturePath = resolve(__dirname, '../fixtures/fa-regular-400.eot');
+    const eotBuffer = readFileSync(fixturePath).buffer;
+
+    const [fontLoad] = withSetup(useFontLoad);
+    await fontLoad.loadFromBuffer(eotBuffer, 'eot');
+
+    expect(fontLoad.loading.value).toBe(false);
+    expect(fontLoad.errorMessage.value).toBeNull();
+    expect(fontLoad.fontFamily.value).toBe(PREVIEW_FONT_FAMILY);
+    expect(fontLoad.format.value).toBe('eot');
+    expect(fontLoad.fileSize.value).toBe(34390);
+    expect(addMock).toHaveBeenCalled();
+
+    const [loadedFace] = addedFonts;
+    expect(loadedFace).toBeInstanceOf(MockFontFace);
+    if (loadedFace instanceof MockFontFace) {
+      expect(loadedFace.source).toBeInstanceOf(ArrayBuffer);
+      if (loadedFace.source instanceof ArrayBuffer) {
+        const view = new DataView(loadedFace.source);
+        expect(view.getUint32(0, false)).toBe(0x00010000);
+      }
+    }
+  });
+
+  it('auto-detects EOT font from ArrayBuffer when format is omitted', async () => {
+    const fixturePath = resolve(__dirname, '../fixtures/fa-regular-400.eot');
+    const eotBuffer = readFileSync(fixturePath).buffer;
+
+    const [fontLoad] = withSetup(useFontLoad);
+    await fontLoad.loadFromBuffer(eotBuffer);
+
+    expect(fontLoad.loading.value).toBe(false);
+    expect(fontLoad.errorMessage.value).toBeNull();
+    expect(fontLoad.fontFamily.value).toBe(PREVIEW_FONT_FAMILY);
+    expect(fontLoad.format.value).toBe('eot');
+  });
+
+  it('loads EOT font from URL via fetch', async () => {
+    const fixturePath = resolve(__dirname, '../fixtures/fa-regular-400.eot');
+    const eotBuffer = readFileSync(fixturePath).buffer;
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      arrayBuffer: () => Promise.resolve(eotBuffer),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const [fontLoad] = withSetup(useFontLoad);
+    await fontLoad.loadFromUrl('https://example.com/fa-regular-400.eot');
+
+    expect(fontLoad.loading.value).toBe(false);
+    expect(fontLoad.fontFamily.value).toBe(PREVIEW_FONT_FAMILY);
+    expect(fontLoad.format.value).toBe('eot');
+    expect(fontLoad.fileSize.value).toBe(34390);
+    expect(fontLoad.targetUrl.value?.toString()).toBe('https://example.com/fa-regular-400.eot');
+  });
+
+  it('handles corrupted EOT buffer gracefully', async () => {
+    const corruptBuffer = new Uint8Array([1, 2, 3]).buffer;
+
+    const [fontLoad] = withSetup(useFontLoad);
+    await fontLoad.loadFromBuffer(corruptBuffer, 'eot');
 
     expect(fontLoad.loading.value).toBe(false);
     expect(fontLoad.fontFamily.value).toBe('');

@@ -1,5 +1,6 @@
 import { onUnmounted, ref } from 'vue';
 import { browser } from 'wxt/browser';
+import { convertEotToTtf, isEot } from '@/utils/eot';
 import { t } from '@/utils/i18n';
 import { isRestricted } from '@/utils/restricted';
 
@@ -57,16 +58,24 @@ export function useFontLoad() {
 
     try {
       fileSize.value = buffer.byteLength;
-      format.value = fontFormat;
+      const normalizedFormat = fontFormat.trim().toLowerCase();
+      const isEotFont = normalizedFormat === 'eot' || isEot(buffer);
+      format.value = fontFormat || (isEotFont ? 'eot' : '');
 
-      face = new FontFace(PREVIEW_FONT_FAMILY, buffer);
+      let fontSource: ArrayBuffer = buffer;
+      if (isEotFont) {
+        fontSource = convertEotToTtf(buffer);
+      }
+
+      face = new FontFace(PREVIEW_FONT_FAMILY, fontSource);
       await face.load();
       document.fonts.add(face);
       fontFamily.value = PREVIEW_FONT_FAMILY;
       loading.value = false;
     } catch (err) {
       loading.value = false;
-      errorMessage.value = t('fontViewerError', [(err as Error).message || t('errorUnknown')]);
+      const message = err instanceof Error ? err.message : t('errorUnknown');
+      errorMessage.value = t('fontViewerError', [message]);
       console.error('Failed to load font from buffer:', err);
     }
   }
@@ -110,7 +119,8 @@ export function useFontLoad() {
       await loadFromBuffer(buffer, format.value, target);
     } catch (err) {
       loading.value = false;
-      errorMessage.value = t('fontViewerError', [(err as Error).message || t('errorUnknown')]);
+      const message = err instanceof Error ? err.message : t('errorUnknown');
+      errorMessage.value = t('fontViewerError', [message]);
       console.error('Failed to load font from URL:', err);
     }
   }

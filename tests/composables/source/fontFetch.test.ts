@@ -1,4 +1,6 @@
 import { withSetup } from '@@/tests/helpers/withSetup';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSourceFetch } from '@/composables/source/useSourceFetch';
 import { PREVIEW_FONT_FAMILY } from '@/composables/useFontLoad';
@@ -105,5 +107,29 @@ describe('useSourceFetch - Font Handling', () => {
     expect(sourceFetch.code.value).toContain('const x = 42;');
     expect(sourceFetch.fontFamily.value).toBe('');
     expect(deleteMock).toHaveBeenCalled();
+  });
+
+  it('loads remote .eot font URL through pipeline into font mode', async () => {
+    const fixturePath = resolve(__dirname, '../../fixtures/fa-regular-400.eot');
+    const eotBuffer = readFileSync(fixturePath).buffer;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        arrayBuffer: () => Promise.resolve(eotBuffer),
+      }),
+    );
+
+    const [sourceFetch] = withSetup(useSourceFetch);
+    await sourceFetch.load('https://example.com/fa-regular-400.eot');
+
+    expect(sourceFetch.loading.value).toBe(false);
+    expect(sourceFetch.resourceType.value).toBe('font');
+    expect(sourceFetch.fontFormat.value).toBe('eot');
+    expect(sourceFetch.fontFamily.value).toBe(PREVIEW_FONT_FAMILY);
+    expect(sourceFetch.byteSize.value).toBe(34390);
+    expect(sourceFetch.code.value).toBe('');
   });
 });
