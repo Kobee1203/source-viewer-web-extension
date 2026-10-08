@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Embedded OpenType (EOT) Font Support** (#42):
+  - Added preview and rendering support for legacy `.eot` fonts in the Font Viewer.
+  - Integrated `mtx-decompressor` to decompress and convert EOT fonts to TrueType (`.ttf`) in-memory, enabling the browser `FontFace` API to load and render EOT files across remote URLs, local file buffers, and directory projects.
+  - Added automated format detection via `isEot` validating magic byte signatures (`0x504C`) and header versions.
+
+### Changed
+
+- **Build Optimization & Static Imports** (#41):
+  - Resolved ineffective dynamic imports in `CustomSearchPanel.vue` by switching to static imports for `@codemirror/search` navigation functions (`findNext`, `findPrevious`).
+  - Optimized reference scanning in `useReferenceSidebar.ts` to extract resource links directly from raw response text, eliminating redundant formatting passes and dynamic imports of `@/utils/beautify`.
+  - Adjusted Vite `chunkSizeWarningLimit` to 1000 kB in `wxt.config.ts` to avoid build warnings on large parser chunks.
+- **TypeScript Strictness & Type Safety**:
+  - Enforced strict `noUncheckedIndexedAccess` across the workspace and hardened all indexed array and object accesses against `undefined`.
+  - Added `/// <reference lib="dom.asynciterable" />` to `src/composables/useLocalDirectory.ts`, removing custom `lib` compiler option overrides from `tsconfig.json`.
+- **Test Suite Hygiene & Performance**:
+  - Configured global mock cleanup and restoration (`clearMocks`, `restoreMocks`, `unstubGlobals`, `unstubEnvs`) in `vitest.config.ts`, eliminating repetitive teardown boilerplate across test suites.
+  - Standardized fetch test spies using `vi.spyOn(window, 'fetch')`.
+  - Configured the `vmThreads` test pool in Vitest to optimize test execution in the Happy DOM environment.
+- **Chrome Web Store API v2 Migration**:
+  - Migrated automated store deployment in `.github/workflows/release.yml` and release documentation to Chrome Web Store API v2 using Google Cloud Service Account credentials (`CHROME_PUBLISHER_ID`, `CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL`, `CHROME_SERVICE_ACCOUNT_PRIVATE_KEY`), replacing legacy OAuth 2.0 user tokens.
+- **Dependency Updates & Deduplication**:
+  - Deduplicated CodeMirror packages and updated project dependencies.
+  - Pinned `jsonpath-plus` to `10.4.0`, updated `typescript` to `5.9.3`, and added `web-ext` `10.7.0`.
+
 ## [1.12.0] - 2026-10-04
 
 ### Added
