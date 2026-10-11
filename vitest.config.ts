@@ -18,6 +18,7 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
       '@@': resolve(__dirname, '.'),
       '#i18n': resolve(__dirname, './.wxt/i18n/index.ts'),
+      '#imports': resolve(__dirname, './tests/helpers/wxtImports.ts'),
     },
   },
 });

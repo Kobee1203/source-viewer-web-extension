@@ -9,6 +9,7 @@ import {
   fetchSource,
 } from '@/utils/messaging';
 import { type OpenNativeRequest, createNativeViewerController } from '@/utils/nativeViewer';
+import { createReentrancyGuard, getViewerActionKey } from '@/utils/reentrancyGuard';
 import { isRestricted } from '@/utils/restricted';
 import { clearSessionSource, getSessionSource, refreshTabSource, saveSessionSource } from '@/utils/sessionSource';
 import { captureTabSource } from '@/utils/tabSourceCapture';
@@ -16,6 +17,7 @@ import { viewerUrl } from '@/utils/viewerUrl';
 
 export default defineBackground(() => {
   const nativeViewer = createNativeViewerController();
+  const actionGuard = createReentrancyGuard();
   const isFirefox = navigator.userAgent.includes('Firefox');
 
   const CONTEXT_MENU_ID = 'view-source-viewer';
@@ -43,57 +45,60 @@ export default defineBackground(() => {
   });
 
   async function openSourceViewer(rawUrl?: string, tabId?: number, isLink = false): Promise<void> {
-    let url = rawUrl ?? '';
-    if (url.startsWith('view-source:')) {
-      url = url.replace(/^view-source:/, '');
-    }
-    if (!url.startsWith('http') && !url.startsWith('file:')) {
-      void browser.tabs.create({ url: browser.runtime.getURL('/viewer.html') });
-      return;
-    }
-
-    const targetUrl = new URL(url);
-    if (isRestricted(targetUrl)) {
-      void browser.tabs.create({ url: 'view-source:' + targetUrl.toString() });
-      return;
-    }
-
-    // On Chromium, extension pages with file scheme access can read file:/// URLs directly from disk,
-    // avoiding CORS restrictions and retrieving the authentic source before JS execution.
-    // On Firefox, moz-extension:// is blocked from reading file:///, requiring in-tab source capture.
-    const shouldCaptureTab = tabId !== undefined && !isLink && (targetUrl.protocol !== 'file:' || isFirefox);
-
-    let captured = null;
-    if (shouldCaptureTab && tabId !== undefined) {
-      captured = await captureTabSource(tabId);
-    }
-
-    if (targetUrl.protocol === 'file:' && !captured) {
-      const isAllowed = await browser.extension.isAllowedFileSchemeAccess();
-      if (!isAllowed) {
-        void browser.tabs.create({ url: `${viewerUrl(targetUrl.toString())}&fileAccess=0` });
+    const actionKey = getViewerActionKey(tabId, rawUrl, isLink);
+    await actionGuard.run(actionKey, async () => {
+      let url = rawUrl ?? '';
+      if (url.startsWith('view-source:')) {
+        url = url.replace(/^view-source:/, '');
+      }
+      if (!url.startsWith('http') && !url.startsWith('file:')) {
+        void browser.tabs.create({ url: browser.runtime.getURL('/viewer.html') });
         return;
       }
-    }
 
-    const result = await browser.storage.local.get('openIn');
-    const openIn = result.openIn === 'current-tab' ? 'current-tab' : 'new-tab';
-
-    if (openIn === 'current-tab' && tabId !== undefined && !isLink) {
-      const res = await injectViewer({ type: 'REQUEST_VIEWER_INJECTION', url: targetUrl.toString() }, tabId);
-      if (!res.inject) {
-        if (captured) {
-          await saveSessionSource(tabId, captured, targetUrl.toString(), tabId);
-        }
-        void browser.tabs.update(tabId, { url: viewerUrl(targetUrl.toString()) });
+      const targetUrl = new URL(url);
+      if (isRestricted(targetUrl)) {
+        void browser.tabs.create({ url: 'view-source:' + targetUrl.toString() });
+        return;
       }
-      return;
-    }
 
-    const newTab = await browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
-    if (captured && newTab.id !== undefined) {
-      await saveSessionSource(newTab.id, captured, targetUrl.toString(), tabId);
-    }
+      // On Chromium, extension pages with file scheme access can read file:/// URLs directly from disk,
+      // avoiding CORS restrictions and retrieving the authentic source before JS execution.
+      // On Firefox, moz-extension:// is blocked from reading file:///, requiring in-tab source capture.
+      const shouldCaptureTab = tabId !== undefined && !isLink && (targetUrl.protocol !== 'file:' || isFirefox);
+
+      let captured = null;
+      if (shouldCaptureTab && tabId !== undefined) {
+        captured = await captureTabSource(tabId);
+      }
+
+      if (targetUrl.protocol === 'file:' && !captured) {
+        const isAllowed = await browser.extension.isAllowedFileSchemeAccess();
+        if (!isAllowed) {
+          void browser.tabs.create({ url: `${viewerUrl(targetUrl.toString())}&fileAccess=0` });
+          return;
+        }
+      }
+
+      const result = await browser.storage.local.get('openIn');
+      const openIn = result.openIn === 'current-tab' ? 'current-tab' : 'new-tab';
+
+      if (openIn === 'current-tab' && tabId !== undefined && !isLink) {
+        const res = await injectViewer({ type: 'REQUEST_VIEWER_INJECTION', url: targetUrl.toString() }, tabId);
+        if (!res.inject) {
+          if (captured) {
+            await saveSessionSource(tabId, captured, targetUrl.toString(), tabId);
+          }
+          void browser.tabs.update(tabId, { url: viewerUrl(targetUrl.toString()) });
+        }
+        return;
+      }
+
+      const newTab = await browser.tabs.create({ url: viewerUrl(targetUrl.toString()) });
+      if (captured && newTab.id !== undefined) {
+        await saveSessionSource(newTab.id, captured, targetUrl.toString(), tabId);
+      }
+    });
   }
 
   // Toolbar icon: open our viewer for the current tab (or empty viewer when on blank/restricted page).

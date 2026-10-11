@@ -8,6 +8,14 @@ export const mockBrowser = {
       addListener: vi.fn(),
       removeListener: vi.fn(),
     },
+    onInstalled: {
+      addListener: vi.fn(),
+    },
+  },
+  action: {
+    onClicked: {
+      addListener: vi.fn(),
+    },
   },
   extension: {
     isAllowedFileSchemeAccess: vi.fn().mockResolvedValue(true),
@@ -46,11 +54,18 @@ export const mockBrowser = {
     onRemoved: {
       addListener: vi.fn(),
     },
+    onUpdated: {
+      addListener: vi.fn(),
+    },
   },
 };
 
 vi.mock('wxt/browser', () => ({
   browser: mockBrowser,
+}));
+
+vi.mock('#imports', () => ({
+  defineBackground: (fn: unknown) => fn,
 }));
 
 vi.mock('#i18n', () => ({
