@@ -20,6 +20,10 @@ Strict rules for TypeScript typing (no `any`), import organization (aliases, typ
 
 System architecture, execution contexts (Service Worker, Content Scripts, In-Place Iframe, Extension Pages), communication channels, and messaging contracts. See `docs/agents/architecture.md`.
 
+### Testing conventions
+
+Test tier hierarchy (Unit, Integration, E2E), Vitest lifecycle and mock hygiene (`clearMocks: true`), WebExtension API mocking (`mockBrowser`), asynchronous event testing, and Red-to-Green bug verification. See `docs/agents/testing.md`.
+
 ### Release process
 
 GitHub Actions release pipeline, GitHub repository secrets configuration, web store submissions (Chrome, Firefox, Edge), and version bumping workflow. See `docs/agents/release-process.md`.
