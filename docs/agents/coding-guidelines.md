@@ -42,11 +42,13 @@ This document outlines the strict coding rules and architecture conventions that
 
 - **Avoid code duplication (DRY)**: Never duplicate data transformations, file-reading logic, or multi-branch metadata assignments across multiple functions. Proactively extract private helpers, shared composables, or domain utilities with a single point of truth.
 - **Inspect template context before adding state (KISS)**: Before declaring new reactive variables, duplicate composable instances, or introducing complex discriminated state identifiers, always inspect the component's template. When elements or controls are mutually exclusive (e.g. conditional branches via `v-if` / `v-else-if`), reuse existing reactive state and composables directly instead of duplicating them or over-engineering discriminated markers.
+- **No redundant defensive calls**: Never invoke a helper, cleanup, or validation routine (e.g. `cleanStale()`, `sanitize()`, `validate()`) immediately before calling a function that already executes that exact step internally. Always inspect callee implementations to avoid defensive double-checks.
 
 ## 8. Separation of Concerns & Testing Hygiene
 
 - **No test-specific code in production**: Never introduce guards, flags, shims, or lifecycle branches in production code (e.g. `if (getCurrentInstance())`) solely to accommodate test runners. Production code must remain clean, idiomatic, and unaware of testing frameworks.
 - **Test helpers & wrappers**: Provide dedicated test utilities in `tests/helpers/` (such as `withSetup`) or mock environments to supply the required Vue setup context, plugins, or lifecycle wrappers during testing.
+- **Adhere to testing conventions**: Follow `docs/agents/testing.md` for mock lifecycle conventions (e.g. never call `vi.clearAllMocks()` manually since Vitest configures this globally), asynchronous event polling (`vi.waitFor`), floating promise handling (`void`), and Red-to-Green bug verification.
 
 ## 9. Post-Development Workflow
 
