@@ -36,6 +36,15 @@ export default defineConfig({
         128: 'icon/128.png',
       },
     },
+    commands: {
+      'view-source': {
+        suggested_key: {
+          default: 'Alt+U',
+          mac: 'Alt+U',
+        },
+        description: '__MSG_commandViewSource__',
+      },
+    },
     // Firefox add-on identity + data collection disclosure (was patched in build.js before).
     ...(browser === 'firefox' && {
       browser_specific_settings: {
