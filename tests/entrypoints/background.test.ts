@@ -147,3 +147,96 @@ describe('background entrypoint - action reentrancy guard', () => {
     });
   });
 });
+
+type CommandListener = (command: string, tab?: { id?: number; url?: string }) => void | Promise<void>;
+
+describe('background entrypoint - command shortcut (view-source)', () => {
+  let onCommand: CommandListener;
+
+  beforeEach(() => {
+    mockBrowser.tabs.create.mockResolvedValue({ id: 999 });
+    mockBrowser.storage.local.get.mockResolvedValue({ openIn: 'new-tab' });
+
+    (background as unknown as () => void)();
+
+    const calls = mockBrowser.commands.onCommand.addListener.mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    onCommand = calls[0]![0] as CommandListener;
+  });
+
+  it('opens viewer for active tab when command is view-source', async () => {
+    let messageListener: ((msg: unknown, sender: unknown) => void) | undefined;
+    mockBrowser.runtime.onMessage.addListener.mockImplementation(
+      (listener: (msg: unknown, sender: unknown) => void) => {
+        messageListener = listener;
+      },
+    );
+    mockBrowser.scripting.executeScript.mockImplementation(() => {
+      messageListener?.({ type: 'TAB_SOURCE_CAPTURED', result: { text: 'test', byteSize: 4 } }, { tab: { id: 42 } });
+      return Promise.resolve([]);
+    });
+
+    const tab = { id: 42, url: 'https://example.com' };
+
+    void onCommand('view-source', tab);
+
+    await vi.waitFor(() => {
+      expect(mockBrowser.tabs.create).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('queries active tab if tab argument is omitted', async () => {
+    let messageListener: ((msg: unknown, sender: unknown) => void) | undefined;
+    mockBrowser.runtime.onMessage.addListener.mockImplementation(
+      (listener: (msg: unknown, sender: unknown) => void) => {
+        messageListener = listener;
+      },
+    );
+    mockBrowser.scripting.executeScript.mockImplementation(() => {
+      messageListener?.({ type: 'TAB_SOURCE_CAPTURED', result: { text: 'test', byteSize: 4 } }, { tab: { id: 88 } });
+      return Promise.resolve([]);
+    });
+
+    mockBrowser.tabs.query.mockResolvedValue([{ id: 88, url: 'https://queried-active.com' }]);
+
+    void onCommand('view-source');
+
+    await vi.waitFor(() => {
+      expect(mockBrowser.tabs.query).toHaveBeenCalledWith({ active: true, currentWindow: true });
+      expect(mockBrowser.tabs.create).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('ignores other commands', async () => {
+    void onCommand('unknown-command', { id: 42, url: 'https://example.com' });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(mockBrowser.tabs.create).not.toHaveBeenCalled();
+  });
+
+  it('drops rapid repeated command invocations on the same tab via reentrancy guard', async () => {
+    let messageListener: ((msg: unknown, sender: unknown) => void) | undefined;
+    mockBrowser.runtime.onMessage.addListener.mockImplementation(
+      (listener: (msg: unknown, sender: unknown) => void) => {
+        messageListener = listener;
+      },
+    );
+    mockBrowser.scripting.executeScript.mockImplementation(() => {
+      messageListener?.({ type: 'TAB_SOURCE_CAPTURED', result: { text: 'test', byteSize: 4 } }, { tab: { id: 42 } });
+      return Promise.resolve([]);
+    });
+
+    const tab = { id: 42, url: 'https://example.com' };
+
+    void onCommand('view-source', tab);
+    await vi.waitFor(() => {
+      expect(mockBrowser.tabs.create).toHaveBeenCalledTimes(1);
+    });
+
+    // Rapid second invocation (e.g. key repeat)
+    void onCommand('view-source', tab);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(mockBrowser.tabs.create).toHaveBeenCalledTimes(1);
+  });
+});

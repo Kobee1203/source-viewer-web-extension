@@ -17,6 +17,11 @@ export const mockBrowser = {
       addListener: vi.fn(),
     },
   },
+  commands: {
+    onCommand: {
+      addListener: vi.fn(),
+    },
+  },
   extension: {
     isAllowedFileSchemeAccess: vi.fn().mockResolvedValue(true),
   },

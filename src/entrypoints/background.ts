@@ -114,6 +114,13 @@ export default defineBackground(() => {
     void openSourceViewer(url, tab?.id, isLink);
   });
 
+  // Keyboard shortcut command: "View source with Source Viewer" (Alt+U).
+  browser.commands.onCommand.addListener(async (command, tab) => {
+    if (command !== 'view-source') return;
+    const targetTab = tab ?? (await browser.tabs.query({ active: true, currentWindow: true }))[0];
+    void openSourceViewer(targetTab?.url, targetTab?.id);
+  });
+
   // Clean up session source cache when a viewer tab is closed.
   browser.tabs.onRemoved.addListener((tabId) => {
     void clearSessionSource(tabId);
