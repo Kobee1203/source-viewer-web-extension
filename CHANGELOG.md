@@ -14,6 +14,11 @@ All notable changes to this project will be documented in this file.
 - **Unified Reference URL Parsing**:
   - Extracted shared `referenceUrl` utility (`src/utils/referenceUrl.ts`) for reference extraction and URL resolution, centralizing parsing logic across the CodeMirror linkify plugin (`src/utils/cm-linkify.ts`) and Reference Sidebar extractor (`src/utils/extractReferences.ts`).
   - Added dedicated unit test suites for `referenceUrl` and `extractReferences`.
+- **Dependency Updates**:
+  - Bumped `typescript-eslint` from `8.71.0` to `8.71.2` (#45).
+  - Bumped `prettier` from `3.9.9` to `3.9.10` (#46).
+  - Bumped `web-ext` from `10.7.0` to `10.8.0` (#48).
+  - Bumped `@playwright/test` and `playwright` from `1.63.0` to `1.64.1` (#47).
 
 ### Security
 
