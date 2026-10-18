@@ -3,36 +3,23 @@ import { Decoration, type DecorationSet, type EditorView, ViewPlugin } from '@co
 import type { ViewUpdate } from '@codemirror/view';
 import { extensionToFileType } from '@/utils/fileType';
 import { classifyLinkTarget } from '@/utils/linkTarget';
+import { extractReferenceMatches, parseReferenceUrl } from '@/utils/referenceUrl';
 import { viewerUrl } from '@/utils/viewerUrl';
 
-/** Whether `value` is an absolute URL (`http(s)://…`) or protocol-relative (`//…`). */
-function isAbsoluteUrl(value: string): boolean {
-  const trimmed = value.trim();
-  return /^https?:\/\//i.test(trimmed) || trimmed.startsWith('//');
-}
-
 export function resolveUrl(attr: string | undefined, rawUrl: string, baseUrl: string): string | null {
-  const trimmed = rawUrl.trim();
-  if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('javascript:') || trimmed.startsWith('data:')) {
+  const resolved = parseReferenceUrl(attr, rawUrl, baseUrl);
+  if (!resolved) {
     return null;
   }
-  if (attr === 'content' && !isAbsoluteUrl(rawUrl)) {
-    return null;
-  }
-  try {
-    const resolved = new URL(trimmed, baseUrl);
-    // Route by target type: images render natively in the browser, fonts and source files
-    // go through the viewer.
-    switch (classifyLinkTarget(resolved)) {
-      case 'image':
-        return resolved.toString();
-      case 'font':
-        return viewerUrl(resolved.toString());
-      default:
-        return extensionToFileType(resolved) ? resolved.toString() : viewerUrl(resolved.toString());
-    }
-  } catch {
-    return null;
+  // Route by target type: images render natively in the browser, fonts and source files
+  // go through the viewer.
+  switch (classifyLinkTarget(resolved)) {
+    case 'image':
+      return resolved.toString();
+    case 'font':
+      return viewerUrl(resolved.toString());
+    default:
+      return extensionToFileType(resolved) ? resolved.toString() : viewerUrl(resolved.toString());
   }
 }
 
@@ -42,22 +29,13 @@ function buildDecorations(view: EditorView, baseUrl: string): DecorationSet {
   for (const { from, to } of view.visibleRanges) {
     const text = view.state.doc.sliceString(from, to);
 
-    const regex = /(href|src|content)=["']([^"']+)["']|url\(['"]?([^)'"]+)['"]?\)/g;
-
-    let match;
-    while ((match = regex.exec(text)) !== null) {
-      const matchText = match[0];
-      const attr = match[1];
-      const isUrlFunc = !!match[3];
-      const rawUrl = isUrlFunc ? match[3] : match[2];
-      if (!matchText || !rawUrl) continue;
-
+    for (const { matchText, attr, rawUrl, index } of extractReferenceMatches(text)) {
       const targetUrl = resolveUrl(attr, rawUrl, baseUrl);
       if (targetUrl) {
         // Find the exact offset of the URL within the match
         // Note: indexOf is safe here because we know rawUrl is exactly inside the match
         const urlStartInMatch = matchText.indexOf(rawUrl);
-        const start = from + match.index + urlStartInMatch;
+        const start = from + index + urlStartInMatch;
         const end = start + rawUrl.length;
 
         builder.add(

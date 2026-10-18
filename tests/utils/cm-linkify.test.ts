@@ -41,6 +41,10 @@ describe('cm-linkify resolveUrl', () => {
   it('ignores invalid or anchor URLs', () => {
     expect(resolveUrl('href', '#section', baseUrl)).toBeNull();
     expect(resolveUrl('href', 'javascript:alert(1)', baseUrl)).toBeNull();
+    expect(resolveUrl('href', 'JAVASCRIPT:alert(1)', baseUrl)).toBeNull();
+    expect(resolveUrl('href', 'vbscript:msgbox(1)', baseUrl)).toBeNull();
+    expect(resolveUrl('href', 'VBScript:msgbox(1)', baseUrl)).toBeNull();
     expect(resolveUrl('href', 'data:text/html,test', baseUrl)).toBeNull();
+    expect(resolveUrl('href', 'DATA:text/html,test', baseUrl)).toBeNull();
   });
 });

@@ -1,5 +1,6 @@
 import { type FileType, extensionToFileType } from '@/utils/fileType';
 import { classifyLinkTarget } from '@/utils/linkTarget';
+import { extractReferenceMatches, parseReferenceUrl } from '@/utils/referenceUrl';
 
 export interface ReferenceEntry {
   /** Resolved absolute URL of the referenced file. */
@@ -12,12 +13,6 @@ export interface ReferenceEntry {
   fileType: FileType | null;
   /** Number of times this URL appears in the source. */
   count: number;
-}
-
-/** Whether `value` looks like an absolute or protocol-relative URL. */
-function isAbsoluteUrl(value: string): boolean {
-  const trimmed = value.trim();
-  return /^https?:\/\//i.test(trimmed) || trimmed.startsWith('//');
 }
 
 /** Returns the basename of a URL's pathname, falling back to the raw URL string. */
@@ -37,27 +32,9 @@ export function extractReferences(source: string, baseUrl: string): ReferenceEnt
   const counts = new Map<string, number>();
   const entries = new Map<string, ReferenceEntry>();
 
-  const regex = /(href|src|content)=["']([^"']+)["']|url\(['"']?([^)'"]+)['"']?\)/g;
-  let match: RegExpExecArray | null;
-
-  while ((match = regex.exec(source)) !== null) {
-    const attr: string | undefined = match[1];
-    const isUrlFunc = !!match[3];
-    const rawUrl: string | undefined = isUrlFunc ? match[3] : match[2];
-
-    if (!rawUrl) continue;
-    const trimmed = rawUrl.trim();
-    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('javascript:') || trimmed.startsWith('data:'))
-      continue;
-    // `content=` attributes only carry URLs when absolute (meta http-equiv, og:image, etc.)
-    if (attr === 'content' && !isAbsoluteUrl(rawUrl)) continue;
-
-    let resolved: URL;
-    try {
-      resolved = new URL(trimmed, baseUrl);
-    } catch {
-      continue;
-    }
+  for (const { attr, rawUrl } of extractReferenceMatches(source)) {
+    const resolved = parseReferenceUrl(attr, rawUrl, baseUrl);
+    if (!resolved) continue;
 
     const linkTarget = classifyLinkTarget(resolved);
     if (linkTarget === 'image') continue; // images are excluded from the sidebar
