@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Dependabot Configuration**:
+  - Configured Dependabot (`.github/dependabot.yml`) for weekly automated dependency updates for pnpm via the `npm` package ecosystem.
+
+### Changed
+
+- **Unified Reference URL Parsing**:
+  - Extracted shared `referenceUrl` utility (`src/utils/referenceUrl.ts`) for reference extraction and URL resolution, centralizing parsing logic across the CodeMirror linkify plugin (`src/utils/cm-linkify.ts`) and Reference Sidebar extractor (`src/utils/extractReferences.ts`).
+  - Added dedicated unit test suites for `referenceUrl` and `extractReferences`.
+
+### Security
+
+- **CodeQL Alert Remediations & URL Scheme Hardening**:
+  - Hardened reference URL scheme validation in `parseReferenceUrl` to reject `vbscript:` and `data:` protocols case-insensitively alongside `javascript:`, resolving CodeQL `js/incomplete-url-scheme-check` alerts.
+  - Added explicit least-privilege `contents: read` permissions to the GitHub Actions validation workflow (`.github/workflows/validate.yml`), resolving CodeQL `actions/missing-workflow-permissions` alert.
+
 ## [1.14.0] - 2026-10-18
 
 ### Added
