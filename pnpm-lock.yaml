@@ -320,8 +320,8 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
       jsonpath-plus:
-        specifier: 10.4.0
-        version: 10.4.0
+        specifier: 11.2.1
+        version: 11.2.1
       mtx-decompressor:
         specifier: ^1.8.0
         version: 1.8.0
@@ -2425,9 +2425,9 @@ packages:
   jsonfile@6.2.1:
     resolution: {integrity: sha512-zwOTdL3rFQ/lRdBnntKVOX6k5cKJwEc1HdilT71BWEu7J41gXIB2MRp+vxduPSwZJPWBxEzv4yH1wYLJGUHX4Q==}
 
-  jsonpath-plus@10.4.0:
-    resolution: {integrity: sha512-T92WWatJXmhBbKsgH/0hl+jxjdXrifi5IKeMY02DWggRxX0UElcbVzPlmgLTbvsPeW1PasQ6xE2Q75stkhGbsA==}
-    engines: {node: '>=18.0.0'}
+  jsonpath-plus@11.2.1:
+    resolution: {integrity: sha512-5wqNYFuGzdMAY7VqDSQMtMBShVl7rFGj72koz+m5hrYpKeL9R3vIV29ekZxbP6/3OUCPfvFJoEjhtNP9Z4OEGA==}
+    engines: {node: '>=22.0.0'}
     hasBin: true
 
   jsonwebtoken@9.0.3:
@@ -5959,7 +5959,7 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  jsonpath-plus@10.4.0:
+  jsonpath-plus@11.2.1:
     dependencies:
       '@jsep-plugin/assignment': 1.3.0(jsep@1.4.0)
       '@jsep-plugin/regex': 1.0.4(jsep@1.4.0)
