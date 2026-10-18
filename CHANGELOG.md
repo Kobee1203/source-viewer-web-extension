@@ -20,14 +20,15 @@ All notable changes to this project will be documented in this file.
   - Bumped `web-ext` from `10.7.0` to `10.8.0` (#48).
   - Bumped `@playwright/test` and `playwright` from `1.63.0` to `1.64.1` (#47).
   - Bumped `vue` from `3.5.43` to `3.5.44` (#50).
-  - Bumped `happy-dom` from `20.14.5` to `21.0.1` (#51).
+  - Bumped `happy-dom` from `20.14.5` to `21.0.3` (#51).
   - Bumped `@codemirror/view` from `6.43.13` to `6.43.14` (#53).
   - Bumped `vitest` from `5.0.3` to `5.0.5` (#52).
   - Bumped `typescript` from `5.9.3` to `6.0.3` (#54).
   - Bumped `xpath` from `0.0.34` to `0.0.35` (#55).
-  - Bumped `@lucide/vue` from `1.52.0` to `1.57.0` (#57).
+  - Bumped `@lucide/vue` from `1.52.0` to `1.59.0` (#57).
   - Bumped `vue-tsc` from `3.3.12` to `3.3.13` (#58).
   - Bumped `jsonpath-plus` from `10.4.0` to `11.2.1` (#56).
+  - Bumped `eslint` from `10.12.0` to `10.13.0`.
 
 ### Security
 
