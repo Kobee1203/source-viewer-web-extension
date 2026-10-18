@@ -94,7 +94,7 @@
     "sanitize-filename": "^1.6.4",
     "vue": "^3.5.44",
     "vue-codemirror6": "^1.7.0",
-    "xpath": "^0.0.34"
+    "xpath": "^0.0.35"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
