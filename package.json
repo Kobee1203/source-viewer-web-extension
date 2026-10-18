@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "wxt prepare",
     "prepare": "husky",
-    "clean": "wxt clean && git clean -fXd -e \\!.idea -e \\!.idea/**/* -e \\!.vscode -e \\!.vscode/**/* -e \\!.claude -e \\!.claude/**/* -e \\!.agents -e \\!.agents/**/* -e \\!.env -e \\!.env.*",
+    "clean": "wxt clean && git clean -fXd -e '!.idea' -e '!.idea/**' -e '!.vscode' -e '!.vscode/**' -e '!.claude' -e '!.claude/**' -e '!.agents' -e '!.agents/**' -e '!.env' -e '!.env.*'",
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
     "dev:edge": "wxt -b edge",

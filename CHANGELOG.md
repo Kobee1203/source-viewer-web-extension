@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Keyboard Shortcut via Commands API** (#34):
+  - Added the `view-source` command in `manifest.json` with a suggested default shortcut of `Alt+U` across Windows, Linux, and macOS.
+  - Implemented a `browser.commands.onCommand` listener in the background service worker that resolves the active tab and opens Source Viewer directly without any intermediate redirection flicker.
+  - Added localized command descriptions across all 9 supported locales (`de`, `en`, `es`, `fr`, `it`, `ja`, `pt_BR`, `pt_PT`, `zh_CN`).
+  - Supports user customization and rebinding via the browser's native extension shortcut management page (`chrome://extensions/shortcuts` or `about:addons`).
+- **Debounce & Reentrancy Guard for Viewer Opening Actions** (#33):
+  - Implemented a reusable, self-cleaning hybrid reentrancy and cooldown guard (`createReentrancyGuard`) to prevent duplicate viewer instances when actions are triggered concurrently or rapidly in succession (e.g. rapid double-clicking on toolbar icons, context menu clicks, or keyboard shortcut autorepeat).
+  - Encapsulated `openSourceViewer` in the background service worker with active in-flight locks and a 400ms cooldown window.
+  - Scoped action locks using discriminant keys (`getViewerActionKey`) indexed by tab ID (`tab:<id>`), link target URL (`link:<url>`), or global fallback.
+  - Added full test coverage including 10 unit tests and 4 integration tests verifying duplicate dropping during in-flight capture, rapid successive clicks, multi-tab concurrency, and post-cooldown re-enablement.
+- **Testing Guidelines & Conventions Documentation**:
+  - Added `docs/agents/testing.md` outlining the test hierarchy (Unit, Integration, E2E), Vitest global mock lifecycle (`clearMocks: true`), asynchronous event testing patterns (`vi.waitFor`, `void`), and Red-to-Green bug verification.
+  - Updated `docs/agents/coding-guidelines.md` with guidelines forbidding redundant defensive calls and linked testing conventions in `AGENTS.md`.
+
 ## [1.13.0] - 2026-10-08
 
 ### Added
