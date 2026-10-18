@@ -90,14 +90,13 @@ async function scanDirectoryHandle(
 
     if (entry.kind === 'file') {
       try {
-        const fileHandle = entry as FileSystemFileHandle;
-        const file = await fileHandle.getFile();
+        const file = await entry.getFile();
         results.push(await createStoredDirectoryFile(file, entryPath));
       } catch (err) {
         console.warn(`Failed to read file ${entryPath}:`, err);
       }
     } else if (entry.kind === 'directory') {
-      const sub = await scanDirectoryHandle(entry as FileSystemDirectoryHandle, entryPath);
+      const sub = await scanDirectoryHandle(entry, entryPath);
       results.push(...sub);
     }
   }
