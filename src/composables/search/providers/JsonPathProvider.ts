@@ -28,8 +28,11 @@ export class JsonPathProvider implements StructuralSearchProvider {
       throw new Error('Document is not valid JSON.');
     }
 
-    const paths = JSONPath<string[]>({ path: query, json: jsonObj, resultType: 'path' });
-    if (!paths || paths.length === 0) return [];
+    const pathsResult = JSONPath({ path: query, json: jsonObj, resultType: 'path' });
+    if (!Array.isArray(pathsResult) || pathsResult.length === 0) return [];
+
+    const paths: string[] = pathsResult.filter((p): p is string => typeof p === 'string');
+    if (paths.length === 0) return [];
 
     const tree = parseTree(text);
     if (!tree) return [];
