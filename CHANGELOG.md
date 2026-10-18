@@ -19,6 +19,11 @@ All notable changes to this project will be documented in this file.
   - Bumped `prettier` from `3.9.9` to `3.9.10` (#46).
   - Bumped `web-ext` from `10.7.0` to `10.8.0` (#48).
   - Bumped `@playwright/test` and `playwright` from `1.63.0` to `1.64.1` (#47).
+  - Bumped `vue` from `3.5.43` to `3.5.44` (#50).
+  - Bumped `happy-dom` from `20.14.5` to `21.0.1` (#51).
+  - Bumped `@codemirror/view` from `6.43.13` to `6.43.14` (#53).
+  - Bumped `vitest` from `5.0.3` to `5.0.5` (#52).
+  - Bumped `typescript` from `5.9.3` to `6.0.3` (#54).
 
 ### Security
 
