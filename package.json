@@ -92,7 +92,7 @@
     "jsonpath-plus": "10.4.0",
     "mtx-decompressor": "^1.8.0",
     "sanitize-filename": "^1.6.4",
-    "vue": "^3.5.43",
+    "vue": "^3.5.44",
     "vue-codemirror6": "^1.7.0",
     "xpath": "^0.0.34"
   },
