@@ -112,7 +112,7 @@
     "postcss-html": "^2.0.0",
     "prettier": "^3.9.10",
     "stylelint": "^17.16.0",
-    "stylelint-config-recess-order": "^7.8.0",
+    "stylelint-config-recess-order": "^7.8.2",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-config-standard-vue": "^2.0.0",
     "tsx": "^4.23.15",
