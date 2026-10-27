@@ -46,7 +46,7 @@
     "@codemirror/search": "^6.7.2",
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
-    "@lucide/vue": "^1.59.0",
+    "@lucide/vue": "^1.61.0",
     "@uiw/codemirror-theme-abcdef": "4.25.12",
     "@uiw/codemirror-theme-abyss": "4.25.12",
     "@uiw/codemirror-theme-androidstudio": "4.25.12",
