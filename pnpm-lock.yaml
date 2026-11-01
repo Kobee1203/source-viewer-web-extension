@@ -335,8 +335,8 @@ importers:
         specifier: ^1.7.0
         version: 1.7.0(@codemirror/autocomplete@6.20.3)(@codemirror/commands@6.11.1)(@codemirror/language@6.13.1)(@codemirror/lint@6.9.7)(@codemirror/search@6.7.2)(@codemirror/state@6.7.6)(@codemirror/view@6.43.15)(codemirror@6.0.2)(style-mod@4.1.4)(vue@3.5.44(typescript@6.0.3))
       xpath:
-        specifier: ^0.0.35
-        version: 0.0.35
+        specifier: ^0.0.36
+        version: 0.0.36
     devDependencies:
       '@playwright/test':
         specifier: ^1.64.1
@@ -3598,8 +3598,8 @@ packages:
     resolution: {integrity: sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==}
     engines: {node: '>=4.0'}
 
-  xpath@0.0.35:
-    resolution: {integrity: sha512-8O+m2N04SwLpGw/1Grz2HD8ejnWDV7M1dMPgKKuOjhYh5W9H4pel/+06kInohIdpS2FeSbL4i8ID8c4tpxwq9Q==}
+  xpath@0.0.36:
+    resolution: {integrity: sha512-HuqAnJx5YJoDeLub7hhcNoiRvnqqrgoSsI4kLrOtv6XkaUI0zY9ylL4+ULozB35JT1SVMfdexsMqRbTp7bkFGQ==}
     engines: {node: '>=0.6.0'}
 
   y18n@5.0.8:
@@ -7051,7 +7051,7 @@ snapshots:
 
   xmlbuilder@11.0.1: {}
 
-  xpath@0.0.35: {}
+  xpath@0.0.36: {}
 
   y18n@5.0.8: {}
 
