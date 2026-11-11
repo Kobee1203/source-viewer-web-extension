@@ -9,27 +9,30 @@
   <rect width="128" height="128" rx="28" fill="url(#bg)"/>
 
   <!-- Left Brace { -->
-  <path d="M 27 26.5 L 20 26.5 C 16 26.5 13.5 29 13.5 34 L 13.5 54 C 13.5 59 10 62 5.5 63 C 10 64 13.5 67 13.5 72 L 13.5 92 C 13.5 97 16 99.5 20 99.5 L 27 99.5"
-        fill="none" stroke="#00e4ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 28 26.5 L 20 26.5 C 16.5 26.5 14 29 14 34 L 14 54 C 14 59 10.5 62 5 64 C 10.5 66 14 69 14 74 L 14 94 C 14 99 16.5 101.5 20 101.5 L 28 101.5"
+        fill="none" stroke="#00e4ff" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- Right Brace } -->
-  <path d="M 101 26.5 L 108 26.5 C 112 26.5 114.5 29 114.5 34 L 114.5 54 C 114.5 59 118 62 122.5 63 C 118 64 114.5 67 114.5 72 L 114.5 92 C 114.5 97 112 99.5 108 99.5 L 101 99.5"
-        fill="none" stroke="#00e4ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 100 26.5 L 108 26.5 C 111.5 26.5 114 29 114 34 L 114 54 C 114 59 117.5 62 123 64 C 117.5 66 114 69 114 74 L 114 94 C 114 99 111.5 101.5 108 101.5 L 100 101.5"
+        fill="none" stroke="#00e4ff" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- Brow Arc -->
-  <path d="M 27 41 C 37 24 91 24 101 41"
-        fill="none" stroke="#00e4ff" stroke-width="8" stroke-linecap="round"/>
+  <!-- Eyebrow Arc -->
+  <path d="M 28 41.5 C 38 26.5 90 26.5 100 41.5"
+        fill="none" stroke="#00e4ff" stroke-width="7" stroke-linecap="round"/>
 
-  <!-- Eye Outline (Upper & Lower) -->
-  <path d="M 23.5 63.5 C 33.5 31.5 94.5 31.5 104.5 63.5 C 94.5 95.5 33.5 95.5 23.5 63.5 Z"
-        fill="none" stroke="#00e4ff" stroke-width="8.5" stroke-linejoin="round"/>
+  <!-- Eye Almond Contour (Top & Bottom Lids) -->
+  <path d="M 22 64 C 33 34.5 95 34.5 106 64 C 95 93.5 33 93.5 22 64 Z"
+        fill="none" stroke="#00e4ff" stroke-width="8" stroke-linejoin="round"/>
 
-  <!-- Iris (White Disc) -->
-  <circle cx="64" cy="63.5" r="17.5" fill="#ffffff"/>
+  <!-- Cyan Ring Around White of Eye -->
+  <circle cx="64" cy="64" r="25.5" fill="#00e4ff"/>
 
-  <!-- Pupil (Dark Disc) -->
-  <circle cx="64" cy="63.5" r="12" fill="#0d1112"/>
+  <!-- White of Eye (Iris Disc) -->
+  <circle cx="64" cy="64" r="18.5" fill="#ffffff"/>
 
-  <!-- Light Reflection -->
-  <circle cx="69" cy="57.5" r="4.2" fill="#ffffff"/>
+  <!-- Dark Pupil -->
+  <circle cx="64" cy="64" r="12.5" fill="#0d1112"/>
+
+  <!-- Specular Reflection Highlight -->
+  <circle cx="69" cy="58" r="4.2" fill="#ffffff"/>
 </svg>
