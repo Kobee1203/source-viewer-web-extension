@@ -40,22 +40,17 @@ async function generatePromoImages(): Promise<void> {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             position: relative;
           }
-          /* Background watermark brackets */
-          .watermark {
+          /* Background Lucide bracket */
+          .b-left {
             position: absolute;
-            right: 12px;
-            top: 20px;
-            font-size: 260px;
-            font-family: "JetBrains Mono", Consolas, monospace;
-            font-weight: 300;
-            color: #00c4e6;
-            opacity: 0.05;
-            user-select: none;
+            left: 240px;
+            top: 10px;
+            width: 140px;
+            height: 260px;
             pointer-events: none;
-            line-height: 1;
           }
           .container {
             display: flex;
@@ -77,7 +72,6 @@ async function generatePromoImages(): Promise<void> {
             width: 100%;
             height: 100%;
             display: block;
-            image-rendering: auto;
           }
           .title-wrap {
             display: flex;
@@ -86,7 +80,7 @@ async function generatePromoImages(): Promise<void> {
           }
           .word-white {
             font-size: 38px;
-            font-weight: 800;
+            font-weight: bold;
             line-height: 1.08;
             letter-spacing: 0.02em;
             color: #ffffff;
@@ -94,7 +88,7 @@ async function generatePromoImages(): Promise<void> {
           }
           .word-cyan {
             font-size: 38px;
-            font-weight: 800;
+            font-weight: bold;
             line-height: 1.08;
             letter-spacing: 0.02em;
             color: #00c4e6;
@@ -103,7 +97,9 @@ async function generatePromoImages(): Promise<void> {
         </style>
       </head>
       <body>
-        <div class="watermark">{</div>
+        <svg class="b-left" viewBox="1 3 7 18" preserveAspectRatio="none" fill="none" stroke="#00c4e6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.08">
+          <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1" />
+        </svg>
         <div class="container">
           <div class="icon-wrap">
             <img src="${iconBase64}" alt="Icon" />
@@ -118,7 +114,7 @@ async function generatePromoImages(): Promise<void> {
       </html>
     `);
 
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(400);
     const smallPromoLocal = path.join(STORE_PROMO_DIR, 'small-promo-440x280.png');
     const smallPromoTarget = path.join(TARGET_DIR, 'small-promo-440x280.png');
     await page.screenshot({ path: smallPromoLocal });
@@ -141,64 +137,42 @@ async function generatePromoImages(): Promise<void> {
             height: 560px;
             overflow: hidden;
             background: radial-gradient(circle at 65% 50%, #0d223a 0%, #050a12 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             position: relative;
+            font-family: Arial, Helvetica, sans-serif;
           }
-          /* Background watermark brackets & lines */
-          .watermark-bracket-left {
+          /* Background Lucide brackets */
+          .brace-left {
             position: absolute;
-            left: 580px;
-            top: 15px;
-            font-size: 520px;
-            font-family: "JetBrains Mono", Consolas, monospace;
-            font-weight: 300;
-            color: #00c4e6;
-            opacity: 0.04;
-            user-select: none;
+            left: 495px;
+            top: 89px;
+            width: 260px;
+            height: 440px;
             pointer-events: none;
-            line-height: 1;
           }
-          .watermark-bracket-right {
+          .brace-right {
             position: absolute;
-            right: 70px;
-            top: 15px;
-            font-size: 520px;
-            font-family: "JetBrains Mono", Consolas, monospace;
-            font-weight: 300;
-            color: #00c4e6;
-            opacity: 0.04;
-            user-select: none;
+            right: 36px;
+            top: 89px;
+            width: 260px;
+            height: 440px;
             pointer-events: none;
-            line-height: 1;
           }
-          .watermark-lines {
+          /* Horizontal code lines */
+          .code-lines {
             position: absolute;
-            right: 140px;
-            top: 155px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            opacity: 0.045;
+            inset: 0;
             pointer-events: none;
           }
           .code-line {
-            height: 12px;
+            position: absolute;
+            height: 14px;
+            border-radius: 7px;
             background: #00c4e6;
-            border-radius: 6px;
-          }
-          .container {
-            display: flex;
-            align-items: center;
-            gap: 60px;
-            padding: 0 110px;
-            z-index: 1;
-            width: 100%;
           }
           .icon-wrap {
-            flex-shrink: 0;
+            position: absolute;
+            left: 115px;
+            top: 145px;
             width: 260px;
             height: 260px;
             border-radius: 16px;
@@ -209,64 +183,66 @@ async function generatePromoImages(): Promise<void> {
             width: 100%;
             height: 100%;
             display: block;
-            image-rendering: auto;
           }
-          .content-wrap {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+          .text-wrap {
+            position: absolute;
+            left: 474px;
+            top: 171px;
           }
           .title-row {
-            font-size: 76px;
-            font-weight: 800;
-            line-height: 1.05;
-            letter-spacing: 0.01em;
+            font-size: 84px;
+            font-weight: bold;
+            line-height: 1.0;
             color: #ffffff;
-            text-transform: uppercase;
+            letter-spacing: 0;
           }
           .title-cyan {
-            font-size: 76px;
-            font-weight: 800;
-            line-height: 1.05;
-            letter-spacing: 0.01em;
+            font-size: 84px;
+            font-weight: bold;
+            line-height: 1.0;
             color: #00c4e6;
-            text-transform: uppercase;
-            margin-bottom: 22px;
+            margin-top: 12px;
+            letter-spacing: 0;
           }
           .subtitle {
-            font-size: 26px;
-            font-weight: 400;
+            font-size: 27px;
+            font-weight: normal;
             color: #94a3b8;
-            letter-spacing: -0.01em;
+            margin-top: 36px;
+            letter-spacing: 0;
           }
         </style>
       </head>
       <body>
-        <div class="watermark-bracket-left">{</div>
-        <div class="watermark-bracket-right">}</div>
-        <div class="watermark-lines">
-          <div class="code-line" style="width: 220px;"></div>
-          <div class="code-line" style="width: 340px;"></div>
-          <div class="code-line" style="width: 180px;"></div>
-          <div class="code-line" style="width: 280px;"></div>
-          <div class="code-line" style="width: 240px;"></div>
-          <div class="code-line" style="width: 140px;"></div>
+        <svg class="brace-left" viewBox="1 3 7 18" preserveAspectRatio="none" fill="none" stroke="#00c4e6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.08">
+          <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1" />
+        </svg>
+        <svg class="brace-right" viewBox="16 3 7 18" preserveAspectRatio="none" fill="none" stroke="#00c4e6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.08">
+          <path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1" />
+        </svg>
+        <div class="code-lines">
+          <div class="code-line" style="top: 150px; left: 1000px; width: 220px; opacity: 0.08;"></div>
+          <div class="code-line" style="top: 187px; left: 1000px; width: 160px; opacity: 0.04;"></div>
+          <div class="code-line" style="top: 228px; left: 950px; width: 350px; opacity: 0.08;"></div>
+          <div class="code-line" style="top: 276px; left: 1050px; width: 240px; opacity: 0.06;"></div>
+          <div class="code-line" style="top: 297px; left: 990px; width: 180px; opacity: 0.05;"></div>
+          <div class="code-line" style="top: 317px; left: 990px; width: 250px; opacity: 0.06;"></div>
+          <div class="code-line" style="top: 359px; left: 1050px; width: 320px; opacity: 0.08;"></div>
+          <div class="code-line" style="top: 401px; left: 1050px; width: 160px; opacity: 0.05;"></div>
         </div>
-        <div class="container">
-          <div class="icon-wrap">
-            <img src="${iconBase64}" alt="Icon" />
-          </div>
-          <div class="content-wrap">
-            <div class="title-row">SOURCE CODE</div>
-            <div class="title-cyan">VIEWER</div>
-            <div class="subtitle">View formatted, highlighted page source</div>
-          </div>
+        <div class="icon-wrap">
+          <img src="${iconBase64}" alt="Icon" />
+        </div>
+        <div class="text-wrap">
+          <div class="title-row">SOURCE CODE</div>
+          <div class="title-cyan">VIEWER</div>
+          <div class="subtitle">View formatted, highlighted page source</div>
         </div>
       </body>
       </html>
     `);
 
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(400);
     const marqueeLocal = path.join(STORE_PROMO_DIR, 'marquee-1400x560.png');
     const marqueeTarget = path.join(TARGET_DIR, 'marquee-1400x560.png');
     await page.screenshot({ path: marqueeLocal });
