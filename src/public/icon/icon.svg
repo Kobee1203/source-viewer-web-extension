@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#111720"/>
+      <stop offset="100%" stop-color="#070a0e"/>
+    </linearGradient>
+  </defs>
+  <!-- Squircle Background with transparent corners -->
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+
+  <!-- Left Brace { -->
+  <path d="M 28 26.5 L 20.5 26.5 C 17 26.5 14.5 29 14.5 34 L 14.5 54 C 14.5 59 11 62 5.5 64 C 11 66 14.5 69 14.5 74 L 14.5 94 C 14.5 99 17 101.5 20.5 101.5 L 28 101.5"
+        fill="none" stroke="#00e4ff" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Right Brace } -->
+  <path d="M 100 26.5 L 107.5 26.5 C 111 26.5 113.5 29 113.5 34 L 113.5 54 C 113.5 59 117 62 122.5 64 C 117 66 113.5 69 113.5 74 L 113.5 94 C 113.5 99 111 101.5 107.5 101.5 L 100 101.5"
+        fill="none" stroke="#00e4ff" stroke-width="6.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Eyebrow Arc (more pronounced curve) -->
+  <path d="M 26 43.5 C 38 23.5 90 23.5 102 43.5"
+        fill="none" stroke="#00e4ff" stroke-width="5.8" stroke-linecap="round"/>
+
+  <!-- Eye Almond Contour (stretched vertically) -->
+  <path d="M 25.5 64 C 36 33 92 33 102.5 64 C 92 95 36 95 25.5 64 Z"
+        fill="none" stroke="#00e4ff" stroke-width="6.8" stroke-linejoin="round"/>
+
+  <!-- Cyan Ring Around White of Eye -->
+  <circle cx="64" cy="64" r="25.5" fill="#00e4ff"/>
+
+  <!-- White of Eye (Iris Disc) -->
+  <circle cx="64" cy="64" r="18.5" fill="#ffffff"/>
+
+  <!-- Dark Pupil -->
+  <circle cx="64" cy="64" r="12.5" fill="#0d1112"/>
+
+  <!-- Specular Reflection Highlight (enlarged & touching pupil edge) -->
+  <circle cx="68.8" cy="56.8" r="5" fill="#ffffff"/>
+</svg>

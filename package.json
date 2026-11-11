@@ -30,6 +30,7 @@
     "screenshots:all": "wxt build && tsx scripts/generate-screenshots.ts --all",
     "metadata:check": "tsx scripts/check-store-metadata.ts",
     "metadata:sync": "tsx scripts/sync-store-descriptions.ts",
+    "promo:images": "tsx scripts/generate-promo-images.ts",
     "demo:video": "wxt build && tsx scripts/generate-demo-video.ts"
   },
   "packageManager": "pnpm@12.9.1",
