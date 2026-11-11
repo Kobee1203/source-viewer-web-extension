@@ -5,10 +5,10 @@ import { chromium } from 'playwright';
 const TARGET_DIR = '/Users/ndossantos/Developments/workspaces/Kobee1203.github.io/source-viewer-web-extension/medias';
 const STORE_PROMO_DIR = path.resolve('store/promo');
 const TEMPLATES_DIR = path.resolve('scripts/promo/templates');
-const ICON_PNG_PATH = path.resolve('src/public/icon/128.png');
+const ICON_SVG_PATH = path.resolve('src/public/icon/icon.svg');
 
-const iconPng = fs.readFileSync(ICON_PNG_PATH);
-const iconBase64 = `data:image/png;base64,${iconPng.toString('base64')}`;
+const iconSvg = fs.readFileSync(ICON_SVG_PATH, 'utf-8');
+const iconBase64 = `data:image/svg+xml;base64,${Buffer.from(iconSvg).toString('base64')}`;
 
 function loadTemplate(filename: string): string {
   const templatePath = path.join(TEMPLATES_DIR, filename);
