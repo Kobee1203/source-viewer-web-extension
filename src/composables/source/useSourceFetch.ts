@@ -13,7 +13,7 @@ import { useFontLoad } from '@/composables/useFontLoad';
 import { useLocalDirectory } from '@/composables/useLocalDirectory';
 import { getStoredSnapshot } from '@/composables/useLocalFile';
 import { formatSource } from '@/utils/beautify';
-import { mimeToFileType } from '@/utils/contentType';
+import { detectRedirectFileType, mimeToFileType } from '@/utils/contentType';
 import { DEFAULT_FILE_TYPE, type FileType, getFileType } from '@/utils/fileType';
 import { t } from '@/utils/i18n';
 import { requestRefreshTabSource } from '@/utils/messaging';
@@ -115,6 +115,8 @@ export function useSourceFetch() {
     let detectedType: FileType = DEFAULT_FILE_TYPE;
     if (payload.detectedFileType) {
       detectedType = payload.detectedFileType;
+    } else if (payload.mimeType && payload.targetUrl) {
+      detectedType = detectRedirectFileType(payload.mimeType, payload.targetUrl) ?? DEFAULT_FILE_TYPE;
     } else if (payload.mimeType) {
       detectedType = mimeToFileType(payload.mimeType) ?? DEFAULT_FILE_TYPE;
     } else if (payload.targetUrl) {

@@ -1,10 +1,8 @@
 import { defineContentScript } from '#imports';
 import { extractHostSource } from '@/utils/hostSource';
-import { HIDE_STYLE_ID } from '@/utils/inplace';
+import { HIDE_STYLE_ID, IFRAME_ID } from '@/utils/inplace';
 import { setInplaceFavicon } from '@/utils/inplaceFavicon';
 import { viewerUrl } from '@/utils/viewerUrl';
-
-const IFRAME_ID = 'source-viewer-frame';
 
 /**
  * Renders the formatted viewer in place on a direct CSS/JS/JSON/XML navigation,

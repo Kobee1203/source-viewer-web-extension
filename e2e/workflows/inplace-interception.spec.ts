@@ -20,6 +20,25 @@ test.describe('In-Place Interception', () => {
     await page.close();
   });
 
+  test('Injects in-place viewer iframe on raw XML navigation and preserves XML tags', async ({ context }) => {
+    const page = await context.newPage();
+    await page.goto('http://localhost:4173/source.xml');
+
+    const iframe = page.locator('#source-viewer-frame');
+    await expect(iframe).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator(':root')).toHaveCSS('visibility', 'hidden');
+
+    await expect.poll(() => page.frames().find((f) => f.url().includes('/viewer.html'))).toBeDefined();
+    const viewerFrame = page.frames().find((f) => f.url().includes('/viewer.html'))!;
+
+    await expect(viewerFrame.locator('.cm-editor')).toBeVisible();
+    await expect(viewerFrame.locator('.cm-content')).toContainText('<catalog');
+    await expect(viewerFrame.locator('.cm-content')).toContainText('<book:entry id="1">');
+    await expect(viewerFrame.locator('.cm-content')).not.toContainText('visibility: hidden');
+
+    await page.close();
+  });
+
   test('Close button removes iframe and restores host page', async ({ context }) => {
     const page = await context.newPage();
     await page.goto('http://localhost:4173/source.js');
