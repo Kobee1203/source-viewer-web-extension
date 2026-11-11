@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-11-11
+
 ### Added
 
 - **Dependabot Configuration**:
