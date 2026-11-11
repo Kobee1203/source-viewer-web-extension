@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - **Dependabot Configuration**:
   - Configured Dependabot (`.github/dependabot.yml`) for weekly automated dependency updates for pnpm via the `npm` package ecosystem.
 
+- **Store Promo Assets**:
+  - Added vector `icon.svg` and a promo image generation script with HTML templates for marketing marquee images.
+  - Updated store screenshots and demo video.
+
 ### Changed
 
 - **Unified Reference URL Parsing**:
@@ -29,6 +33,11 @@ All notable changes to this project will be documented in this file.
   - Bumped `vue-tsc` from `3.3.12` to `3.3.13` (#58).
   - Bumped `jsonpath-plus` from `10.4.0` to `11.2.1` (#56).
   - Bumped `eslint` from `10.12.0` to `10.13.0`.
+  - Bumped `@codemirror/view` to `6.43.15`, `@lucide/vue` to `1.63.0`, `jsonpath-plus` to `11.2.2`, `xpath` to `0.0.36`, `happy-dom` to `21.0.4`, `typescript-eslint` to `8.72.0`, `eslint-plugin-vue` to `10.12.0`, `stylelint-config-recess-order` to `7.8.2`, `wxt` to `0.21.5` and `glob` (#59–#71).
+
+### Fixed
+
+- **In-Place XML Rendering**: Serialize the XML DOM and strip injected nodes in `hostSource` so XML documents render correctly in-place (#72).
 
 ### Security
 
