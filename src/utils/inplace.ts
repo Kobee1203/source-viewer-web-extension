@@ -6,3 +6,9 @@
  * element to find/remove.
  */
 export const HIDE_STYLE_ID = 'source-viewer-hide';
+
+/** Id of the full-viewport `<iframe>` injected by `inplace-viewer.content.ts`. */
+export const IFRAME_ID = 'source-viewer-frame';
+
+/** Data attribute marking favicon `<link>` elements injected by `setInplaceFavicon`. */
+export const FAVICON_ATTR = 'data-source-viewer-favicon';

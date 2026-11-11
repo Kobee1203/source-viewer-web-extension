@@ -1,12 +1,11 @@
 import icon16 from '@/public/icon/16.png?inline';
 import icon48 from '@/public/icon/48.png?inline';
+import { FAVICON_ATTR } from '@/utils/inplace';
 
 const ICONS = [
   { href: icon16, sizes: '16x16' },
   { href: icon48, sizes: '48x48' },
 ] as const;
-
-const FAVICON_ATTR = 'data-source-viewer-favicon';
 
 interface SavedFavicon {
   el: HTMLLinkElement;

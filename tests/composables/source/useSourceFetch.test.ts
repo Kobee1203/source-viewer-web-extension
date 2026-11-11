@@ -45,6 +45,25 @@ describe('useSourceFetch', () => {
     expect(httpStatus.value).toBe(200);
   });
 
+  it('falls back to URL extension when server returns generic text/plain MIME type for XML', async () => {
+    mockBrowser.runtime.sendMessage.mockResolvedValueOnce({
+      ok: true,
+      text: '<urlset><url><loc>https://example.com/</loc></url></urlset>',
+      contentType: 'text/plain; charset=utf-8',
+      contentDisposition: null,
+      byteLength: 59,
+      httpStatus: 200,
+      httpStatusText: 'OK',
+    });
+
+    const [{ code, language, load }] = withSetup(useSourceFetch);
+
+    await load('https://example.com/sitemap.xml');
+
+    expect(language.value).toBe('xml');
+    expect(code.value).toContain('<urlset>\n  <url>\n    <loc>https://example.com/</loc>\n  </url>\n</urlset>');
+  });
+
   it('handles remote fetch errors and flags native viewer fallback', async () => {
     mockBrowser.runtime.sendMessage.mockResolvedValueOnce({
       ok: false,
